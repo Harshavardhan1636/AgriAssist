@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useRef, ChangeEvent } from 'react';
-import { useFormState } from 'react-dom';
+import { useState, useRef, ChangeEvent, useActionState } from 'react';
 import { analyzeImage } from './actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,9 +25,8 @@ function fileToDataUri(file: File): Promise<string> {
 }
 
 export default function AnalysisView() {
-  const [formState, formAction] = useFormState(analyzeImage, initialState);
+  const [formState, formAction, isPending] = useActionState(analyzeImage, initialState);
   const [preview, setPreview] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -53,11 +51,9 @@ export default function AnalysisView() {
     event.preventDefault();
     if (!preview) return;
 
-    setIsPending(true);
     const formData = new FormData();
     formData.append('photoDataUri', preview);
-    await formAction(formData);
-    setIsPending(false);
+    formAction(formData);
   };
 
   if (isPending) {
