@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -28,6 +31,22 @@ import {
 import { Button } from "@/components/ui/button";
 
 export default function HistoryPage() {
+  const [search, setSearch] = useState("");
+  const [cropFilter, setCropFilter] = useState("all");
+
+  const filteredHistory = mockHistory.filter((analysis) => {
+    const searchLower = search.toLowerCase();
+    const matchesSearch =
+      search === "" ||
+      analysis.crop.toLowerCase().includes(searchLower) ||
+      analysis.predictions.some((p) =>
+        p.label.toLowerCase().includes(searchLower)
+      );
+    const matchesCrop = cropFilter === "all" || analysis.crop === cropFilter;
+
+    return matchesSearch && matchesCrop;
+  });
+
   return (
     <Card>
       <CardHeader>
@@ -36,16 +55,21 @@ export default function HistoryPage() {
           Browse and review all past crop analyses.
         </CardDescription>
         <div className="flex items-center gap-4 pt-4">
-          <Input placeholder="Search by disease..." className="max-w-sm" />
-          <Select>
+          <Input 
+            placeholder="Search by disease..." 
+            className="max-w-sm"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <Select value={cropFilter} onValueChange={setCropFilter}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filter by crop" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Crops</SelectItem>
-              <SelectItem value="tomato">Tomato</SelectItem>
-              <SelectItem value="potato">Potato</SelectItem>
-              <SelectItem value="maize">Maize</SelectItem>
+              <SelectItem value="Tomato">Tomato</SelectItem>
+              <SelectItem value="Potato">Potato</SelectItem>
+              <SelectItem value="Maize">Maize</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -69,7 +93,7 @@ export default function HistoryPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {mockHistory.map((analysis) => (
+            {filteredHistory.map((analysis) => (
               <TableRow key={analysis.id}>
                 <TableCell className="hidden sm:table-cell">
                   <Image

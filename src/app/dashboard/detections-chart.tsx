@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import {
   ChartContainer,
   ChartTooltip,
@@ -24,7 +25,7 @@ const chartConfig = {
   },
 };
 
-export default function DetectionsChart() {
+const DetectionsChart = React.memo(function DetectionsChart() {
   return (
     <ChartContainer config={chartConfig} className="h-[300px] w-full">
       <RechartsBarChart data={chartData} accessibilityLayer>
@@ -49,4 +50,6 @@ export default function DetectionsChart() {
       </RechartsBarChart>
     </ChartContainer>
   );
-}
+});
+
+export default DetectionsChart;
