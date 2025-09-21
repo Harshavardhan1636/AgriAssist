@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster"
 export const metadata: Metadata = {
   title: 'AgriAssist',
   description: 'A Digital Health Twin for your farm.',
+  viewport: 'minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover',
 };
 
 export default function RootLayout({
