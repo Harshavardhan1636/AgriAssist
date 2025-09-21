@@ -7,6 +7,7 @@ import { explainClassificationWithGradCAM } from "@/ai/flows/explain-classificat
 import { z } from "zod";
 import type { FullAnalysisResponse } from "@/lib/types";
 
+// Re-exporting types for easier access from the client
 export type {
   ClassifyPlantDiseaseOutput,
   ClassifyPlantDiseaseInput,
@@ -27,12 +28,26 @@ export type {
   ExplainClassificationWithGradCAMInput,
 } from '@/ai/flows/explain-classification-with-grad-cam';
 
+
+/**
+ * Defines the schema for the input form.
+ * Ensures that the photoDataUri is a valid base64-encoded image data URI.
+ */
 const analyzeImageSchema = z.object({
   photoDataUri: z.string().refine(val => val.startsWith('data:image/'), {
     message: "Invalid image data URI"
   }),
 });
 
+
+/**
+ * This is the primary server action that orchestrates the entire AI analysis process.
+ * It is called from the client when the user submits an image for analysis.
+ *
+ * @param prevState - The previous state of the form, used by `useActionState`.
+ * @param formData - The form data submitted by the client, containing the image.
+ * @returns A promise that resolves to an object with either the analysis data or an error message.
+ */
 export async function analyzeImage(
   prevState: any,
   formData: FormData
@@ -40,33 +55,44 @@ export async function analyzeImage(
 
   const photoDataUri = formData.get('photoDataUri') as string;
 
+  // 1. Validate the input to ensure it's a valid data URI.
   const validatedFields = analyzeImageSchema.safeParse({ photoDataUri });
   if (!validatedFields.success) {
     return { data: null, error: "Invalid input: Please upload a valid image." };
   }
 
   try {
+    // 2. First, classify the disease to get the primary diagnosis.
+    // This is done first because its output is used as input for other flows.
     const classification = await classifyPlantDisease({ photoDataUri });
     
+    // Get the top prediction to pass to other AI flows for more context.
     const topPredictionLabel = classification.predictions?.[0]?.label ?? "unknown";
 
+    // 3. In parallel, run the other analysis flows for efficiency.
+    // These flows provide deeper insights into the diagnosis.
     const [severity, explanation, forecast] = await Promise.all([
+      // Assess the severity of the identified disease.
       assessDiseaseSeverity({ photoDataUri, description: `Image of a plant leaf, classified as ${topPredictionLabel}` }),
+      // Generate an "explainable AI" overlay to show what the AI focused on.
       explainClassificationWithGradCAM({ photoDataUri, classificationResult: topPredictionLabel }),
+      // Forecast the risk of a disease outbreak based on mock data.
       forecastOutbreakRisk({
-        historicalDetections: [1, 0, 2, 1, 3, 0, 4],
-        weatherFeatures: { temperature: 25, humidity: 80, rainfall: 5 },
-        cropType: 'Tomato',
-        soilType: 'Loam',
-        recentSeverityAverages: 0.35,
+        historicalDetections: [1, 0, 2, 1, 3, 0, 4], // Mock data
+        weatherFeatures: { temperature: 25, humidity: 80, rainfall: 5 }, // Mock data
+        cropType: 'Tomato', // Mock data
+        soilType: 'Loam', // Mock data
+        recentSeverityAverages: 0.35, // Mock data
       }),
     ]);
     
-    // In a real scenario, the Grad-CAM might fail or be mocked. Let's ensure a fallback.
+    // 4. Fallback for the Grad-CAM explanation. If the AI fails to generate an
+    // overlay, we'll just use the original image to prevent a crash.
     if (!explanation.gradCAMOverlay) {
-        explanation.gradCAMOverlay = photoDataUri; // Fallback to original image
+        explanation.gradCAMOverlay = photoDataUri;
     }
 
+    // 5. Aggregate all the results into a single object and return it to the client.
     return {
       data: {
         classification,
@@ -79,6 +105,7 @@ export async function analyzeImage(
     };
 
   } catch (e: any) {
+    // 6. If any part of the analysis fails, log the error and return a user-friendly error message.
     console.error("Analysis failed:", e);
     return { data: null, error: e.message || "An unexpected error occurred during analysis." };
   }
