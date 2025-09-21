@@ -29,14 +29,11 @@ export default function AnalysisView() {
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      const dataUri = await fileToDataUri(file);
+      setPreview(dataUri);
     }
   };
 
@@ -45,15 +42,6 @@ export default function AnalysisView() {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  };
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!preview) return;
-
-    const formData = new FormData();
-    formData.append('photoDataUri', preview);
-    formAction(formData);
   };
 
   if (isPending) {
@@ -77,7 +65,8 @@ export default function AnalysisView() {
         <CardDescription>Upload an image of a plant leaf to get an AI-powered health analysis and risk assessment.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form action={formAction} className="space-y-6">
+            {preview && <input type="hidden" name="photoDataUri" value={preview} />}
           <div className="space-y-2">
             <label htmlFor="file-upload" className="block text-sm font-medium text-foreground">
               Crop Image
