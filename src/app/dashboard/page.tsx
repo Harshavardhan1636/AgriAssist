@@ -19,12 +19,7 @@ import {
   FlaskConical,
   ShieldAlert,
 } from "lucide-react";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import { Bar, BarChart as RechartsBarChart, XAxis, YAxis } from "recharts";
+import DetectionsChart from "./detections-chart";
 import { mockHistory } from "@/lib/mock-data";
 import { formatDistanceToNow } from "date-fns";
 import Image from "next/image";
@@ -38,13 +33,6 @@ const chartData = [
   { day: "Sat", detections: 11 },
   { day: "Sun", detections: 9 },
 ];
-
-const chartConfig = {
-  detections: {
-    label: "Detections",
-    color: "hsl(var(--primary))",
-  },
-};
 
 export default function DashboardPage() {
   const recentAnalyses = mockHistory.slice(0, 5);
@@ -100,17 +88,7 @@ export default function DashboardPage() {
             <CardTitle>Detections This Week</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-            <ChartContainer config={chartConfig} className="h-[300px] w-full">
-              <RechartsBarChart data={chartData} accessibilityLayer>
-                <XAxis dataKey="day" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
-                <YAxis tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent indicator="dot" />}
-                />
-                <Bar dataKey="detections" fill="var(--color-detections)" radius={4} />
-              </RechartsBarChart>
-            </ChartContainer>
+            <DetectionsChart />
           </CardContent>
         </Card>
 
