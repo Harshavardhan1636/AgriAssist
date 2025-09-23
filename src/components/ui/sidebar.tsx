@@ -35,7 +35,8 @@ export function useSidebar() {
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const isMobile = useIsMobile()
   const [isOpen, setIsOpen] = React.useState(false)
-  const [isCollapsed, setIsCollapsed] = React.useState(true) // Start collapsed on desktop
+  // On desktop, start with a collapsed state.
+  const [isCollapsed, setIsCollapsed] = React.useState(true)
 
   return (
     <SidebarContext.Provider
@@ -50,22 +51,25 @@ export const SidebarTrigger = React.forwardRef<
   HTMLButtonElement,
   ButtonProps
 >(({ className, children, ...props }, ref) => {
-  const { isMobile, isOpen, setIsOpen } = useSidebar();
-  if (!isMobile) return null;
+  const { isMobile } = useSidebar();
+
+  // The trigger is only for mobile view.
+  if (!isMobile) {
+    return null
+  }
   
-  // This component will be used as the trigger for the Sheet.
-  // The actual <SheetTrigger> is inside the <Sidebar> component.
   return (
+    <SheetTrigger asChild>
       <Button
         ref={ref}
         variant="ghost"
         size="icon"
-        className={cn("md:hidden", className)}
+        className={cn(className)}
         {...props}
-        onClick={() => setIsOpen(!isOpen)}
       >
         {children}
       </Button>
+    </SheetTrigger>
   );
 });
 SidebarTrigger.displayName = "SidebarTrigger"
@@ -74,15 +78,15 @@ export const Sidebar = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, children, ...props }, ref) => {
-  const { isMobile, isOpen, setIsOpen, isCollapsed, setIsCollapsed } =
-    useSidebar()
+  const { isMobile, isOpen, setIsOpen, isCollapsed, setIsCollapsed } = useSidebar()
 
+  // Mobile view: Renders a Sheet (drawer).
   if (isMobile) {
     return (
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        {/* The trigger is conceptually here but controlled by the Header's button state */}
+        {/* The trigger is now part of the Header and activates this sheet */}
         <SheetContent side="left" className="p-0">
-          <SheetHeader className="p-4 border-b">
+           <SheetHeader className="p-4 border-b">
              <SheetTitle className="sr-only">AgriAssist Menu</SheetTitle>
           </SheetHeader>
           <div ref={ref} className={cn("flex h-full flex-col", className)}>
@@ -92,6 +96,8 @@ export const Sidebar = React.forwardRef<
       </Sheet>
     )
   }
+
+  // Desktop view: Renders a collapsible sidebar.
   return (
     <div
       ref={ref}
@@ -217,7 +223,12 @@ export const SidebarInset = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
-  const { isCollapsed } = useSidebar()
+  const { isMobile, isCollapsed } = useSidebar()
+  
+  if (isMobile) {
+    return <div ref={ref} className={cn("", className)} {...props} />;
+  }
+
   return (
     <div
       ref={ref}
@@ -231,3 +242,4 @@ export const SidebarInset = React.forwardRef<
   )
 })
 SidebarInset.displayName = "SidebarInset"
+

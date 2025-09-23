@@ -21,6 +21,7 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined);
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocale] = useState('en');
 
+  // Effect to run only on the client
   useEffect(() => {
     const browserLang = navigator.language.split('-')[0];
     if (translations[browserLang]) {
@@ -29,6 +30,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const t = (key: string): string => {
+    // Fallback to English if the key is not found in the current locale
     const messages = translations[locale] || translations.en;
     return messages[key] || key;
   };
