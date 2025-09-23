@@ -1,5 +1,5 @@
 
-import type { AnalysisResult, CommunityOutbreak, StoreProduct, StoreLocation } from './types';
+import type { AnalysisResult, CommunityOutbreak, StoreProduct, StoreLocation, WeatherForecast } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 
 const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id)?.imageUrl || `https://picsum.photos/seed/${id}/600/400`;
@@ -328,4 +328,14 @@ export const mockStoreLocations: StoreLocation[] = [
     latitude: 20.2961,
     longitude: 85.8245,
   }
+];
+
+export const mockForecast: WeatherForecast[] = [
+    { condition: 'Partly Cloudy', temp: { max: 32, min: 24 }, humidity: 75, rainChance: 20 },
+    { condition: 'Partly Cloudy', temp: { max: 33, min: 25 }, humidity: 80, rainChance: 30 },
+    { condition: 'Thunderstorms', temp: { max: 30, min: 23 }, humidity: 88, rainChance: 70 },
+    { condition: 'Thunderstorms', temp: { max: 29, min: 22 }, humidity: 90, rainChance: 80 },
+    { condition: 'Rain', temp: { max: 28, min: 22 }, humidity: 92, rainChance: 60 },
+    { condition: 'Partly Cloudy', temp: { max: 31, min: 24 }, humidity: 85, rainChance: 20 },
+    { condition: 'Sunny', temp: { max: 34, min: 26 }, humidity: 70, rainChance: 10 },
 ];

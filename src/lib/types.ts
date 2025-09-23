@@ -75,3 +75,13 @@ export type StoreLocation = {
     latitude: number;
     longitude: number;
 };
+
+export type WeatherForecast = {
+    condition: 'Sunny' | 'Partly Cloudy' | 'Cloudy' | 'Rain' | 'Thunderstorms';
+    temp: {
+        max: number;
+        min: number;
+    };
+    humidity: number;
+    rainChance: number;
+};

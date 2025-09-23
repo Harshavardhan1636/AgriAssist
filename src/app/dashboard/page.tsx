@@ -22,16 +22,23 @@ import {
   ClipboardCheck,
   FlaskConical,
   ShieldAlert,
-  ArrowUpRight
+  ArrowUpRight,
+  AlertTriangle,
+  Cloudy,
+  Thermometer,
+  Droplets
 } from "lucide-react";
 
-import { mockHistory } from "@/lib/mock-data";
-import { formatDistanceToNow } from "date-fns";
+import { mockHistory, mockForecast } from "@/lib/mock-data";
+import { formatDistanceToNow, format, addDays } from "date-fns";
 import { useI18n } from "@/context/i18n-context";
 import dynamic from 'next/dynamic';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+
 
 const DetectionsChart = dynamic(() => import('./detections-chart'), { 
     ssr: false,
@@ -52,9 +59,19 @@ const chartData = [
 export default function DashboardPage() {
   const recentAnalyses = mockHistory.slice(0, 5);
   const { t } = useI18n();
+  const today = new Date();
 
   return (
     <div className="flex flex-col gap-6">
+
+       <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>{t('High-Risk Alert: Tomato Late Blight')}</AlertTitle>
+          <AlertDescription>
+            {t("High humidity forecasted. Your tomato crops are at immediate risk. Review preventive actions now.")}
+          </AlertDescription>
+       </Alert>
+       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -97,6 +114,38 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+       <Card>
+        <CardHeader>
+            <div className='flex justify-between items-center'>
+                <div>
+                    <CardTitle>{t('7-Day Forecast')}</CardTitle>
+                    <CardDescription>{t('Minimal weather forecast for the upcoming week.')}</CardDescription>
+                </div>
+                 <Button asChild size="sm" variant="outline">
+                    <Link href="/dashboard/forecast">{t('View Detailed Forecast')}</Link>
+                </Button>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <ScrollArea>
+              <div className="flex space-x-6 pb-4">
+                {mockForecast.map((day, index) => (
+                  <div key={index} className="flex flex-col items-center min-w-[80px] p-2 rounded-lg bg-muted/50">
+                    <p className="font-semibold text-sm">{format(addDays(today, index), 'EEE')}</p>
+                    <Cloudy className="h-8 w-8 my-2 text-muted-foreground" />
+                    <p className="font-bold text-lg">{day.temp.max}°</p>
+                     <div className="flex items-center gap-1 text-xs text-blue-500">
+                        <Droplets className="h-3 w-3" />
+                        <span>{day.humidity}%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+        </CardContent>
+       </Card>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         <Card className="lg:col-span-4">

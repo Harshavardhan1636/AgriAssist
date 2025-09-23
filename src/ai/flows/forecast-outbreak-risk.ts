@@ -40,10 +40,10 @@ const ForecastOutbreakRiskOutputSchema = z.object({
       .describe(
         'The risk score for a potential outbreak, ranging from 0 to 1 (0-100%).'
       ),
-  explanation: z.string().describe('A detailed explanation of the factors contributing to the risk score.'),
+  explanation: z.string().describe('A detailed explanation of the factors contributing to the risk score, including how weather impacts the specific disease on the specific crop.'),
   preventiveActions: z
     .array(z.string())
-    .describe('A list of preventive actions to mitigate the outbreak risk.'),
+    .describe('A list of clear, actionable preventive actions to mitigate the outbreak risk based on the forecast.'),
 });
 export type ForecastOutbreakRiskOutput = z.infer<typeof ForecastOutbreakRiskOutputSchema>;
 
@@ -63,21 +63,22 @@ const prompt = ai.definePrompt({
 
   Analysis Details:
   - Detected Disease: {{{disease}}}
-  - Historical Detections (last 7 days): {{{historicalDetections}}}
-  - 7-Day Avg Weather: Temperature={{{weatherFeatures.temperature}}}°C, Humidity={{{weatherFeatures.humidity}}}%, Rainfall={{{weatherFeatures.rainfall}}}mm
   - Crop Type: {{{cropType}}}
+  - 7-Day Avg Weather: Temperature={{{weatherFeatures.temperature}}}°C, Humidity={{{weatherFeatures.humidity}}}%, Rainfall={{{weatherFeatures.rainfall}}}mm
   - Soil Type: {{{soilType}}}
+  - Historical Detections (last 7 days): {{{historicalDetections}}}
 
   Your Task:
   1.  **Calculate a Risk Score:** Provide a risk score between 0 and 1, representing the probability of a significant outbreak in the next 7-14 days.
-  2.  **Provide a Detailed Explanation:** Explain the "why" behind the score. Mention how the weather, disease type, and crop vulnerability contribute. For example, high humidity is favorable for fungal diseases like Late Blight.
-  3.  **Suggest Preventive Actions:** Provide a list of 3-4 clear, simple, and actionable steps the farmer can take *before* the outbreak gets worse. Prioritize cultural and organic methods.
+  2.  **Provide a Detailed Explanation:** Explain the "why" behind the score. Mention how the forecasted weather (humidity, temperature) specifically favors or disfavors the growth and spread of the identified '{{{disease}}}' on '{{{cropType}}}'.
+  3.  **Suggest Preventive Actions:** Provide a list of 3-4 clear, simple, and actionable steps the farmer can take *before* the outbreak gets worse, based on the forecast. Prioritize cultural and organic methods.
 
   Example Preventive Actions:
-  - "Improve air circulation by pruning lower leaves."
-  - "Avoid overhead watering to keep leaves dry."
-  - "Proactively spray with a Neem oil solution."
-  - "Monitor fields daily, especially in the early morning."
+  - "With rain expected, ensure good field drainage to avoid waterlogging, which helps spread blight."
+  - "Improve air circulation by pruning lower leaves, as high humidity is forecasted."
+  - "Avoid overhead watering in the evenings to keep leaves dry overnight."
+  - "Proactively spray with a Neem oil solution before the forecasted rain."
+  - "Monitor fields daily, especially after the rain stops."
 `,
 });
 
