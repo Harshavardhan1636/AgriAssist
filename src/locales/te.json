@@ -156,6 +156,7 @@
     "Thunderstorms": "ఉరుములు",
     "Rain": "వర్షం",
     "Sunny": "ఎండ",
+    "Cloudy": "మేఘావృతం",
     "Crop Health Advisory": "పంట ఆరోగ్య సలహా",
     "Based on the forecast, here's what to watch out for.": "సూచన ఆధారంగా, ఇక్కడ ఏమి చూడాలో ఉంది.",
     "High Risk: Tomato Late Blight": "అధిక ప్రమాదం: టమోటా లేట్ బ్లైట్",
@@ -169,7 +170,15 @@
     "Check Field Drainage": "పొలం డ్రైనేజీని తనిఖీ చేయండి",
     "Ensure your fields can handle the forecasted rain. Clear any blocked drainage channels to prevent waterlogging.": "మీ పొలాలు అంచనా వేసిన వర్షాన్ని తట్టుకోగలవని నిర్ధారించుకోండి. నీటి ఎద్దడిని నివారించడానికి ఏవైనా అడ్డుపడిన డ్రైనేజీ ఛానెళ్లను క్లియర్ చేయండి.",
     "Scout for Early Symptoms": "ప్రారంభ లక్షణాల కోసం వెతకండి",
-    "Be extra vigilant in the mornings after rainfall. Look for the first signs of blight on lower leaves and stems.": "వర్షం తర్వాత ఉదయం పూట అదనపు జాగ్రత్తగా ఉండండి. తక్కువ ఆకులు మరియు కాండాలపై బ్లైట్ యొక్క మొదటి సంకేతాల కోసం చూడండి."
+    "Be extra vigilant in the mornings after rainfall. Look for the first signs of blight on lower leaves and stems.": "వర్షం తర్వాత ఉదయం పూట అదనపు జాగ్రత్తగా ఉండండి. తక్కువ ఆకులు మరియు కాండాలపై బ్లైట్ యొక్క మొదటి సంకేతాల కోసం చూడండి.",
+    "Soil Data": "మట్టి డేటా",
+    "Current soil conditions for your farm.": "మీ పొలం కోసం ప్రస్తుత మట్టి పరిస్థితులు.",
+    "Soil Type": "మట్టి రకం",
+    "Moisture": "తేమ",
+    "pH Level": "pH స్థాయి",
+    "Nutrients": "పోషకాలు",
+    "Loam": "లోమ్",
+    "Silty": "సిల్టి",
+    "Clay": "క్లే",
+    "Sandy": "శాండీ"
 }
-
-    

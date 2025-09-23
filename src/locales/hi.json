@@ -156,6 +156,7 @@
     "Thunderstorms": "आंधी-तूफान",
     "Rain": "बारिश",
     "Sunny": "धूप",
+    "Cloudy": "बादल छाए रहेंगे",
     "Crop Health Advisory": "फसल स्वास्थ्य सलाह",
     "Based on the forecast, here's what to watch out for.": "पूर्वानुमान के आधार पर, यहां क्या ध्यान रखना है।",
     "High Risk: Tomato Late Blight": "उच्च जोखिम: टमाटर का पछेती झुलसा",
@@ -169,7 +170,15 @@
     "Check Field Drainage": "खेत की जल निकासी की जाँच करें",
     "Ensure your fields can handle the forecasted rain. Clear any blocked drainage channels to prevent waterlogging.": "सुनिश्चित करें कि आपके खेत पूर्वानुमानित बारिश को संभाल सकते हैं। जल-जमाव को रोकने के लिए किसी भी अवरुद्ध जल निकासी चैनलों को साफ करें।",
     "Scout for Early Symptoms": "प्रारंभिक लक्षणों के लिए स्काउट",
-    "Be extra vigilant in the mornings after rainfall. Look for the first signs of blight on lower leaves and stems.": "बारिश के बाद सुबह में अतिरिक्त सतर्क रहें। निचली पत्तियों और तनों पर झुलसा के पहले लक्षणों की तलाश करें।"
+    "Be extra vigilant in the mornings after rainfall. Look for the first signs of blight on lower leaves and stems.": "बारिश के बाद सुबह में अतिरिक्त सतर्क रहें। निचली पत्तियों और तनों पर झुलसा के पहले लक्षणों की तलाश करें।",
+    "Soil Data": "मिट्टी का डेटा",
+    "Current soil conditions for your farm.": "आपके खेत के लिए वर्तमान मिट्टी की स्थिति।",
+    "Soil Type": "मिट्टी का प्रकार",
+    "Moisture": "नमी",
+    "pH Level": "पीएच स्तर",
+    "Nutrients": "पोषक तत्व",
+    "Loam": "दोमट",
+    "Silty": "गाद",
+    "Clay": "चिकनी मिट्टी",
+    "Sandy": "रेतीली"
 }
-
-    

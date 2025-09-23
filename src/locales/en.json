@@ -156,6 +156,7 @@
     "Thunderstorms": "Thunderstorms",
     "Rain": "Rain",
     "Sunny": "Sunny",
+    "Cloudy": "Cloudy",
     "Crop Health Advisory": "Crop Health Advisory",
     "Based on the forecast, here's what to watch out for.": "Based on the forecast, here's what to watch out for.",
     "High Risk: Tomato Late Blight": "High Risk: Tomato Late Blight",
@@ -169,7 +170,15 @@
     "Check Field Drainage": "Check Field Drainage",
     "Ensure your fields can handle the forecasted rain. Clear any blocked drainage channels to prevent waterlogging.": "Ensure your fields can handle the forecasted rain. Clear any blocked drainage channels to prevent waterlogging.",
     "Scout for Early Symptoms": "Scout for Early Symptoms",
-    "Be extra vigilant in the mornings after rainfall. Look for the first signs of blight on lower leaves and stems.": "Be extra vigilant in the mornings after rainfall. Look for the first signs of blight on lower leaves and stems."
+    "Be extra vigilant in the mornings after rainfall. Look for the first signs of blight on lower leaves and stems.": "Be extra vigilant in the mornings after rainfall. Look for the first signs of blight on lower leaves and stems.",
+    "Soil Data": "Soil Data",
+    "Current soil conditions for your farm.": "Current soil conditions for your farm.",
+    "Soil Type": "Soil Type",
+    "Moisture": "Moisture",
+    "pH Level": "pH Level",
+    "Nutrients": "Nutrients",
+    "Loam": "Loam",
+    "Silty": "Silty",
+    "Clay": "Clay",
+    "Sandy": "Sandy"
 }
-
-    

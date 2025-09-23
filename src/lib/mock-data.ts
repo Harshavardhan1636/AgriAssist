@@ -1,5 +1,5 @@
 
-import type { AnalysisResult, CommunityOutbreak, StoreProduct, StoreLocation, WeatherForecast } from './types';
+import type { AnalysisResult, CommunityOutbreak, StoreProduct, StoreLocation, WeatherForecast, SoilData } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 
 const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id)?.imageUrl || `https://picsum.photos/seed/${id}/600/400`;
@@ -347,4 +347,13 @@ export const mockForecast: WeatherForecast[] = [
     { condition: 'Sunny', temp: { max: 34, min: 26 }, humidity: 75, rainChance: 10 },
 ];
 
-    
+export const mockSoilData: SoilData = {
+    type: 'Loam',
+    moisture: 28,
+    ph: 6.8,
+    nutrients: {
+        nitrogen: 'Medium',
+        phosphorus: 'High',
+        potassium: 'Medium',
+    }
+};

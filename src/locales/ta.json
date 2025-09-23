@@ -156,6 +156,7 @@
     "Thunderstorms": "இடியுடன் கூடிய மழை",
     "Rain": "மழை",
     "Sunny": "சூரிய ஒளி",
+    "Cloudy": "மேகமூட்டத்துடன்",
     "Crop Health Advisory": "பயிர் சுகாதார ஆலோசனை",
     "Based on the forecast, here's what to watch out for.": "முன்னறிவிப்பின் அடிப்படையில், இதோ கவனிக்க வேண்டியவை.",
     "High Risk: Tomato Late Blight": "அதிக ஆபத்து: தக்காளி தாமதமான கருகல் நோய்",
@@ -169,7 +170,15 @@
     "Check Field Drainage": "வயல் வடிகால் சரிபார்க்கவும்",
     "Ensure your fields can handle the forecasted rain. Clear any blocked drainage channels to prevent waterlogging.": "உங்கள் வயல்கள் கணிக்கப்பட்ட மழையை கையாள முடியும் என்பதை உறுதிப்படுத்தவும். நீர் தேங்குவதைத் தடுக்க எந்தவொரு தடுக்கப்பட்ட வடிகால் சேனல்களையும் அழிக்கவும்.",
     "Scout for Early Symptoms": "ஆரம்ப அறிகுறிகளுக்காக கண்காணிக்கவும்",
-    "Be extra vigilant in the mornings after rainfall. Look for the first signs of blight on lower leaves and stems.": "மழைக்குப் பிறகு காலையில் கூடுதல் கவனமாக இருங்கள். கீழ் இலைகள் மற்றும் தண்டுகளில் கருகல் நோயின் முதல் அறிகுறிகளைத் தேடுங்கள்."
+    "Be extra vigilant in the mornings after rainfall. Look for the first signs of blight on lower leaves and stems.": "மழைக்குப் பிறகு காலையில் கூடுதல் கவனமாக இருங்கள். கீழ் இலைகள் மற்றும் தண்டுகளில் கருகல் நோயின் முதல் அறிகுறிகளைத் தேடுங்கள்.",
+    "Soil Data": "மண் தரவு",
+    "Current soil conditions for your farm.": "உங்கள் பண்ணைக்கான தற்போதைய மண் நிலைமைகள்.",
+    "Soil Type": "மண் வகை",
+    "Moisture": "ஈரப்பதம்",
+    "pH Level": "pH நிலை",
+    "Nutrients": "ஊட்டச்சத்துக்கள்",
+    "Loam": "வண்டல் மண்",
+    "Silty": "வண்டல்",
+    "Clay": "களிமண்",
+    "Sandy": "மணல்"
 }
-
-    

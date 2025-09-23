@@ -85,3 +85,14 @@ export type WeatherForecast = {
     humidity: number;
     rainChance: number;
 };
+
+export type SoilData = {
+    type: 'Loam' | 'Clay' | 'Sandy' | 'Silty';
+    moisture: number; // percentage
+    ph: number;
+    nutrients: {
+        nitrogen: 'Low' | 'Medium' | 'High';
+        phosphorus: 'Low' | 'Medium' | 'High';
+        potassium: 'Low' | 'Medium' | 'High';
+    };
+};

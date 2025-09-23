@@ -1,11 +1,11 @@
 
 'use client';
 
-import { Cloudy, Droplets, Thermometer, Wind, AlertCircle } from 'lucide-react';
+import { Cloudy, Droplets, Thermometer, Wind, AlertCircle, TestTube2, Sprout } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useI18n } from '@/context/i18n-context';
-import { mockForecast } from '@/lib/mock-data';
+import { mockForecast, mockSoilData } from '@/lib/mock-data';
 import { Badge } from '@/components/ui/badge';
 import { addDays, format } from 'date-fns';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -69,6 +69,36 @@ export default function ForecastPage() {
                         </Table>
                         <ScrollBar orientation="horizontal" />
                     </ScrollArea>
+                </CardContent>
+            </Card>
+
+             <Card>
+                <CardHeader>
+                    <CardTitle>{t('Soil Data')}</CardTitle>
+                    <CardDescription>{t('Current soil conditions for your farm.')}</CardDescription>
+                </CardHeader>
+                <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div className="p-4 rounded-lg bg-muted/50 flex flex-col items-center justify-center text-center">
+                        <Sprout className="h-8 w-8 mb-2 text-primary" />
+                        <p className="text-sm font-medium text-muted-foreground">{t('Soil Type')}</p>
+                        <p className="text-lg font-bold">{t(mockSoilData.type)}</p>
+                    </div>
+                     <div className="p-4 rounded-lg bg-muted/50 flex flex-col items-center justify-center text-center">
+                        <Droplets className="h-8 w-8 mb-2 text-blue-500" />
+                        <p className="text-sm font-medium text-muted-foreground">{t('Moisture')}</p>
+                        <p className="text-lg font-bold">{mockSoilData.moisture}%</p>
+                    </div>
+                     <div className="p-4 rounded-lg bg-muted/50 flex flex-col items-center justify-center text-center">
+                        <TestTube2 className="h-8 w-8 mb-2 text-violet-500" />
+                        <p className="text-sm font-medium text-muted-foreground">{t('pH Level')}</p>
+                        <p className="text-lg font-bold">{mockSoilData.ph}</p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-muted/50 flex flex-col items-center justify-center text-center space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">{t('Nutrients')}</p>
+                        <p className="text-xs">N: <Badge variant={mockSoilData.nutrients.nitrogen === 'High' ? 'default' : 'secondary'}>{t(mockSoilData.nutrients.nitrogen)}</Badge></p>
+                        <p className="text-xs">P: <Badge variant={mockSoilData.nutrients.phosphorus === 'High' ? 'default' : 'secondary'}>{t(mockSoilData.nutrients.phosphorus)}</Badge></p>
+                        <p className="text-xs">K: <Badge variant={mockSoilData.nutrients.potassium === 'High' ? 'default' : 'secondary'}>{t(mockSoilData.nutrients.potassium)}</Badge></p>
+                    </div>
                 </CardContent>
             </Card>
 
