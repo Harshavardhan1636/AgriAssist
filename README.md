@@ -8,7 +8,7 @@ AgriAssist is a web application designed to act as a "Digital Health Twin" for a
 - **Disease Classification:** The AI model identifies potential diseases and provides confidence scores for each prediction.
 - **Severity Assessment:** Estimates the extent of disease damage as a percentage.
 - **Explainable AI (XAI):** Uses Grad-CAM to visualize which parts of the image the AI focused on for its diagnosis.
-- **Risk Forecasting:** Provides a 7-day outbreak risk score based on various data points.
+- **Risk Forecasting:** Provides a 7-day outbreak risk score based on various data points. 
 - **Analysis History:** Browse and review all past crop analyses.
 - **Review Queue:** Flags low-confidence analyses for expert review by an agronomist.
 
