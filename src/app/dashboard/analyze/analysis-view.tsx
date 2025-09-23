@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, ChangeEvent, useActionState } from 'react';
+import { useState, useRef, ChangeEvent, FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -13,14 +13,6 @@ import { useI18n } from '@/context/i18n-context';
 import { analyzeImage } from './actions';
 
 
-const initialState: {
-  data: FullAnalysisResponse | null;
-  error: string | null;
-} = {
-  data: null,
-  error: null,
-};
-
 function fileToDataUri(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -31,11 +23,13 @@ function fileToDataUri(file: File): Promise<string> {
 }
 
 export default function AnalysisView() {
-  const [formState, formAction, isPending] = useActionState(analyzeImage, initialState);
+  const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<FullAnalysisResponse | null>(null);
+  
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t, locale } = useI18n();
-
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -52,6 +46,30 @@ export default function AnalysisView() {
     }
   };
 
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!preview) return;
+
+    setIsPending(true);
+    setError(null);
+    setResult(null);
+
+    const formData = new FormData(event.currentTarget);
+    
+    try {
+      const response = await analyzeImage(null, formData);
+      if (response.error) {
+        setError(response.error);
+      } else {
+        setResult(response.data);
+      }
+    } catch (e: any) {
+      setError(e.message || "An unexpected error occurred.");
+    } finally {
+      setIsPending(false);
+    }
+  };
+
   if (isPending) {
     return (
         <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-card p-12 text-center h-[500px]">
@@ -62,8 +80,8 @@ export default function AnalysisView() {
     );
   }
 
-  if (formState.data) {
-    return <AnalysisResults result={formState.data} />;
+  if (result) {
+    return <AnalysisResults result={result} />;
   }
   
   return (
@@ -73,7 +91,7 @@ export default function AnalysisView() {
         <CardDescription>{t('Upload an image of a plant leaf to get an AI-powered health analysis and risk assessment.')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
             {preview && <input type="hidden" name="photoDataUri" value={preview} />}
             <input type="hidden" name="locale" value={locale} />
           <div className="space-y-2">
@@ -126,11 +144,11 @@ export default function AnalysisView() {
               </div>
             )}
           </div>
-          {formState.error && (
+          {error && (
             <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>{t('Analysis Failed')}</AlertTitle>
-                <AlertDescription>{formState.error}</AlertDescription>
+                <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
           <Button type="submit" disabled={!preview || isPending} className="w-full">
