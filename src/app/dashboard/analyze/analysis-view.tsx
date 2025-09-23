@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, ChangeEvent, FormEvent, useEffect } from 'react';
+import { useState, useRef, ChangeEvent, FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -30,11 +30,11 @@ export default function AnalysisView() {
   
   const [activeTab, setActiveTab] = useState('image');
   const [preview, setPreview] = useState<string | null>(null);
+  const [textQuery, setTextQuery] = useState('');
   const [audioDataUri, setAudioDataUri] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const textQueryRef = useRef<HTMLTextAreaElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
@@ -61,8 +61,11 @@ export default function AnalysisView() {
     setError(null);
     // Reset other inputs when switching tabs for a cleaner experience
     setPreview(null);
+    setTextQuery('');
     setAudioDataUri(null);
-    if (textQueryRef.current) textQueryRef.current.value = '';
+    if (isRecording) {
+      stopRecording();
+    }
   };
 
   const startRecording = async () => {
@@ -105,27 +108,27 @@ export default function AnalysisView() {
 
     const formData = new FormData();
     formData.append('locale', locale);
-
-    const textQuery = textQueryRef.current?.value || '';
+    
+    let hasInput = false;
 
     // Append data based on the active tab
     if (activeTab === 'image' && preview) {
       formData.append('photoDataUri', preview);
+      hasInput = true;
     } else if (activeTab === 'text' && textQuery) {
       formData.append('textQuery', textQuery);
+      hasInput = true;
     } else if (activeTab === 'audio' && audioDataUri) {
       formData.append('audioDataUri', audioDataUri);
-    } else {
+      hasInput = true;
+    } 
+
+    if (!hasInput) {
         setError("Please provide an input before starting the analysis.");
         setIsPending(false);
         return;
     }
     
-    // Always include textQuery if it exists, as it can complement other inputs
-    if (textQuery) {
-        formData.append('textQuery', textQuery);
-    }
-
     try {
       const response = await analyzeImage(formData);
       if (response.error) {
@@ -141,6 +144,8 @@ export default function AnalysisView() {
       setIsPending(false);
     }
   };
+  
+  const isSubmitDisabled = isPending || isRecording || (activeTab === 'image' && !preview) || (activeTab === 'text' && !textQuery.trim()) || (activeTab === 'audio' && !audioDataUri);
 
   if (isPending) {
     return (
@@ -230,7 +235,8 @@ export default function AnalysisView() {
                     </CardHeader>
                     <CardContent>
                         <Textarea 
-                            ref={textQueryRef}
+                            value={textQuery}
+                            onChange={(e) => setTextQuery(e.target.value)}
                             placeholder={t("e.g., 'My tomato leaves have yellow spots and brown edges.'")}
                             className="min-h-[200px]"
                         />
@@ -278,7 +284,7 @@ export default function AnalysisView() {
             <div className="flex justify-end">
                 <Button 
                   type="submit" 
-                  disabled={isPending || isRecording || (activeTab === 'image' && !preview) || (activeTab === 'text' && !textQueryRef.current?.value) || (activeTab === 'audio' && !audioDataUri)} 
+                  disabled={isSubmitDisabled} 
                   className="w-full sm:w-auto"
                 >
                     {isPending ? t('Analyzing...') : t('Start Analysis')}
@@ -288,5 +294,3 @@ export default function AnalysisView() {
     </form>
   );
 }
-
-    

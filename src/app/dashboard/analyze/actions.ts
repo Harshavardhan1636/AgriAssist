@@ -127,12 +127,12 @@ export async function analyzeImage(
       
       const [severity, explanation, forecast] = await Promise.all([
         // Assess Severity
-        assessDiseaseSeverity({ photoDataUri: usedPhoto, description: textDescription, language: locale })
+        assessDiseaseSeverity({ photoDataUri: usedPhoto!, description: textDescription, language: locale })
           .catch(e => { console.error("Severity assessment failed:", e); return { severityPercentage: 0, severityBand: 'Unknown', confidence: 0 }; }),
         
         // Explain with Grad-CAM (or fallback for text)
-        explainClassificationWithGradCAM({ photoDataUri: usedPhoto, classificationResult: topPrediction.label })
-          .catch(e => { console.error("Grad-CAM explanation failed:", e); return { gradCAMOverlay: usedPhoto }; }),
+        explainClassificationWithGradCAM({ photoDataUri: usedPhoto!, classificationResult: topPrediction.label })
+          .catch(e => { console.error("Grad-CAM explanation failed:", e); return { gradCAMOverlay: usedPhoto! }; }),
         
         // Forecast Risk
         forecastOutbreakRisk({
@@ -165,7 +165,7 @@ export async function analyzeImage(
           explanation,
           forecast,
           recommendations,
-          originalImage: usedPhoto,
+          originalImage: usedPhoto!,
           locale,
           conversationId,
         },
