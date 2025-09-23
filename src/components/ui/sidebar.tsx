@@ -3,7 +3,7 @@
 
 import * as React from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "@/components/ui/sheet"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import {
   Tooltip,
@@ -12,6 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
+import { PanelLeft } from "lucide-react"
 
 type SidebarContextProps = {
   isOpen: boolean
@@ -35,7 +36,6 @@ export function useSidebar() {
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const isMobile = useIsMobile()
   const [isOpen, setIsOpen] = React.useState(false)
-  // On desktop, start with a collapsed state.
   const [isCollapsed, setIsCollapsed] = React.useState(true)
 
   return (
@@ -47,52 +47,40 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
-export const SidebarTrigger = React.forwardRef<
-  HTMLButtonElement,
-  ButtonProps
->(({ className, children, ...props }, ref) => {
-  const { isMobile, isOpen, setIsOpen } = useSidebar();
+export function MobileSidebar({ children, className }: { children: React.ReactNode, className?: string }) {
+    const { isMobile, isOpen, setIsOpen } = useSidebar();
 
-  if (!isMobile) {
-    return null;
-  }
-  
-  return (
-    <SheetTrigger asChild>
-        <Button
-          ref={ref}
-          variant="ghost"
-          size="icon"
-          className={cn(className)}
-          {...props}
-        >
-          {children}
-        </Button>
-    </SheetTrigger>
-  );
-});
-SidebarTrigger.displayName = "SidebarTrigger"
+    if (!isMobile) {
+        return null;
+    }
+
+    return (
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                    <PanelLeft />
+                    <span className="sr-only">Toggle Menu</span>
+                </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className={cn("p-0", className)}>
+                <SheetHeader className="p-4 border-b sr-only">
+                    Menu
+                </SheetHeader>
+                {children}
+            </SheetContent>
+        </Sheet>
+    )
+}
+
 
 export const Sidebar = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, children, ...props }, ref) => {
-  const { isMobile, isOpen, setIsOpen, isCollapsed, setIsCollapsed } = useSidebar()
+  const { isMobile, isCollapsed, setIsCollapsed } = useSidebar()
 
-  // Mobile view: Renders a Sheet (drawer).
   if (isMobile) {
-    return (
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent side="left" className="p-0">
-           <SheetHeader className="p-4 border-b">
-             <SheetTitle className="sr-only">AgriAssist Menu</SheetTitle>
-          </SheetHeader>
-          <div ref={ref} className={cn("flex h-full flex-col", className)}>
-            {children}
-          </div>
-        </SheetContent>
-      </Sheet>
-    )
+      return null;
   }
 
   // Desktop view: Renders a collapsible sidebar.
@@ -241,4 +229,11 @@ export const SidebarInset = React.forwardRef<
 })
 SidebarInset.displayName = "SidebarInset"
 
-
+// This is deprecated and will be removed. Use MobileSidebar instead.
+export const SidebarTrigger = React.forwardRef<
+  HTMLButtonElement,
+  ButtonProps
+>(({ className, children, ...props }, ref) => {
+    return null;
+});
+SidebarTrigger.displayName = "SidebarTrigger"

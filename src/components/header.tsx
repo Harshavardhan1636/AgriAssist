@@ -3,7 +3,7 @@
 
 import { UserNav } from "@/components/user-nav";
 import { Button } from "@/components/ui/button";
-import { Upload, Languages, PanelLeft } from "lucide-react";
+import { Upload, Languages } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useI18n } from "@/context/i18n-context";
@@ -13,13 +13,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SidebarTrigger, useSidebar } from "./ui/sidebar";
+import { MobileSidebar } from "./ui/sidebar";
+import AppSidebar from "./app-sidebar";
 
 
 export default function Header() {
   const pathname = usePathname();
   const { t, setLocale, locale } = useI18n();
-  const { isMobile } = useSidebar();
 
   const getTitle = (pathname: string) => {
     switch (pathname) {
@@ -47,12 +47,9 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:px-6">
-       {isMobile && (
-        <SidebarTrigger>
-          <PanelLeft />
-          <span className="sr-only">Toggle Menu</span>
-        </SidebarTrigger>
-       )}
+       <MobileSidebar>
+         <AppSidebar />
+       </MobileSidebar>
       <div className="flex items-center gap-2">
         <h1 className="text-xl font-semibold font-headline text-foreground">{getTitle(pathname)}</h1>
       </div>
@@ -89,5 +86,3 @@ export default function Header() {
     </header>
   );
 }
-
-
