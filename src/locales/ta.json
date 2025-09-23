@@ -202,5 +202,16 @@
     "Add observations, mention subtle visual cues for the model...": "கவனிப்புகளைச் சேர்க்கவும், மாதிரிக்கான நுட்பமான காட்சி குறிப்புகளைக் குறிப்பிடவும்...",
     "Submit Correction": "திருத்தத்தைச் சமர்ப்பி",
     "Viewing case": "வழக்கைப் பார்க்கிறது",
-    "of": "-இன்"
+    "of": "-இன்",
+    "AI Conversations": "AI உரையாடல்கள்",
+    "Chat History": "அரட்டை வரலாறு",
+    "Review and continue your past conversations with the AI assistant.": "AI உதவியாளருடன் உங்கள் கடந்தகால உரையாடல்களை மதிப்பாய்வு செய்து தொடரவும்.",
+    "Last message": "கடைசி செய்தி",
+    "No conversations yet.": "இன்னும் உரையாடல்கள் இல்லை.",
+    "Start a new analysis to begin a chat.": "ஒரு அரட்டையைத் தொடங்க ஒரு புதிய பகுப்பாய்வைத் தொடங்குங்கள்.",
+    "Continue your conversation with the AI assistant.": "AI உதவியாளருடன் உங்கள் உரையாடலைத் தொடரவும்.",
+    "Conversation not found": "உரையாடல் காணப்படவில்லை",
+    "We couldn't find the chat you're looking for.": "நீங்கள் தேடும் அரட்டையை எங்களால் கண்டுபிடிக்க முடியவில்லை.",
+    "Back to Conversations": "உரையாடல்களுக்குத் திரும்பு",
+    "Ask a follow-up question...": "ஒரு பின்தொடர்தல் கேள்வியைக் கேளுங்கள்..."
 }

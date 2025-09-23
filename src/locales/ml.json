@@ -131,7 +131,7 @@
     "Account": "അക്കൗണ്ട്",
     "Manage your account settings.": "നിങ്ങളുടെ അക്കൗണ്ട് ക്രമീകരണങ്ങൾ നിയന്ത്രിക്കുക.",
     "Delete Account": "അക്കൗണ്ട് ഇല്ലാതാക്കുക",
-    "Permanently delete your account and all associated data.": "നിങ്ങളുടെ അക്കൗണ്ടും ബന്ധപ്പെട്ട എല്ലാ ഡാറ്റയും ശാശ്വതമായി ഇല്ലാതാക്കുക.",
+    "Permanently delete your account and all associated data.": "നിങ്ങളുടെ അക്കൗണ്ടും ബന്ധപ്പെട്ട എല്ലാ ഡാറ്റയും శాశ్వతంగా ഇല്ലാതാക്കുക.",
     "Store": "സ്റ്റോർ",
     "Recommended Products": "ശുപാർശ ചെയ്യുന്ന ഉൽപ്പന്നങ്ങൾ",
     "Safe and effective products based on your crop's needs.": "നിങ്ങളുടെ വിളയുടെ ആവശ്യകതകളെ അടിസ്ഥാനമാക്കി സുരക്ഷിതവും ഫലപ്രദവുമായ ഉൽപ്പന്നങ്ങൾ.",
@@ -202,5 +202,16 @@
     "Add observations, mention subtle visual cues for the model...": "നിരീക്ഷണങ്ങൾ ചേർക്കുക, മോഡലിനായി സൂക്ഷ്മമായ വിഷ്വൽ സൂചനകൾ പരാമർശിക്കുക...",
     "Submit Correction": "തിരുത്തൽ സമർപ്പിക്കുക",
     "Viewing case": "കേസ് കാണുന്നു",
-    "of": "-ന്റെ"
+    "of": "-ന്റെ",
+    "AI Conversations": "AI സംഭാഷണങ്ങൾ",
+    "Chat History": "ചാറ്റ് ചരിത്രം",
+    "Review and continue your past conversations with the AI assistant.": "AI അസിസ്റ്റന്റുമായുള്ള നിങ്ങളുടെ പഴയ സംഭാഷണങ്ങൾ അവലോകനം ചെയ്യുകയും തുടരുകയും ചെയ്യുക.",
+    "Last message": "അവസാന സന്ദേശം",
+    "No conversations yet.": "ഇതുവരെ സംഭാഷണങ്ങൾ ഒന്നും ഇല്ല.",
+    "Start a new analysis to begin a chat.": "ഒരു ചാറ്റ് ആരംഭിക്കാൻ ഒരു പുതിയ വിശകലനം ആരംഭിക്കുക.",
+    "Continue your conversation with the AI assistant.": "AI അസിസ്റ്റന്റുമായുള്ള നിങ്ങളുടെ സംഭാഷണം തുടരുക.",
+    "Conversation not found": "സംഭാഷണം കണ്ടെത്താനായില്ല",
+    "We couldn't find the chat you're looking for.": "നിങ്ങൾ തിരയുന്ന ചാറ്റ് കണ്ടെത്താനായില്ല.",
+    "Back to Conversations": "സംഭാഷണങ്ങളിലേക്ക് മടങ്ങുക",
+    "Ask a follow-up question...": "ഒരു തുടർചോദ്യം ചോദിക്കുക..."
 }

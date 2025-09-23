@@ -202,5 +202,16 @@
     "Add observations, mention subtle visual cues for the model...": "Add observations, mention subtle visual cues for the model...",
     "Submit Correction": "Submit Correction",
     "Viewing case": "Viewing case",
-    "of": "of"
+    "of": "of",
+    "AI Conversations": "AI Conversations",
+    "Chat History": "Chat History",
+    "Review and continue your past conversations with the AI assistant.": "Review and continue your past conversations with the AI assistant.",
+    "Last message": "Last message",
+    "No conversations yet.": "No conversations yet.",
+    "Start a new analysis to begin a chat.": "Start a new analysis to begin a chat.",
+    "Continue your conversation with the AI assistant.": "Continue your conversation with the AI assistant.",
+    "Conversation not found": "Conversation not found",
+    "We couldn't find the chat you're looking for.": "We couldn't find the chat you're looking for.",
+    "Back to Conversations": "Back to Conversations",
+    "Ask a follow-up question...": "Ask a follow-up question..."
 }

@@ -27,6 +27,7 @@ export type CommunityOutbreak = {
 
 export type AnalysisResult = {
   id: string;
+  conversationId: string;
   timestamp: string;
   image: string;
   imageHint: string;
@@ -52,6 +53,7 @@ export type FullAnalysisResponse = {
   recommendations: GenerateRecommendationsOutput;
   originalImage: string;
   locale: string;
+  conversationId: string;
 };
 
 
@@ -74,6 +76,7 @@ export type StoreLocation = {
     name: string;
     address: string;
     latitude: number;
+    longitude:.ts
     longitude: number;
 };
 
@@ -97,3 +100,17 @@ export type SoilData = {
         potassium: 'Low' | 'Medium' | 'High';
     };
 };
+
+export interface ChatMessage {
+  sender: 'user' | 'bot';
+  text: string;
+}
+
+export interface Conversation {
+  id: string;
+  analysisId: string;
+  title: string;
+  lastMessageTimestamp: string;
+  analysisContext: string;
+  messages: ChatMessage[];
+}

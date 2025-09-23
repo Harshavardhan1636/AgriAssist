@@ -12,6 +12,7 @@ import { transcribeAudio } from "@/ai/flows/transcribe-audio";
 import type { AskFollowUpQuestionOutput } from "@/ai/flows/ask-follow-up-question";
 import type { FullAnalysisResponse } from "@/lib/types";
 import { z } from "zod";
+import { v4 as uuidv4 } from 'uuid';
 
 
 // Re-exporting types for easier access from the client
@@ -146,6 +147,8 @@ export async function analyzeImage(
           .catch(e => { console.error("Recommendations generation failed:", e); return { recommendations: [] }; }),
       ]);
       
+      const conversationId = uuidv4();
+      
       console.log("Full analysis complete.");
       return {
         data: {
@@ -156,6 +159,7 @@ export async function analyzeImage(
           recommendations,
           originalImage: usedPhoto,
           locale,
+          conversationId,
         },
         error: null
       };
@@ -186,5 +190,3 @@ export async function askFollowUpQuestion(
         return { answer: "Sorry, I encountered an error trying to answer your question." };
     }
 }
-
-    

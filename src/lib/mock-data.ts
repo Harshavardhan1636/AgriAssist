@@ -1,5 +1,5 @@
 
-import type { AnalysisResult, CommunityOutbreak, StoreProduct, StoreLocation, WeatherForecast, SoilData } from './types';
+import type { AnalysisResult, CommunityOutbreak, StoreProduct, StoreLocation, WeatherForecast, SoilData, Conversation } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 
 const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id)?.imageUrl || `https://picsum.photos/seed/${id}/600/400`;
@@ -8,6 +8,7 @@ const getImageHint = (id: string) => PlaceHolderImages.find(img => img.id === id
 export const mockHistory: AnalysisResult[] = [
   {
     id: 'case_001',
+    conversationId: 'convo_001',
     timestamp: '2024-07-20T10:30:00Z',
     image: getImage('tomato_late_blight_leaf'),
     imageHint: getImageHint('tomato_late_blight_leaf'),
@@ -24,6 +25,7 @@ export const mockHistory: AnalysisResult[] = [
   },
   {
     id: 'case_002',
+    conversationId: 'convo_002',
     timestamp: '2024-07-20T09:15:00Z',
     image: getImage('maize_common_rust_leaf'),
     imageHint: getImageHint('maize_common_rust_leaf'),
@@ -40,6 +42,7 @@ export const mockHistory: AnalysisResult[] = [
   },
   {
     id: 'case_003',
+    conversationId: 'convo_003',
     timestamp: '2024-07-19T17:00:00Z',
     image: getImage('potato_early_blight_leaf'),
     imageHint: getImageHint('potato_early_blight_leaf'),
@@ -56,6 +59,7 @@ export const mockHistory: AnalysisResult[] = [
   },
   {
     id: 'case_004',
+    conversationId: 'convo_004',
     timestamp: '2024-07-18T11:45:00Z',
     image: getImage('healthy_tomato_leaf'),
     imageHint: getImageHint('healthy_tomato_leaf'),
@@ -72,6 +76,7 @@ export const mockHistory: AnalysisResult[] = [
   },
     {
     id: 'case_005',
+    conversationId: 'convo_005',
     timestamp: '2024-07-17T14:20:00Z',
     image: getImage('potato_late_blight_leaf_2'),
     imageHint: getImageHint('potato_late_blight_leaf_2'),
@@ -357,3 +362,40 @@ export const mockSoilData: SoilData = {
         potassium: 'Medium',
     }
 };
+
+export const mockConversations: Conversation[] = [
+    {
+        id: 'convo_001',
+        analysisId: 'case_001',
+        title: 'Chat about Tomato Late Blight',
+        lastMessageTimestamp: '2024-07-21T11:00:00Z',
+        analysisContext: JSON.stringify({
+            disease: 'Tomato Late Blight',
+            confidence: 0.92,
+            severity: { percentage: 45, band: 'Medium' },
+            risk: 0.75,
+        }),
+        messages: [
+            { sender: 'user', text: 'What is the best organic way to treat this?' },
+            { sender: 'bot', text: 'For Tomato Late Blight, a good organic first step is to spray with a copper-based fungicide or a neem oil solution. Also, be sure to remove and destroy infected leaves to prevent it from spreading.' },
+            { sender: 'user', text: 'How often should I spray neem oil?' },
+            { sender: 'bot', text: 'You should spray neem oil every 7-14 days, and more frequently if you are seeing heavy rain, as it can wash the oil off the leaves. Always follow the product instructions for the correct mixture.' },
+        ]
+    },
+    {
+        id: 'convo_003',
+        analysisId: 'case_003',
+        title: 'Chat about Potato Early Blight',
+        lastMessageTimestamp: '2024-07-20T11:00:00Z',
+        analysisContext: JSON.stringify({
+            disease: 'Potato Early Blight',
+            confidence: 0.98,
+            severity: { percentage: 25, band: 'Medium' },
+            risk: 0.60,
+        }),
+        messages: [
+            { sender: 'user', text: 'Can I use the same treatment for my tomato plants?' },
+            { sender: 'bot', text: 'Yes, Early Blight affects both potatoes and tomatoes, and the treatment methods are very similar. Good crop rotation, removing infected debris, and using fungicides like mancozeb or chlorothalonil are effective. For organic options, copper-based sprays are recommended.' },
+        ]
+    }
+];

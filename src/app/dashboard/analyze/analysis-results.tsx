@@ -36,7 +36,7 @@ const RecommendationIcon = ({type}: {type: string}) => {
 
 
 export default function AnalysisResults({ result }: AnalysisResultsProps) {
-  const { classification, severity, explanation, forecast, recommendations, locale } = result;
+  const { classification, severity, explanation, forecast, recommendations, locale, conversationId } = result;
   const topPrediction = classification.predictions[0];
   const { t } = useI18n();
 
@@ -61,6 +61,14 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     setIsAsking(true);
 
     const response: AskFollowUpQuestionOutput = await askFollowUpQuestion(analysisContext, question, locale);
+    
+    // In a real app, this chat would be saved to a database with the conversationId.
+    // For now, it's just in local state.
+    console.log(`New chat message for conversation ${conversationId}:`, {
+      user: question,
+      bot: response.answer,
+    });
+
 
     const newAiMessage: ChatMessage = { sender: 'bot', text: response.answer };
     setChatHistory(prev => [...prev, newAiMessage]);
@@ -170,7 +178,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t('Outbreak Risk Forecast (14 Day)')}</CardTitle>
+              <CardTitle>{t('14-Day Forecast')}</CardTitle>
             </CardHeader>
             <CardContent>
               <RadialChart 
@@ -208,4 +216,3 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     </div>
   );
 }
-

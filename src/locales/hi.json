@@ -160,7 +160,7 @@
     "Crop Health Advisory": "फसल स्वास्थ्य सलाह",
     "Based on the forecast, here's what to watch out for.": "पूर्वानुमान के आधार पर, यहां क्या ध्यान रखना है।",
     "High Risk: Tomato Late Blight": "उच्च जोखिम: टमाटर का पछेती झुलसा",
-    "The upcoming high humidity and rain are ideal conditions for Late Blight to spread rapidly. Your tomato crops are highly vulnerable over the next 5-7 days.": "आगामी उच्च आर्द्रता और बारिश पछेती झुलसा के तेजी से फैलने के लिए आदर्श स्थितियां हैं। आपकी टमाटर की फसलें अगले 5-7 दिनों में अत्यधिक असुरक्षित हैं।",
+    "The upcoming high humidity and rain are ideal conditions for Late Blight to spread rapidly. Your tomato crops are highly vulnerable over the next 5-7 days.": "आगामी उच्च आर्द्रता और बारिश पछेती झुलसा के तेजी से फैलने के لیے आदर्श स्थितियां हैं। आपकी टमाटर की फसलें अगले 5-7 दिनों में अत्यधिक असुरक्षित हैं।",
     "General Advisory for All Crops": "सभी फसलों के लिए सामान्य सलाह",
     "Increased moisture can encourage fungal growth on all leafy vegetables. Ensure good air circulation and monitor for early signs of mildew.": "बढ़ी हुई नमी सभी पत्तेदार सब्जियों पर फफूंद के विकास को प्रोत्साहित कर सकती है। अच्छा वायु परिसंचरण सुनिश्चित करें और फफूंदी के शुरुआती लक्षणों के लिए निगरानी करें।",
     "Preventive Actions to Take Now": "अभी उठाने के लिए निवारक उपाय",
@@ -202,5 +202,16 @@
     "Add observations, mention subtle visual cues for the model...": "अवलोकन जोड़ें, मॉडल के लिए सूक्ष्म दृश्य संकेतों का उल्लेख करें...",
     "Submit Correction": "सुधार सबमिट करें",
     "Viewing case": "मामला देख रहे हैं",
-    "of": "का"
+    "of": "का",
+    "AI Conversations": "एआई बातचीत",
+    "Chat History": "चैट इतिहास",
+    "Review and continue your past conversations with the AI assistant.": "एआई सहायक के साथ अपनी पिछली बातचीत की समीक्षा करें और जारी रखें।",
+    "Last message": "अंतिम संदेश",
+    "No conversations yet.": "अभी तक कोई बातचीत नहीं हुई है।",
+    "Start a new analysis to begin a chat.": "चैट शुरू करने کے لیے ایک نیا تجزیہ شروع کریں۔",
+    "Continue your conversation with the AI assistant.": "एआई सहायक के साथ अपनी बातचीत जारी रखें।",
+    "Conversation not found": "बातचीत नहीं मिली",
+    "We couldn't find the chat you're looking for.": "आप जिस चैट की तलाश कर رہے ہیں वह हमें نہیں مل سکی۔",
+    "Back to Conversations": "बातचीत पर वापस जाएं",
+    "Ask a follow-up question...": "एक अनुवर्ती प्रश्न पूछें..."
 }
