@@ -1,7 +1,6 @@
 
 'use client';
 
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { UserNav } from "@/components/user-nav";
 import { Button } from "@/components/ui/button";
 import { Upload, Languages } from "lucide-react";
@@ -47,7 +46,6 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:px-6">
       <div className="flex items-center gap-2">
-        <SidebarTrigger className="md:hidden" />
         <h1 className="text-xl font-semibold font-headline text-foreground">{getTitle(pathname)}</h1>
       </div>
       <div className="flex flex-1 items-center justify-end gap-4">
