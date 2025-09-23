@@ -11,7 +11,7 @@ import {
   SidebarFooter,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import { Leaf, LayoutDashboard, History, FlaskConical, LifeBuoy, Settings, PanelLeft } from 'lucide-react';
+import { Leaf, LayoutDashboard, History, FlaskConical, LifeBuoy, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@/context/i18n-context';
@@ -34,9 +34,6 @@ export default function AppSidebar() {
             <Leaf className="h-8 w-8 text-primary" />
             <h1 className="text-xl font-bold font-headline">AgriAssist</h1>
         </div>
-         <SidebarTrigger className="absolute top-4 right-4">
-            <PanelLeft />
-          </SidebarTrigger>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>

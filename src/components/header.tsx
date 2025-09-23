@@ -13,13 +13,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSidebar } from "./ui/sidebar";
+import { SidebarTrigger, useSidebar } from "./ui/sidebar";
 
 
 export default function Header() {
   const pathname = usePathname();
   const { t, setLocale, locale } = useI18n();
-  const { setIsOpen } = useSidebar();
 
   const getTitle = (pathname: string) => {
     switch (pathname) {
@@ -47,15 +46,10 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:px-6">
-       <Button
-        variant="ghost"
-        size="icon"
-        className="md:hidden"
-        onClick={() => setIsOpen(true)}
-      >
+       <SidebarTrigger>
         <PanelLeft />
         <span className="sr-only">Toggle Menu</span>
-      </Button>
+      </SidebarTrigger>
       <div className="flex items-center gap-2">
         <h1 className="text-xl font-semibold font-headline text-foreground">{getTitle(pathname)}</h1>
       </div>

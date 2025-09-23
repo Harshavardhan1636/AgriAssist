@@ -3,7 +3,7 @@
 
 import * as React from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Button, type ButtonProps } from "@/components/ui/button"
 import {
   Tooltip,
@@ -49,9 +49,9 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 export const SidebarTrigger = React.forwardRef<
   HTMLButtonElement,
   ButtonProps
->(({ className, ...props }, ref) => {
-  const { isMobile, isOpen, setIsOpen } = useSidebar()
-  if (!isMobile) return null
+>(({ className, children, ...props }, ref) => {
+  const { isMobile, isOpen, setIsOpen } = useSidebar();
+  if (!isMobile) return null;
   return (
     <SheetTrigger asChild>
       <Button
@@ -61,10 +61,12 @@ export const SidebarTrigger = React.forwardRef<
         className={cn("md:hidden", className)}
         {...props}
         onClick={() => setIsOpen(!isOpen)}
-      />
+      >
+        {children}
+      </Button>
     </SheetTrigger>
-  )
-})
+  );
+});
 SidebarTrigger.displayName = "SidebarTrigger"
 
 export const Sidebar = React.forwardRef<
@@ -78,6 +80,9 @@ export const Sidebar = React.forwardRef<
     return (
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent side="left" className="p-0">
+          <SheetHeader className="p-4 border-b">
+             <SheetTitle className="sr-only">AgriAssist Menu</SheetTitle>
+          </SheetHeader>
           <div ref={ref} className={cn("flex h-full flex-col", className)}>
             {children}
           </div>
@@ -215,9 +220,8 @@ export const SidebarInset = React.forwardRef<
     <div
       ref={ref}
       className={cn(
-        "md:pl-64",
-        isCollapsed ? "md:pl-16" : "md:pl-64",
         "transition-[padding-left]",
+        isCollapsed ? "md:pl-16" : "md:pl-64",
         className
       )}
       {...props}
