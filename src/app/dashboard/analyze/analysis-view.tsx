@@ -2,7 +2,6 @@
 'use client';
 
 import { useState, useRef, ChangeEvent, useActionState } from 'react';
-import { analyzeImage } from './actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -12,10 +11,28 @@ import type { FullAnalysisResponse } from '@/lib/types';
 import AnalysisResults from './analysis-results';
 import { useI18n } from '@/context/i18n-context';
 
-const initialState = {
+import { classifyPlantDisease } from "@/ai/flows/classify-plant-disease";
+import { assessDiseaseSeverity } from "@/ai/flows/assess-disease-severity";
+import { forecastOutbreakRisk } from "@/ai/flows/forecast-outbreak-risk";
+import { explainClassificationWithGradCAM } from "@/ai/flows/explain-classification-with-grad-cam";
+import { generateRecommendations } from "@/ai/flows/generate-recommendations";
+import { z } from "zod";
+
+const initialState: {
+  data: FullAnalysisResponse | null;
+  error: string | null;
+} = {
   data: null,
   error: null,
 };
+
+const analyzeImageSchema = z.object({
+  photoDataUri: z.string().refine(val => val.startsWith('data:image/'), {
+    message: "Invalid image data URI"
+  }),
+  locale: z.string().optional(),
+});
+
 
 function fileToDataUri(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -27,6 +44,62 @@ function fileToDataUri(file: File): Promise<string> {
 }
 
 export default function AnalysisView() {
+
+  async function analyzeImage(
+    prevState: any,
+    formData: FormData
+  ): Promise<{ data: FullAnalysisResponse | null, error: string | null }> {
+    'use server';
+    const photoDataUri = formData.get('photoDataUri') as string;
+    const locale = formData.get('locale') as string || 'en';
+
+    const validatedFields = analyzeImageSchema.safeParse({ photoDataUri, locale });
+    if (!validatedFields.success) {
+      return { data: null, error: "Invalid input: Please upload a valid image." };
+    }
+
+    try {
+      const classification = await classifyPlantDisease({ photoDataUri, language: locale });
+      const topPrediction = classification.predictions?.[0] ?? { label: "unknown", confidence: 0 };
+      
+      const [severity, explanation, forecast, recommendations] = await Promise.all([
+        assessDiseaseSeverity({ photoDataUri, description: `Image of a plant leaf, classified as ${topPrediction.label}`, language: locale }),
+        explainClassificationWithGradCAM({ photoDataUri, classificationResult: topPrediction.label }),
+        forecastOutbreakRisk({
+          historicalDetections: [1, 0, 2, 1, 3, 0, 4],
+          weatherFeatures: { temperature: 25, humidity: 80, rainfall: 5 },
+          cropType: 'Tomato',
+          soilType: 'Loam',
+          recentSeverityAverages: 0.35,
+          language: locale,
+        }),
+        generateRecommendations({ disease: topPrediction.label, severity: 'Medium', cropType: 'Tomato', language: locale }),
+      ]);
+      
+      if (!explanation.gradCAMOverlay) {
+          explanation.gradCAMOverlay = photoDataUri;
+      }
+
+      return {
+        data: {
+          classification,
+          severity,
+          explanation,
+          forecast,
+          recommendations,
+          originalImage: photoDataUri,
+          locale,
+        },
+        error: null
+      };
+
+    } catch (e: any) {
+      console.error("Analysis failed:", e);
+      return { data: null, error: e.message || "An unexpected error occurred during analysis." };
+    }
+  }
+
+
   const [formState, formAction, isPending] = useActionState(analyzeImage, initialState);
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
