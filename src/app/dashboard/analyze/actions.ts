@@ -64,10 +64,13 @@ export async function analyzeImage(
     
     const photoDataUri = formData.get('photoDataUri') as string | null;
     const textQuery = formData.get('textQuery') as string | null;
-    const locale = formData.get('locale') as string || 'en';
+    const locale = (formData.get('locale') as string) || 'en';
+
+    console.log("Received data:", { photoDataUri: !!photoDataUri, textQuery, locale });
 
     const validatedFields = analyzeImageSchema.safeParse({ photoDataUri, textQuery, locale });
     if (!validatedFields.success) {
+      console.error("Validation failed:", validatedFields.error.flatten());
       return { data: null, error: "Invalid input: Please upload an image or describe the issue." };
     }
 
@@ -76,23 +79,28 @@ export async function analyzeImage(
       let usedPhoto = photoDataUri;
 
       if (photoDataUri) {
+        console.log("Analyzing with image...");
         // 1a. Classify with image
         classification = await classifyPlantDisease({ photoDataUri, language: locale });
       } else if (textQuery) {
+        console.log("Analyzing with text...");
         // 1b. Classify with text
         const textDiagnosis = await diagnoseWithText({ query: textQuery, language: locale });
         classification = { predictions: textDiagnosis.predictions };
         // We don't have a real photo, so we'll use a placeholder for subsequent steps
         usedPhoto = "https://picsum.photos/seed/placeholder/600/400";
       } else {
+         console.error("No input provided.");
          return { data: null, error: "No input provided. Please upload an image or describe the problem." };
       }
 
       if (!classification || !classification.predictions || classification.predictions.length === 0) {
+        console.error("Classification failed to return predictions.");
         return { data: null, error: "The AI model could not identify a disease. Please try a different photo or description." };
       }
 
       const topPrediction = classification.predictions[0];
+      console.log("Top prediction:", topPrediction);
       
       const [severity, explanation, forecast, recommendations] = await Promise.all([
         // Assess Severity
@@ -111,14 +119,14 @@ export async function analyzeImage(
           cropType: 'Tomato', // Mock data
           soilType: 'Loam', // Mock data
           language: locale,
-        }).catch(e => { console.error("Risk forecast failed:", e); return { riskScore: 0, explanation: 'Not available', recommendations: [] }; }),
+        }).catch(e => { console.error("Risk forecast failed:", e); return { riskScore: 0, explanation: 'Not available', preventiveActions: [] }; }),
 
         // Generate Recommendations
         generateRecommendations({ disease: topPrediction.label, severity: 'Medium', cropType: 'Tomato', language: locale }) // Mock severity for now
-          .catch(e => { console.error("Recommendations generation failed:", e); return { recommendations: ['Could not generate recommendations.'] }; }),
+          .catch(e => { console.error("Recommendations generation failed:", e); return { recommendations: [] }; }),
       ]);
       
-
+      console.log("Full analysis complete.");
       return {
         data: {
           classification,
@@ -133,7 +141,7 @@ export async function analyzeImage(
       };
 
     } catch (e: any) {
-      console.error("Analysis failed:", e);
+      console.error("Full analysis pipeline failed:", e);
       return { data: null, error: e.message || "An unexpected error occurred during analysis." };
     }
   }

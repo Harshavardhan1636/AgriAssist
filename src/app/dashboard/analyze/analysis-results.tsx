@@ -27,10 +27,10 @@ interface ChatMessage {
 
 const RecommendationIcon = ({type}: {type: string}) => {
     switch (type) {
-        case 'Organic/Cultural': return <CheckCircle className="text-green-600" />;
-        case 'Chemical': return <AlertTriangle className="text-amber-600" />;
-        case 'Preventive': return <Wind className="text-blue-600" />;
-        default: return <CheckCircle className="text-green-600" />;
+        case 'Organic/Cultural': return <CheckCircle className="text-green-600 h-5 w-5" />;
+        case 'Chemical': return <AlertTriangle className="text-amber-600 h-5 w-5" />;
+        case 'Preventive': return <Wind className="text-blue-600 h-5 w-5" />;
+        default: return <CheckCircle className="text-green-600 h-5 w-5" />;
     }
 }
 
@@ -86,22 +86,26 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
               <CardDescription>{t('Follow these ethical and effective steps to treat the issue.')}</CardDescription>
             </CardHeader>
             <CardContent>
-              <Accordion type="single" collapsible className="w-full" defaultValue="item-0">
-                {recommendations.recommendations.map((rec, index) => (
-                  <AccordionItem value={`item-${index}`} key={index}>
-                    <AccordionTrigger>
-                      <div className="flex items-center gap-3">
-                        <RecommendationIcon type={rec.type} />
-                        <span className="font-semibold">{rec.title}</span>
-                        <Badge variant="outline">{t(rec.type as any)}</Badge>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <p className="text-sm text-muted-foreground pl-9">{rec.description}</p>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+              {recommendations?.recommendations?.length > 0 ? (
+                  <Accordion type="single" collapsible className="w-full" defaultValue="item-0">
+                    {recommendations.recommendations.map((rec, index) => (
+                      <AccordionItem value={`item-${index}`} key={index}>
+                        <AccordionTrigger>
+                          <div className="flex items-center gap-3">
+                            <RecommendationIcon type={rec.type} />
+                            <span className="font-semibold">{rec.title}</span>
+                            <Badge variant="outline">{t(rec.type as any)}</Badge>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <p className="text-sm text-muted-foreground pl-9">{rec.description}</p>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+              ) : (
+                <p className="text-sm text-muted-foreground">{t('No recommendations could be generated at this time.')}</p>
+              )}
             </CardContent>
           </Card>
 
@@ -110,7 +114,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
               <CardTitle>{t('Conversational Assistant')}</CardTitle>
               <CardDescription>{t('Ask a follow-up question about your analysis.')}</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-h-[150px]">
               <div className="space-y-4">
                   {chatHistory.map((msg, index) => (
                     <div key={index} className={`flex items-start gap-3 ${msg.sender === 'user' ? 'justify-end' : ''}`}>
@@ -185,12 +189,14 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                   <AccordionTrigger>{t('Preventive Actions')}</AccordionTrigger>
                   <AccordionContent>
                     <ul className="space-y-2 text-sm">
-                      {forecast.preventiveActions.map((action, index) => (
+                      {forecast?.preventiveActions?.length > 0 ? forecast.preventiveActions.map((action, index) => (
                         <li key={index} className="flex items-start gap-2">
                           <Wind className="h-4 w-4 mt-0.5 text-blue-500 flex-shrink-0" />
                           <span>{action}</span>
                         </li>
-                      ))}
+                      )) : (
+                        <li>{t('No preventive actions available.')}</li>
+                      )}
                     </ul>
                   </AccordionContent>
                 </AccordionItem>

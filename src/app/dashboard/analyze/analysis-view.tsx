@@ -13,8 +13,6 @@ import { useI18n } from '@/context/i18n-context';
 import { analyzeImage } from './actions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
-
 
 function fileToDataUri(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -53,19 +51,21 @@ export default function AnalysisView() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    
     setIsPending(true);
     setError(null);
     setResult(null);
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData();
+    formData.append('locale', locale);
 
-    // Manually clear the input that is not active to avoid sending both
-    if (activeTab === 'image') {
-        formData.delete('textQuery');
+    if (activeTab === 'image' && preview) {
+      formData.append('photoDataUri', preview);
+    } else if (activeTab === 'text' && textQuery) {
+      formData.append('textQuery', textQuery);
     } else {
-        formData.delete('photoDataUri');
-        formData.delete('file-upload');
+        setError("Please provide an input for the analysis.");
+        setIsPending(false);
+        return;
     }
     
     try {
@@ -75,7 +75,6 @@ export default function AnalysisView() {
       } else if (response.data) {
         setResult(response.data);
       } else {
-        // This case should not happen if the server action is well-behaved
         setError("An unexpected error occurred: received no data and no error.");
       }
     } catch (e: any) {
@@ -101,91 +100,86 @@ export default function AnalysisView() {
   
   return (
     <form onSubmit={handleSubmit}>
-        <input type="hidden" name="locale" value={locale} />
-        {preview && <input type="hidden" name="photoDataUri" value={preview} />}
-
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="image"><ImageIcon className="mr-2" />{t('Analyze with Image')}</TabsTrigger>
-                <TabsTrigger value="text"><FileText className="mr-2"/>{t('Describe the Issue')}</TabsTrigger>
+                <TabsTrigger value="image"><ImageIcon className="mr-2 h-4 w-4" />{t('Analyze with Image')}</TabsTrigger>
+                <TabsTrigger value="text"><FileText className="mr-2 h-4 w-4"/>{t('Describe the Issue')}</TabsTrigger>
             </TabsList>
 
-            <div className="mt-4">
-                <div className={cn(activeTab !== 'image' && 'hidden')}>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t('Analyze with Image')}</CardTitle>
-                            <CardDescription>{t('Upload an image of a plant leaf to get an AI-powered health analysis and risk assessment.')}</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="space-y-2">
-                                {preview ? (
-                                <div className="relative group w-full max-w-lg mx-auto">
-                                    <Image
-                                    src={preview}
-                                    alt="Image preview"
-                                    width={600}
-                                    height={400}
-                                    className="rounded-lg object-contain border"
-                                    />
-                                    <Button
-                                    type="button"
-                                    variant="destructive"
-                                    size="icon"
-                                    className="absolute top-2 right-2 opacity-50 group-hover:opacity-100 transition-opacity"
-                                    onClick={handleRemoveImage}
-                                    >
-                                    <X className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                                ) : (
-                                <div
-                                    className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer hover:border-primary transition"
-                                    onClick={() => fileInputRef.current?.click()}
+            <TabsContent value="image">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t('Analyze with Image')}</CardTitle>
+                        <CardDescription>{t('Upload an image of a plant leaf to get an AI-powered health analysis and risk assessment.')}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <div className="space-y-2">
+                            {preview ? (
+                            <div className="relative group w-full max-w-lg mx-auto">
+                                <Image
+                                src={preview}
+                                alt="Image preview"
+                                width={600}
+                                height={400}
+                                className="rounded-lg object-contain border"
+                                />
+                                <Button
+                                type="button"
+                                variant="destructive"
+                                size="icon"
+                                className="absolute top-2 right-2 opacity-50 group-hover:opacity-100 transition-opacity"
+                                onClick={handleRemoveImage}
                                 >
-                                    <div className="space-y-1 text-center">
-                                    <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                                    <div className="flex text-sm text-muted-foreground">
-                                        <span className="relative rounded-md font-medium text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary">
-                                        {t('Upload a file')}
-                                        </span>
-                                        <input
-                                        ref={fileInputRef}
-                                        id="file-upload"
-                                        name="file-upload"
-                                        type="file"
-                                        className="sr-only"
-                                        accept="image/*"
-                                        onChange={handleFileChange}
-                                        />
-                                        <p className="pl-1">{t('or drag and drop')}</p>
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">{t('PNG, JPG, GIF up to 10MB')}</p>
-                                    </div>
-                                </div>
-                                )}
+                                <X className="h-4 w-4" />
+                                </Button>
                             </div>
-                        </CardContent>
-                    </Card>
-                </div>
-                <div className={cn(activeTab !== 'text' && 'hidden')}>
-                     <Card>
-                        <CardHeader>
-                            <CardTitle>{t('Describe the Issue')}</CardTitle>
-                            <CardDescription>{t("Describe the symptoms you're seeing in your own words.")}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <Textarea 
-                                name="textQuery"
-                                placeholder={t("e.g., 'My tomato leaves have yellow spots and brown edges.'")}
-                                className="min-h-[200px]"
-                                value={textQuery}
-                                onChange={(e) => setTextQuery(e.target.value)}
-                            />
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
+                            ) : (
+                            <div
+                                className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md cursor-pointer hover:border-primary transition"
+                                onClick={() => fileInputRef.current?.click()}
+                            >
+                                <div className="space-y-1 text-center">
+                                <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
+                                <div className="flex text-sm text-muted-foreground">
+                                    <span className="relative rounded-md font-medium text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary">
+                                    {t('Upload a file')}
+                                    </span>
+                                    <input
+                                    ref={fileInputRef}
+                                    id="file-upload"
+                                    name="file-upload"
+                                    type="file"
+                                    className="sr-only"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                    />
+                                    <p className="pl-1">{t('or drag and drop')}</p>
+                                </div>
+                                <p className="text-xs text-muted-foreground">{t('PNG, JPG, GIF up to 10MB')}</p>
+                                </div>
+                            </div>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+            </TabsContent>
+            <TabsContent value="text">
+                 <Card>
+                    <CardHeader>
+                        <CardTitle>{t('Describe the Issue')}</CardTitle>
+                        <CardDescription>{t("Describe the symptoms you're seeing in your own words.")}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Textarea 
+                            name="textQuery"
+                            placeholder={t("e.g., 'My tomato leaves have yellow spots and brown edges.'")}
+                            className="min-h-[200px]"
+                            value={textQuery}
+                            onChange={(e) => setTextQuery(e.target.value)}
+                        />
+                    </CardContent>
+                </Card>
+            </TabsContent>
             
             <div className="py-4">
               {error && (
@@ -206,5 +200,3 @@ export default function AnalysisView() {
     </form>
   );
 }
-
-    
