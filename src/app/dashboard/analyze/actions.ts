@@ -62,36 +62,38 @@ export async function analyzeImage(
     formData: FormData
   ): Promise<{ data: FullAnalysisResponse | null, error: string | null }> {
     
-    const photoDataUri = formData.get('photoDataUri') as string | null;
-    const textQuery = formData.get('textQuery') as string | null;
+    const rawPhotoDataUri = formData.get('photoDataUri') as string | null;
+    const rawTextQuery = formData.get('textQuery') as string | null;
     const locale = (formData.get('locale') as string) || 'en';
 
-    console.log("Received data:", { photoDataUri: !!photoDataUri, textQuery, locale });
+    const validatedFields = analyzeImageSchema.safeParse({ 
+        photoDataUri: rawPhotoDataUri, 
+        textQuery: rawTextQuery, 
+        locale 
+    });
 
-    const validatedFields = analyzeImageSchema.safeParse({ photoDataUri, textQuery, locale });
     if (!validatedFields.success) {
       console.error("Validation failed:", validatedFields.error.flatten());
       return { data: null, error: "Invalid input: Please upload an image or describe the issue." };
     }
+    
+    const { photoDataUri, textQuery } = validatedFields.data;
 
     try {
       let classification;
       let usedPhoto = photoDataUri;
+      let textDescription = textQuery || '';
 
       if (photoDataUri) {
         console.log("Analyzing with image...");
-        // 1a. Classify with image
         classification = await classifyPlantDisease({ photoDataUri, language: locale });
       } else if (textQuery) {
         console.log("Analyzing with text...");
-        // 1b. Classify with text
         const textDiagnosis = await diagnoseWithText({ query: textQuery, language: locale });
         classification = { predictions: textDiagnosis.predictions };
-        // We don't have a real photo, so we'll use a placeholder for subsequent steps
         usedPhoto = "https://picsum.photos/seed/placeholder/600/400";
       } else {
-         console.error("No input provided.");
-         return { data: null, error: "No input provided. Please upload an image or describe the problem." };
+         return { data: null, error: "Invalid input: Please upload an image or describe the issue." };
       }
 
       if (!classification || !classification.predictions || classification.predictions.length === 0) {
@@ -104,12 +106,12 @@ export async function analyzeImage(
       
       const [severity, explanation, forecast, recommendations] = await Promise.all([
         // Assess Severity
-        assessDiseaseSeverity({ photoDataUri: usedPhoto, description: `Classified as ${topPrediction.label}. ${textQuery || ''}`, language: locale })
+        assessDiseaseSeverity({ photoDataUri: usedPhoto!, description: `Classified as ${topPrediction.label}. ${textDescription}`, language: locale })
           .catch(e => { console.error("Severity assessment failed:", e); return { severityPercentage: 0, severityBand: 'Unknown', confidence: 0 }; }),
         
         // Explain with Grad-CAM (or fallback for text)
-        explainClassificationWithGradCAM({ photoDataUri: usedPhoto, classificationResult: topPrediction.label })
-          .catch(e => { console.error("Grad-CAM explanation failed:", e); return { gradCAMOverlay: usedPhoto }; }), // Fallback to original/placeholder image
+        explainClassificationWithGradCAM({ photoDataUri: usedPhoto!, classificationResult: topPrediction.label })
+          .catch(e => { console.error("Grad-CAM explanation failed:", e); return { gradCAMOverlay: usedPhoto! }; }),
         
         // Forecast Risk
         forecastOutbreakRisk({
@@ -134,7 +136,7 @@ export async function analyzeImage(
           explanation,
           forecast,
           recommendations,
-          originalImage: usedPhoto,
+          originalImage: usedPhoto!,
           locale,
         },
         error: null

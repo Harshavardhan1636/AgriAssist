@@ -30,8 +30,8 @@ export default function AnalysisView() {
   
   const [activeTab, setActiveTab] = useState('image');
   const [preview, setPreview] = useState<string | null>(null);
-  const [textQuery, setTextQuery] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const { t, locale } = useI18n();
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -39,6 +39,7 @@ export default function AnalysisView() {
     if (file) {
       const dataUri = await fileToDataUri(file);
       setPreview(dataUri);
+      setError(null);
     }
   };
 
@@ -49,6 +50,11 @@ export default function AnalysisView() {
     }
   };
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setError(null);
+  };
+  
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsPending(true);
@@ -58,14 +64,16 @@ export default function AnalysisView() {
     const formData = new FormData();
     formData.append('locale', locale);
 
+    const form = formRef.current;
+    if (!form) return;
+
     if (activeTab === 'image' && preview) {
       formData.append('photoDataUri', preview);
-    } else if (activeTab === 'text' && textQuery) {
-      formData.append('textQuery', textQuery);
-    } else {
-        setError("Please provide an input for the analysis.");
-        setIsPending(false);
-        return;
+    } else if (activeTab === 'text') {
+      const textQuery = (form.elements.namedItem('textQuery') as HTMLTextAreaElement)?.value;
+      if (textQuery) {
+        formData.append('textQuery', textQuery);
+      }
     }
     
     try {
@@ -99,8 +107,8 @@ export default function AnalysisView() {
   }
   
   return (
-    <form onSubmit={handleSubmit}>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+    <form onSubmit={handleSubmit} ref={formRef}>
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="image"><ImageIcon className="mr-2 h-4 w-4" />{t('Analyze with Image')}</TabsTrigger>
                 <TabsTrigger value="text"><FileText className="mr-2 h-4 w-4"/>{t('Describe the Issue')}</TabsTrigger>
@@ -174,8 +182,7 @@ export default function AnalysisView() {
                             name="textQuery"
                             placeholder={t("e.g., 'My tomato leaves have yellow spots and brown edges.'")}
                             className="min-h-[200px]"
-                            value={textQuery}
-                            onChange={(e) => setTextQuery(e.target.value)}
+                            onChange={() => setError(null)}
                         />
                     </CardContent>
                 </Card>
@@ -192,7 +199,7 @@ export default function AnalysisView() {
             </div>
 
             <div className="flex justify-end">
-                <Button type="submit" disabled={isPending || (activeTab === 'image' && !preview) || (activeTab === 'text' && !textQuery.trim())} className="w-full sm:w-auto">
+                <Button type="submit" disabled={isPending || (activeTab === 'image' && !preview)} className="w-full sm:w-auto">
                     {isPending ? t('Analyzing...') : t('Start Analysis')}
                 </Button>
             </div>
