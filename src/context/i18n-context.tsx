@@ -23,10 +23,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState(translations.en);
 
   useEffect(() => {
+    // This effect runs only on the client-side after hydration
     const browserLang = navigator.language.split('-')[0];
     const initialLocale = Object.keys(translations).includes(browserLang) ? browserLang : 'en';
     setLocale(initialLocale);
-  }, []);
+  }, []); // Empty dependency array ensures it runs once on mount
 
   useEffect(() => {
     setMessages(translations[locale] || translations.en);
