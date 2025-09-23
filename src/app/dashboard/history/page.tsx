@@ -57,15 +57,15 @@ export default function HistoryPage() {
         <CardDescription>
           {t('Browse and review all past crop analyses.')}
         </CardDescription>
-        <div className="flex items-center gap-4 pt-4">
+        <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
           <Input 
             placeholder={t('Search by disease...')}
-            className="max-w-sm"
+            className="w-full sm:max-w-sm"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <Select value={cropFilter} onValueChange={setCropFilter}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder={t('Filter by crop')} />
             </SelectTrigger>
             <SelectContent>

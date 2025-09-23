@@ -23,7 +23,7 @@ function DashboardLayoutContent({
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <div className="flex min-h-screen w-full flex-col bg-muted/40">
             <Header />
-            <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+            <main className="flex-1 gap-4 p-4 md:gap-8 md:p-6">
               {children}
             </main>
           </div>
@@ -40,9 +40,9 @@ function DashboardLayoutContent({
     return (
       <div className="flex min-h-screen w-full flex-col bg-muted/40">
         <AppSidebar />
-        <div className={cn("flex flex-col sm:gap-4 sm:py-4 transition-[padding-left]", isCollapsed ? 'sm:pl-14' : 'sm:pl-64')}>
+        <div className={cn("flex flex-col sm:py-4 transition-[padding-left]", isCollapsed ? 'sm:pl-14' : 'sm:pl-64')}>
           <Header />
-          <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+          <main className="flex-1 gap-4 p-4 md:gap-8 md:p-6">
             {children}
           </main>
         </div>
