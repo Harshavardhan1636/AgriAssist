@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { LogOut, User, Settings } from "lucide-react"
 import { useI18n } from "@/context/i18n-context"
+import Link from "next/link";
 
 export function UserNav() {
   const { t } = useI18n();
@@ -40,20 +41,26 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <User className="mr-2" />
-            <span>{t('Profile')}</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Settings className="mr-2" />
-            <span>{t('Settings')}</span>
-          </DropdownMenuItem>
+          <Link href="/dashboard/settings">
+            <DropdownMenuItem>
+              <User className="mr-2" />
+              <span>{t('Profile')}</span>
+            </DropdownMenuItem>
+          </Link>
+          <Link href="/dashboard/settings">
+            <DropdownMenuItem>
+              <Settings className="mr-2" />
+              <span>{t('Settings')}</span>
+            </DropdownMenuItem>
+          </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <LogOut className="mr-2" />
-          <span>{t('Log out')}</span>
-        </DropdownMenuItem>
+         <Link href="#">
+            <DropdownMenuItem>
+              <LogOut className="mr-2" />
+              <span>{t('Log out')}</span>
+            </DropdownMenuItem>
+        </Link>
       </DropdownMenuContent>
     </DropdownMenu>
   )
