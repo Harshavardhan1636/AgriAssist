@@ -50,9 +50,6 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     if (isMobile) {
       setIsCollapsed(true);
-      setIsOpen(false);
-    } else {
-      setIsCollapsed(false);
     }
   }, [isMobile]);
 
@@ -72,23 +69,21 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function MobileSidebar({children}: {children: React.ReactNode}) {
-  const { isOpen, setIsOpen, isMobile } = useSidebar();
+  const {isOpen, setIsOpen, isMobile} = useSidebar();
 
   if (!isMobile) return null;
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild>
-        <Button size="icon" variant="outline" className="sm:hidden">
-          <PanelLeft className="h-5 w-5" />
-          <span className="sr-only">Toggle Menu</span>
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="left" className="sm:max-w-xs p-0" withCloseButton={false}>
+      <SheetContent
+        side="left"
+        className="sm:max-w-xs p-0"
+        withCloseButton={true}
+      >
         <SheetHeader className="h-14 flex items-center border-b px-4 lg:h-[60px] lg:px-6">
-            <Link href="/" className="flex items-center gap-2 font-semibold">
-                <SheetTitle>AgriAssist</SheetTitle>
-            </Link>
+          <Link href="/" className="flex items-center gap-2 font-semibold">
+            <SheetTitle>AgriAssist</SheetTitle>
+          </Link>
         </SheetHeader>
         {children}
       </SheetContent>
@@ -190,7 +185,7 @@ export const SidebarMenuLink = ({ href, label, icon: Icon }: SidebarMenuButtonPr
       }
     };
   
-    if (isCollapsed) {
+    if (isCollapsed && !isMobile) {
       return (
         <Tooltip>
           <TooltipTrigger asChild>
@@ -224,5 +219,3 @@ export const SidebarMenuLink = ({ href, label, icon: Icon }: SidebarMenuButtonPr
       </Link>
     );
 };
-  
-

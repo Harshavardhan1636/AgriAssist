@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MobileSidebar, useSidebar } from "./ui/sidebar";
+import { useSidebar } from "./ui/sidebar";
 
 
 export default function Header() {
@@ -30,11 +30,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-        <MobileSidebar>
-            {/* The AppSidebar component will be rendered inside the SheetContent for mobile */}
-            {/* This is a placeholder; the actual content is in layout.tsx */}
-        </MobileSidebar>
-
+        
         {!isMobile && (
             <Button
                 variant="ghost"
