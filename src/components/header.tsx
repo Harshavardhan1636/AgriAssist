@@ -1,3 +1,4 @@
+
 'use client';
 
 import { UserNav } from "@/components/user-nav";
@@ -33,7 +34,7 @@ export default function Header() {
         
         {isMobile ? (
           <SheetTrigger asChild>
-            <Button size="icon" variant="outline">
+            <Button size="icon" variant="outline" onClick={() => setIsOpen(true)}>
               <PanelLeft className="h-5 w-5" />
               <span className="sr-only">Toggle Menu</span>
             </Button>

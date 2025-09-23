@@ -103,12 +103,12 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle>{t('Detections This Week')}</CardTitle>
           </CardHeader>
-          <CardContent className="pl-2">
+          <CardContent className="pl-2 overflow-x-auto">
             <DetectionsChart />
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="lg:col-span-3">
           <CardHeader className="flex flex-row items-center">
             <div className="grid gap-2">
               <CardTitle>{t('Recent Analyses')}</CardTitle>
@@ -121,7 +121,7 @@ export default function DashboardPage() {
               </Link>
             </Button>
           </CardHeader>
-          <CardContent>
+          <CardContent className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
