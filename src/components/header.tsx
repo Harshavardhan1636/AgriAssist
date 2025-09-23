@@ -11,13 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet"
-import Link from "next/link";
-import AppSidebar from "./app-sidebar";
+import { MobileSidebar } from "./ui/sidebar";
 
 
 export default function Header() {
@@ -34,17 +28,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-        <Sheet>
-            <SheetTrigger asChild>
-                <Button size="icon" variant="outline" className="sm:hidden">
-                    <PanelLeft className="h-5 w-5" />
-                    <span className="sr-only">Toggle Menu</span>
-                </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="sm:max-w-xs p-0">
-                <AppSidebar />
-            </SheetContent>
-        </Sheet>
+        <MobileSidebar />
       
       <div className="flex flex-1 items-center justify-end gap-4">
         <DropdownMenu>

@@ -11,6 +11,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
+import { Sheet, SheetContent, SheetTrigger } from "./sheet"
+import { PanelLeft } from "lucide-react"
+import AppSidebar from "../app-sidebar"
+
 
 type SidebarContextProps = {
   isOpen: boolean
@@ -50,23 +54,35 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
+export const MobileSidebar = () => {
+    return (
+        <Sheet>
+            <SheetTrigger asChild>
+                <Button size="icon" variant="outline" className="sm:hidden">
+                    <PanelLeft className="h-5 w-5" />
+                    <span className="sr-only">Toggle Menu</span>
+                </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="sm:max-w-xs p-0">
+                <AppSidebar />
+            </SheetContent>
+        </Sheet>
+    )
+}
+
 
 export const Sidebar = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, children, ...props }, ref) => {
-  const { isMobile } = useSidebar()
+  const { isCollapsed } = useSidebar()
 
-  if (isMobile) {
-      return null;
-  }
-
-  // Desktop view: Renders a collapsible sidebar.
   return (
     <aside
         ref={ref}
         className={cn(
-            "fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex",
+            "fixed inset-y-0 left-0 z-10 hidden flex-col border-r bg-background sm:flex transition-[width]",
+            isCollapsed ? "w-14" : "w-64",
             className
         )}
         {...props}
@@ -98,7 +114,7 @@ export const SidebarContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("flex-grow", className)} {...props} />
+  <div ref={ref} className={cn("flex-grow overflow-y-auto", className)} {...props} />
 ))
 SidebarContent.displayName = "SidebarContent"
 
@@ -106,10 +122,15 @@ export const SidebarMenu = React.forwardRef<
   HTMLUListElement,
   React.HTMLAttributes<HTMLUListElement>
 >(({ className, ...props }, ref) => {
+  const { isCollapsed } = useSidebar();
   return (
     <ul
       ref={ref}
-      className={cn("flex flex-col items-center gap-y-1 p-2", className)}
+      className={cn(
+        "flex flex-col gap-y-1 p-2",
+        isCollapsed ? "items-center" : "items-stretch",
+        className
+      )}
       {...props}
     />
   )
@@ -129,33 +150,42 @@ export const SidebarMenuButton = React.forwardRef<
   ButtonProps & {
     isActive?: boolean
     tooltip?: string
+    isCollapsed?: boolean
   }
->(({ className, isActive, tooltip, children, ...props }, ref) => {
-  return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
+>(({ className, isActive, tooltip, children, isCollapsed, ...props }, ref) => {
+
+    if (isCollapsed) {
+        return (
+            <Tooltip>
+                <TooltipTrigger asChild>
+                <Button
+                    ref={ref}
+                    variant={isActive ? "secondary" : "ghost"}
+                    size="icon"
+                    className={cn("rounded-lg", className)}
+                    {...props}
+                >
+                    {children}
+                </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                <p>{tooltip}</p>
+                </TooltipContent>
+            </Tooltip>
+        )
+    }
+
+    return (
+        <Button
             ref={ref}
             variant={isActive ? "secondary" : "ghost"}
-            size="icon"
-            className={cn("rounded-lg", isActive && "bg-muted", className)}
+            size="default"
+            className={cn("rounded-lg justify-start", className)}
             {...props}
-          >
-            {React.Children.map(children, (child) =>
-                React.isValidElement(child) && child.props.href ?
-                React.cloneElement(child, {
-                    children: React.Children.map(child.props.children, (c) => c.type === 'span' ? null : c)
-                })
-                : child
-            )}
-            <span className="sr-only">{tooltip}</span>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="right">
-          <p>{tooltip}</p>
-        </TooltipContent>
-      </Tooltip>
-  )
+        >
+            {children}
+        </Button>
+    )
 })
 SidebarMenuButton.displayName = "SidebarMenuButton"
 
@@ -163,7 +193,7 @@ export const SidebarFooter = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("mt-auto flex flex-col items-center gap-4 px-2 py-4", className)} {...props} />
+  <div ref={ref} className={cn("mt-auto p-2", className)} {...props} />
 ))
 SidebarFooter.displayName = "SidebarFooter"
 
@@ -182,7 +212,7 @@ export const SidebarInset = React.forwardRef<
       ref={ref}
       className={cn(
         "transition-[padding-left]",
-        isCollapsed ? "md:pl-16" : "md:pl-64",
+        isCollapsed ? "sm:pl-14" : "sm:pl-64",
         className
       )}
       {...props}

@@ -37,7 +37,7 @@ export default function AppSidebar() {
         <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold">
                 <Leaf className="h-6 w-6 text-primary" />
-                <span className="">AgriAssist</span>
+                {!isCollapsed && <span className="">AgriAssist</span>}
             </Link>
         </div>
       </SidebarHeader>
@@ -49,6 +49,7 @@ export default function AppSidebar() {
                 asChild
                 isActive={pathname === item.href}
                 tooltip={item.label}
+                isCollapsed={isCollapsed}
               >
                 <Link href={item.href}>
                   <item.icon />
@@ -62,7 +63,7 @@ export default function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
             <SidebarMenuItem>
-                <SidebarMenuButton tooltip={t('Settings')}>
+                <SidebarMenuButton tooltip={t('Settings')} isCollapsed={isCollapsed}>
                     <Settings />
                     <span>{t('Settings')}</span>
                 </SidebarMenuButton>
