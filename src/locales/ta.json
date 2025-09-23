@@ -21,7 +21,7 @@
     "Analyze Crop Health": "பயிர் ஆரோக்கியத்தை பகுப்பாய்வு செய்யுங்கள்",
     "Upload an image of a plant leaf to get an AI-powered health analysis and risk assessment.": "AI-இயங்கும் சுகாதார பகுப்பாய்வு மற்றும் இடர் மதிப்பீட்டைப் பெற தாவர இலையின் படத்தைப் பதிவேற்றவும்.",
     "Crop Image": "பயிர் படம்",
-    "Upload a file": "ഒരു കോப்பைப் பதிவேற்றவும்",
+    "Upload a file": "ஒரு கோப்பைப் பதிவேற்றவும்",
     "or drag and drop": "அல்லது இழுத்து விடுங்கள்",
     "PNG, JPG, GIF up to 10MB": "பிஎன்ஜி, ஜேபிஜி, ஜிஐஎஃப் 10MB வரை",
     "Analysis Failed": "பகுப்பாய்வு தோல்வியடைந்தது",
@@ -213,5 +213,7 @@
     "Conversation not found": "உரையாடல் காணப்படவில்லை",
     "We couldn't find the chat you're looking for.": "நீங்கள் தேடும் அரட்டையை எங்களால் கண்டுபிடிக்க முடியவில்லை.",
     "Back to Conversations": "உரையாடல்களுக்குத் திரும்பு",
-    "Ask a follow-up question...": "ஒரு பின்தொடர்தல் கேள்வியைக் கேளுங்கள்..."
+    "Ask a follow-up question...": "ஒரு பின்தொடர்தல் கேள்வியைக் கேளுங்கள்...",
+    "Search by title...": "தலைப்பு மூலம் தேடு...",
+    "You": "நீங்கள்"
 }

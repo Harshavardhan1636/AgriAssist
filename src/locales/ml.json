@@ -131,7 +131,7 @@
     "Account": "അക്കൗണ്ട്",
     "Manage your account settings.": "നിങ്ങളുടെ അക്കൗണ്ട് ക്രമീകരണങ്ങൾ നിയന്ത്രിക്കുക.",
     "Delete Account": "അക്കൗണ്ട് ഇല്ലാതാക്കുക",
-    "Permanently delete your account and all associated data.": "നിങ്ങളുടെ അക്കൗണ്ടും ബന്ധപ്പെട്ട എല്ലാ ഡാറ്റയും శాశ్వతంగా ഇല്ലാതാക്കുക.",
+    "Permanently delete your account and all associated data.": "നിങ്ങളുടെ അക്കൗണ്ടും ബന്ധപ്പെട്ട എല്ലാ ഡാറ്റയും ശാశ్వతంగా ഇല്ലാതാക്കുക.",
     "Store": "സ്റ്റോർ",
     "Recommended Products": "ശുപാർശ ചെയ്യുന്ന ഉൽപ്പന്നങ്ങൾ",
     "Safe and effective products based on your crop's needs.": "നിങ്ങളുടെ വിളയുടെ ആവശ്യകതകളെ അടിസ്ഥാനമാക്കി സുരക്ഷിതവും ഫലപ്രദവുമായ ഉൽപ്പന്നങ്ങൾ.",
@@ -162,7 +162,7 @@
     "High Risk: Tomato Late Blight": "ഉയർന്ന അപകടസാധ്യത: തക്കാളിയിലെ ലേറ്റ് ബ്ലൈറ്റ്",
     "The upcoming high humidity and rain are ideal conditions for Late Blight to spread rapidly. Your tomato crops are highly vulnerable over the next 5-7 days.": "വരാനിരിക്കുന്ന ഉയർന്ന ഈർപ്പവും മഴയും ലേറ്റ് ബ്ലൈറ്റ് അതിവേഗം പടരാൻ അനുയോജ്യമായ സാഹചര്യങ്ങളാണ്. നിങ്ങളുടെ തക്കാളി വിളകൾ അടുത്ത 5-7 ദിവസങ്ങളിൽ വളരെ ദുർബലമാണ്.",
     "General Advisory for All Crops": "എല്ലാ വിളകൾക്കുമുള്ള പൊതുവായ ഉപദേശം",
-    "Increased moisture can encourage fungal growth on all leafy vegetables. Ensure good air circulation and monitor for early signs of mildew.": "വർദ്ധിച്ച ഈർപ്പം എല്ലാ ഇലക്കറികളിലും പൂപ്പൽ വളർച്ചയെ പ്രോത്സാഹിപ്പിക്കും. നല്ല വായു സഞ്ചാരം ഉറപ്പാക്കുകയും плесень-ന്റെ ആദ്യ ലക്ഷണങ്ങൾ നിരീക്ഷിക്കുകയും ചെയ്യുക.",
+    "Increased moisture can encourage fungal growth on all leafy vegetables. Ensure good air circulation and monitor for early signs of mildew.": "വർദ്ധിച്ച ഈർപ്പം എല്ലാ ഇലക്കറികളിലും പൂപ്പൽ വളർച്ചയെ പ്രോത്സാഹിപ്പിക്കും. നല്ല വായു സഞ്ചാരം ഉറപ്പാക്കുകയും പൂപ്പൽ-ന്റെ ആദ്യ ലക്ഷണങ്ങൾ നിരീക്ഷിക്കുകയും ചെയ്യുക.",
     "Preventive Actions to Take Now": "ഇപ്പോൾ സ്വീകരിക്കേണ്ട പ്രതിരോധ നടപടികൾ",
     "Proactive steps to protect your farm based on the weather forecast.": "കാലാവസ്ഥാ പ്രവചനത്തെ അടിസ്ഥാനമാക്കി നിങ്ങളുടെ ഫാമിനെ സംരക്ഷിക്കുന്നതിനുള്ള മുൻകരുതൽ നടപടികൾ.",
     "Improve Air Circulation": "വായുസഞ്ചാരം മെച്ചപ്പെടുത്തുക",
@@ -213,5 +213,7 @@
     "Conversation not found": "സംഭാഷണം കണ്ടെത്താനായില്ല",
     "We couldn't find the chat you're looking for.": "നിങ്ങൾ തിരയുന്ന ചാറ്റ് കണ്ടെത്താനായില്ല.",
     "Back to Conversations": "സംഭാഷണങ്ങളിലേക്ക് മടങ്ങുക",
-    "Ask a follow-up question...": "ഒരു തുടർചോദ്യം ചോദിക്കുക..."
+    "Ask a follow-up question...": "ഒരു തുടർചോദ്യം ചോദിക്കുക...",
+    "Search by title...": "തലക്കെട്ട് ഉപയോഗിച്ച് തിരയുക...",
+    "You": "നിങ്ങൾ"
 }
