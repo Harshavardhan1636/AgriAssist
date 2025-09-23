@@ -20,7 +20,13 @@ import { useSidebar } from './ui/sidebar';
 export default function AppSidebar() {
   const pathname = usePathname();
   const { t } = useI18n();
-  const { isCollapsed } = useSidebar();
+  const { isCollapsed, isMobile, setIsOpen } = useSidebar();
+
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setIsOpen(false);
+    }
+  };
 
 
   const menuItems = [
@@ -51,7 +57,7 @@ export default function AppSidebar() {
                 tooltip={item.label}
                 isCollapsed={isCollapsed}
               >
-                <Link href={item.href}>
+                <Link href={item.href} onClick={handleLinkClick}>
                   <item.icon />
                   <span>{item.label}</span>
                 </Link>
