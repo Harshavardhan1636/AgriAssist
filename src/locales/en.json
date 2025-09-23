@@ -194,5 +194,13 @@
     "Community Alert": "Community Alert",
     "High-risk outbreak detected": "High-risk outbreak detected",
     "in": "in",
-    "View Details": "View Details"
+    "View Details": "View Details",
+    "Feedback Submitted": "Feedback Submitted",
+    "has been processed.": "has been processed.",
+    "Correct Label (if AI is wrong)": "Correct Label (if AI is wrong)",
+    "Notes for Farmer & Retraining": "Notes for Farmer & Retraining",
+    "Add observations, mention subtle visual cues for the model...": "Add observations, mention subtle visual cues for the model...",
+    "Submit Correction": "Submit Correction",
+    "Viewing case": "Viewing case",
+    "of": "of"
 }

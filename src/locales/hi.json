@@ -194,5 +194,13 @@
     "Community Alert": "सामुदायिक चेतावनी",
     "High-risk outbreak detected": "उच्च जोखिम वाले प्रकोप का पता चला",
     "in": "में",
-    "View Details": "विवरण देखें"
+    "View Details": "विवरण देखें",
+    "Feedback Submitted": "प्रतिक्रिया सबमिट की गई",
+    "has been processed.": "संसाधित किया गया है।",
+    "Correct Label (if AI is wrong)": "सही लेबल (यदि AI गलत है)",
+    "Notes for Farmer & Retraining": "किसान और पुनर्शिक्षण के लिए नोट्स",
+    "Add observations, mention subtle visual cues for the model...": "अवलोकन जोड़ें, मॉडल के लिए सूक्ष्म दृश्य संकेतों का उल्लेख करें...",
+    "Submit Correction": "सुधार सबमिट करें",
+    "Viewing case": "मामला देख रहे हैं",
+    "of": "का"
 }

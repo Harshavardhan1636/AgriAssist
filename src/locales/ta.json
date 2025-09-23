@@ -21,7 +21,7 @@
     "Analyze Crop Health": "பயிர் ஆரோக்கியத்தை பகுப்பாய்வு செய்யுங்கள்",
     "Upload an image of a plant leaf to get an AI-powered health analysis and risk assessment.": "AI-இயங்கும் சுகாதார பகுப்பாய்வு மற்றும் இடர் மதிப்பீட்டைப் பெற தாவர இலையின் படத்தைப் பதிவேற்றவும்.",
     "Crop Image": "பயிர் படம்",
-    "Upload a file": "ഒരു கோப்பைப் பதிவேற்றவும்",
+    "Upload a file": "ഒരു കോப்பைப் பதிவேற்றவும்",
     "or drag and drop": "அல்லது இழுத்து விடுங்கள்",
     "PNG, JPG, GIF up to 10MB": "பிஎன்ஜி, ஜேபிஜி, ஜிஐஎஃப் 10MB வரை",
     "Analysis Failed": "பகுப்பாய்வு தோல்வியடைந்தது",
@@ -194,5 +194,13 @@
     "Community Alert": "சமூக எச்சரிக்கை",
     "High-risk outbreak detected": "அதிக ஆபத்துள்ள நோய் வெடிப்பு கண்டறியப்பட்டது",
     "in": "-ல்",
-    "View Details": "விவரங்களைக் காண்க"
+    "View Details": "விவரங்களைக் காண்க",
+    "Feedback Submitted": "கருத்து சமர்ப்பிக்கப்பட்டது",
+    "has been processed.": "செயலாக்கப்பட்டது.",
+    "Correct Label (if AI is wrong)": "சரியான லேபிள் (AI தவறாக இருந்தால்)",
+    "Notes for Farmer & Retraining": "விவசாயி மற்றும் மறுபயிற்சிக்கான குறிப்புகள்",
+    "Add observations, mention subtle visual cues for the model...": "கவனிப்புகளைச் சேர்க்கவும், மாதிரிக்கான நுட்பமான காட்சி குறிப்புகளைக் குறிப்பிடவும்...",
+    "Submit Correction": "திருத்தத்தைச் சமர்ப்பி",
+    "Viewing case": "வழக்கைப் பார்க்கிறது",
+    "of": "-இன்"
 }

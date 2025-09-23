@@ -194,5 +194,13 @@
     "Community Alert": "സാമൂഹിക മുന്നറിയിപ്പ്",
     "High-risk outbreak detected": "ഉയർന്ന അപകടസാധ്യതയുള്ള രോഗവ്യാപനം കണ്ടെത്തി",
     "in": "-ൽ",
-    "View Details": "വിശദാംശങ്ങൾ കാണുക"
+    "View Details": "വിശദാംശങ്ങൾ കാണുക",
+    "Feedback Submitted": "അഭിപ്രായം സമർപ്പിച്ചു",
+    "has been processed.": "പ്രോസസ്സ് ചെയ്തു.",
+    "Correct Label (if AI is wrong)": "ശരിയായ ലേബൽ (AI തെറ്റാണെങ്കിൽ)",
+    "Notes for Farmer & Retraining": "കർഷകനും പുനർപരിശീലനത്തിനുമുള്ള കുറിപ്പുകൾ",
+    "Add observations, mention subtle visual cues for the model...": "നിരീക്ഷണങ്ങൾ ചേർക്കുക, മോഡലിനായി സൂക്ഷ്മമായ വിഷ്വൽ സൂചനകൾ പരാമർശിക്കുക...",
+    "Submit Correction": "തിരുത്തൽ സമർപ്പിക്കുക",
+    "Viewing case": "കേസ് കാണുന്നു",
+    "of": "-ന്റെ"
 }

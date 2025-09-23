@@ -194,5 +194,13 @@
     "Community Alert": "సంఘం హెచ్చరిక",
     "High-risk outbreak detected": "అధిక-ప్రమాద వ్యాప్తి కనుగొనబడింది",
     "in": "లో",
-    "View Details": "వివరాలను చూడండి"
+    "View Details": "వివరాలను చూడండి",
+    "Feedback Submitted": "అభిప్రాయం సమర్పించబడింది",
+    "has been processed.": "ప్రాసెస్ చేయబడింది.",
+    "Correct Label (if AI is wrong)": "సరైన లేబుల్ (AI తప్పు అయితే)",
+    "Notes for Farmer & Retraining": "రైతు & పునఃశిక్షణ కోసం గమనికలు",
+    "Add observations, mention subtle visual cues for the model...": "పరిశీలనలను జోడించండి, మోడల్ కోసం సూక్ష్మ దృశ్య సూచనలను పేర్కొనండి...",
+    "Submit Correction": "సవరణను సమర్పించండి",
+    "Viewing case": "కేసును చూస్తున్నారు",
+    "of": "లో"
 }
