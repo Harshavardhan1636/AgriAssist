@@ -53,7 +53,6 @@ const analyzeImageSchema = z.object({
 
 
 export async function analyzeImage(
-    prevState: any,
     formData: FormData
   ): Promise<{ data: FullAnalysisResponse | null, error: string | null }> {
     

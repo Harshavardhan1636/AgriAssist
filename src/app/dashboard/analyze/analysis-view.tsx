@@ -57,14 +57,14 @@ export default function AnalysisView() {
     const formData = new FormData(event.currentTarget);
     
     try {
-      const response = await analyzeImage(null, formData);
+      const response = await analyzeImage(formData);
       if (response.error) {
         setError(response.error);
       } else {
         setResult(response.data);
       }
     } catch (e: any) {
-      setError(e.message || "An unexpected error occurred.");
+      setError(e.message || "An unexpected response was received from the server.");
     } finally {
       setIsPending(false);
     }
