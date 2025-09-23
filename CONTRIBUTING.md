@@ -11,13 +11,17 @@ The project follows the standard Next.js App Router structure. Here's an overvie
 This directory contains all the routes and UI pages of the application.
 
 - **`src/app/layout.tsx`**: The root layout of the application.
-- **`src/app/page.tsx`**: The home page, which redirects to the dashboard.
+- **`src/app/page.tsx`**: The home page, which redirects to the login or dashboard.
+- **`src/app/login/page.tsx`**: The user login page.
 - **`src/app/dashboard/`**: This is the main section of the application, containing the user-facing dashboard and its sub-pages.
   - **`layout.tsx`**: The primary layout for the dashboard area, including the sidebar and header.
   - **`page.tsx`**: The main dashboard overview page.
   - **`analyze/`**: Contains the logic and UI for uploading an image and viewing the analysis results. The core server-side logic is in `actions.ts`.
   - **`history/`**: The page for viewing past analyses.
   - **`review/`**: The page for agronomists to review low-confidence AI predictions.
+  - **`community/`**: The page for visualizing community-reported outbreaks on a map.
+  - **`store/`**: The e-commerce section for recommended products and a retailer map.
+  - **`settings/`**: The user settings page for profile, appearance, and language.
 
 ### `src/ai`
 
@@ -41,15 +45,21 @@ This directory is for shared utilities, type definitions, and mock data.
 - **`src/lib/types.ts`**: Contains all major TypeScript type definitions used throughout the application. This file is crucial for understanding the data structures.
 - **`src/lib/utils.ts`**: General utility functions.
 - **`src/lib/mock-data.ts`**: Provides mock data for populating the UI in a development environment.
+- **`src/lib/placeholder-images.json`**: Contains all placeholder image data used in the app.
+
+### `src/context`
+This directory holds React context providers for managing global state.
+- **`src/context/auth-context.tsx`**: Manages user authentication state.
+- **`src/context/i18n-context.tsx`**: Manages internationalization and language state.
 
 ## Business Logic Flow
 
 The primary user workflow is the **Image Analysis Flow**:
 
-1.  A user uploads an image in the UI (`src/app/dashboard/analyze/analysis-view.tsx`).
+1.  A user provides input (image, text, or audio) in the UI (`src/app/dashboard/analyze/analysis-view.tsx`).
 2.  The form submission triggers the `analyzeImage` server action in `src/app/dashboard/analyze/actions.ts`.
 3.  The `analyzeImage` action orchestrates multiple calls to different AI flows defined in `src/ai/flows/`.
-    - It first calls `classifyPlantDisease` to get the disease name.
-    - It then runs `assessDiseaseSeverity`, `explainClassificationWithGradCAM`, and `forecastOutbreakRisk` in parallel.
+    - It first calls `classifyPlantDisease` (or `diagnoseWithText`) to get the disease name.
+    - It then runs `assessDiseaseSeverity`, `explainClassificationWithGradCAM`, `forecastOutbreakRisk`, and `generateRecommendations` in parallel.
 4.  The aggregated result is returned to the client.
 5.  The `AnalysisResults` component (`src/app/dashboard/analyze/analysis-results.tsx`) receives the data and displays it to the user.
