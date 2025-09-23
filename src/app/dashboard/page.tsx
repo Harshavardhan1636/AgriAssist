@@ -60,6 +60,7 @@ export default function DashboardPage() {
   const recentAnalyses = mockHistory.slice(0, 5);
   const { t } = useI18n();
   const today = new Date();
+  const minimalForecast = mockForecast.slice(0, 7);
 
   return (
     <div className="flex flex-col gap-6">
@@ -119,8 +120,8 @@ export default function DashboardPage() {
         <CardHeader>
             <div className='flex justify-between items-center'>
                 <div>
-                    <CardTitle>{t('14-Day Forecast')}</CardTitle>
-                    <CardDescription>{t('Minimal weather forecast for the upcoming two weeks.')}</CardDescription>
+                    <CardTitle>{t('7-Day Forecast')}</CardTitle>
+                    <CardDescription>{t('Minimal weather forecast for the upcoming week.')}</CardDescription>
                 </div>
                  <Button asChild size="sm" variant="outline">
                     <Link href="/dashboard/forecast">{t('View Detailed Forecast')}</Link>
@@ -128,10 +129,9 @@ export default function DashboardPage() {
             </div>
         </CardHeader>
         <CardContent>
-            <ScrollArea>
-              <div className="flex space-x-6 pb-4">
-                {mockForecast.map((day, index) => (
-                  <div key={index} className="flex flex-col items-center min-w-[80px] p-2 rounded-lg bg-muted/50">
+            <div className="grid grid-cols-7 gap-2">
+                {minimalForecast.map((day, index) => (
+                  <div key={index} className="flex flex-col items-center p-2 rounded-lg bg-muted/50 text-center">
                     <p className="font-semibold text-sm">{format(addDays(today, index), 'EEE')}</p>
                     <Cloudy className="h-8 w-8 my-2 text-muted-foreground" />
                     <p className="font-bold text-lg">{day.temp.max}°</p>
@@ -141,9 +141,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 ))}
-              </div>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
+            </div>
         </CardContent>
        </Card>
 
