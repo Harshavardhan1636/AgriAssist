@@ -51,24 +51,23 @@ export const SidebarTrigger = React.forwardRef<
   HTMLButtonElement,
   ButtonProps
 >(({ className, children, ...props }, ref) => {
-  const { isMobile } = useSidebar();
+  const { isMobile, isOpen, setIsOpen } = useSidebar();
 
-  // The trigger is only for mobile view.
   if (!isMobile) {
-    return null
+    return null;
   }
   
   return (
     <SheetTrigger asChild>
-      <Button
-        ref={ref}
-        variant="ghost"
-        size="icon"
-        className={cn(className)}
-        {...props}
-      >
-        {children}
-      </Button>
+        <Button
+          ref={ref}
+          variant="ghost"
+          size="icon"
+          className={cn(className)}
+          {...props}
+        >
+          {children}
+        </Button>
     </SheetTrigger>
   );
 });
@@ -84,7 +83,6 @@ export const Sidebar = React.forwardRef<
   if (isMobile) {
     return (
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        {/* The trigger is now part of the Header and activates this sheet */}
         <SheetContent side="left" className="p-0">
            <SheetHeader className="p-4 border-b">
              <SheetTitle className="sr-only">AgriAssist Menu</SheetTitle>
@@ -242,4 +240,5 @@ export const SidebarInset = React.forwardRef<
   )
 })
 SidebarInset.displayName = "SidebarInset"
+
 
