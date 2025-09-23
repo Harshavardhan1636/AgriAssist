@@ -7,27 +7,18 @@ import {
   SidebarContent,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton,
   SidebarFooter,
+  SidebarMenuLink,
 } from '@/components/ui/sidebar';
 import { Leaf, LayoutDashboard, History, FlaskConical, LifeBuoy, Settings, Users } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useI18n } from '@/context/i18n-context';
 import { useSidebar } from './ui/sidebar';
 
 
 export default function AppSidebar() {
-  const pathname = usePathname();
   const { t } = useI18n();
-  const { isCollapsed, isMobile, setIsOpen } = useSidebar();
-
-  const handleLinkClick = () => {
-    if (isMobile) {
-      setIsOpen(false);
-    }
-  };
-
+  const { isCollapsed } = useSidebar();
 
   const menuItems = [
     { href: '/dashboard', label: t('Dashboard'), icon: LayoutDashboard },
@@ -37,44 +28,42 @@ export default function AppSidebar() {
     { href: '/dashboard/review', label: t('Review Queue'), icon: LifeBuoy },
   ];
 
+  const settingsItem = { href: '#', label: t('Settings'), icon: Settings };
+
   return (
-    <Sidebar>
-      <SidebarHeader>
-        <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+    <>
+      <Sidebar>
+        <SidebarHeader>
             <Link href="/" className="flex items-center gap-2 font-semibold">
                 <Leaf className="h-6 w-6 text-primary" />
                 {!isCollapsed && <span className="">AgriAssist</span>}
             </Link>
-        </div>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarMenu>
-          {menuItems.map((item) => (
-            <SidebarMenuItem key={item.label}>
-              <SidebarMenuButton
-                asChild
-                isActive={pathname === item.href}
-                tooltip={item.label}
-              >
-                <Link href={item.href} onClick={handleLinkClick}>
-                  <item.icon />
-                  <span>{item.label}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenu>
-            <SidebarMenuItem>
-                <SidebarMenuButton tooltip={t('Settings')}>
-                    <Settings />
-                    <span>{t('Settings')}</span>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarMenu>
+            {menuItems.map((item) => (
+              <SidebarMenuItem key={item.label}>
+                <SidebarMenuLink 
+                    href={item.href}
+                    label={item.label}
+                    icon={item.icon}
+                />
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarContent>
+        <SidebarFooter>
+          <SidebarMenu>
+              <SidebarMenuItem>
+                  <SidebarMenuLink 
+                      href={settingsItem.href}
+                      label={settingsItem.label}
+                      icon={settingsItem.icon}
+                  />
+              </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+      </Sidebar>
+    </>
   );
 }

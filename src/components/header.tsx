@@ -3,7 +3,7 @@
 
 import { UserNav } from "@/components/user-nav";
 import { Button } from "@/components/ui/button";
-import { Languages, PanelLeft, PanelLeftClose, PanelRightClose } from "lucide-react";
+import { Languages, PanelLeftClose, PanelRightClose } from "lucide-react";
 import { useI18n } from "@/context/i18n-context";
 import {
   DropdownMenu,
@@ -15,7 +15,7 @@ import { MobileSidebar, useSidebar } from "./ui/sidebar";
 
 
 export default function Header() {
-  const { t, setLocale, locale } = useI18n();
+  const { setLocale, locale } = useI18n();
   const { isCollapsed, setIsCollapsed, isMobile } = useSidebar();
 
 
@@ -30,7 +30,10 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-        <MobileSidebar />
+        <MobileSidebar>
+            {/* The AppSidebar component will be rendered inside the SheetContent for mobile */}
+            {/* This is a placeholder; the actual content is in layout.tsx */}
+        </MobileSidebar>
 
         {!isMobile && (
             <Button

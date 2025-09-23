@@ -3,7 +3,7 @@
 
 import AppSidebar from '@/components/app-sidebar';
 import Header from '@/components/header';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider, MobileSidebar } from '@/components/ui/sidebar';
 
 export default function DashboardLayout({
   children,
@@ -20,6 +20,9 @@ export default function DashboardLayout({
             {children}
           </main>
         </div>
+        <MobileSidebar>
+            <AppSidebar />
+        </MobileSidebar>
       </div>
     </SidebarProvider>
   );
