@@ -40,7 +40,7 @@ const ForecastOutbreakRiskOutputSchema = z.object({
       .describe(
         'The risk score for a potential outbreak, ranging from 0 to 1 (0-100%).'
       ),
-  explanation: z.string().describe('A detailed explanation of the factors contributing to the risk score, including how weather impacts the specific disease on the specific crop.'),
+  explanation: z.string().describe('A detailed explanation of the factors contributing to the risk score, including how weather and soil type impact the specific disease on the specific crop.'),
   preventiveActions: z
     .array(z.string())
     .describe('A list of clear, actionable preventive actions to mitigate the outbreak risk based on the forecast.'),
@@ -70,11 +70,11 @@ const prompt = ai.definePrompt({
 
   Your Task:
   1.  **Calculate a Risk Score:** Provide a risk score between 0 and 1, representing the probability of a significant outbreak in the next 7-14 days.
-  2.  **Provide a Detailed Explanation:** Explain the "why" behind the score. Mention how the forecasted weather (humidity, temperature) specifically favors or disfavors the growth and spread of the identified '{{{disease}}}' on '{{{cropType}}}'.
-  3.  **Suggest Preventive Actions:** Provide a list of 3-4 clear, simple, and actionable steps the farmer can take *before* the outbreak gets worse, based on the forecast. Prioritize cultural and organic methods.
+  2.  **Provide a Detailed Explanation:** Explain the "why" behind the score. Mention how the forecasted weather (humidity, temperature) and the specified '{{{soilType}}}' (e.g., clay soil retains moisture, increasing fungal risk) specifically favors or disfavors the growth and spread of the identified '{{{disease}}}' on '{{{cropType}}}'.
+  3.  **Suggest Preventive Actions:** Provide a list of 3-4 clear, simple, and actionable steps the farmer can take *before* the outbreak gets worse, based on the forecast and soil type. Prioritize cultural and organic methods.
 
   Example Preventive Actions:
-  - "With rain expected, ensure good field drainage to avoid waterlogging, which helps spread blight."
+  - "With rain expected in your clay soil, ensure good field drainage to avoid waterlogging, which helps spread blight."
   - "Improve air circulation by pruning lower leaves, as high humidity is forecasted."
   - "Avoid overhead watering in the evenings to keep leaves dry overnight."
   - "Proactively spray with a Neem oil solution before the forecasted rain."
@@ -93,5 +93,4 @@ const forecastOutbreakRiskFlow = ai.defineFlow(
     return output!;
   }
 );
-
     
