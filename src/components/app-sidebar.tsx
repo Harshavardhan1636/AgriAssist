@@ -15,7 +15,7 @@ import Link from 'next/link';
 import { useI18n } from '@/context/i18n-context';
 
 
-export default function AppSidebar() {
+export default function AppSidebar({isMobile = false}: {isMobile?: boolean}) {
     const { t } = useI18n();
   
     const menuItems = [
@@ -29,7 +29,7 @@ export default function AppSidebar() {
     const settingsItem = { href: '#', label: t('Settings'), icon: Settings };
 
     return (
-    <Sidebar>
+    <Sidebar isMobile={isMobile}>
         <SidebarHeader>
             <Link href="/" className="flex items-center gap-2 font-semibold">
                 <Leaf className="h-6 w-6 text-primary" />
@@ -63,3 +63,5 @@ export default function AppSidebar() {
     </Sidebar>
     )
 }
+
+    

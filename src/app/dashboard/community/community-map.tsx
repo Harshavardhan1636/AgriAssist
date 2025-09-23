@@ -64,6 +64,8 @@ export default function CommunityMap({ outbreaks }: CommunityMapProps) {
   }, [outbreaks]);
 
   return (
-    <div ref={mapContainerRef} className="h-[400px] w-full rounded-lg border overflow-hidden" />
+    <div ref={mapContainerRef} className="h-[400px] w-full rounded-lg border overflow-hidden z-10" />
   );
 }
+
+    

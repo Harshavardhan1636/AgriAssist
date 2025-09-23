@@ -59,11 +59,13 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 
 export const Sidebar = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, children, ...props }, ref) => {  
+  React.HTMLAttributes<HTMLDivElement> & { isMobile?: boolean }
+>(({ className, children, isMobile = false, ...props }, ref) => {  
+  const { isCollapsed } = useSidebar();
   return (
     <div
       ref={ref}
+      data-collapsed={isMobile ? false : isCollapsed}
       className={cn('flex h-full max-h-screen flex-col gap-2', className)}
       {...props}
     >
@@ -172,3 +174,5 @@ export const SidebarMenuLink = ({ href, label, icon: Icon }: SidebarMenuLinkProp
       </Link>
     );
 };
+
+    

@@ -159,7 +159,7 @@ export default function AnalysisView() {
   return (
     <form onSubmit={handleSubmit}>
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-auto sm:h-10">
                 <TabsTrigger value="image"><ImageIcon className="mr-2 h-4 w-4" />{t('Analyze with Image')}</TabsTrigger>
                 <TabsTrigger value="text"><FileText className="mr-2 h-4 w-4"/>{t('Describe the Issue')}</TabsTrigger>
                 <TabsTrigger value="audio"><Mic className="mr-2 h-4 w-4"/>{t('Record Audio')}</TabsTrigger>
@@ -288,3 +288,5 @@ export default function AnalysisView() {
     </form>
   );
 }
+
+    
