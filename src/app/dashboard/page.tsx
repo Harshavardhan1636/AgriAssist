@@ -22,11 +22,19 @@ import {
   FlaskConical,
   ShieldAlert,
 } from "lucide-react";
-import DetectionsChart from "./detections-chart";
+
 import { mockHistory } from "@/lib/mock-data";
 import { formatDistanceToNow } from "date-fns";
 import Image from "next/image";
 import { useI18n } from "@/context/i18n-context";
+import dynamic from 'next/dynamic';
+import { Skeleton } from "@/components/ui/skeleton";
+
+const DetectionsChart = dynamic(() => import('./detections-chart'), { 
+    ssr: false,
+    loading: () => <Skeleton className="h-[300px] w-full" />
+});
+
 
 const chartData = [
   { day: "Mon", detections: 5 },
