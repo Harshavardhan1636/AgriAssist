@@ -60,8 +60,11 @@ export default function AnalysisView() {
       const response = await analyzeImage(formData);
       if (response.error) {
         setError(response.error);
-      } else {
+      } else if (response.data) {
         setResult(response.data);
+      } else {
+        // This case should not happen if the server action is well-behaved
+        setError("An unexpected error occurred: received no data and no error.");
       }
     } catch (e: any) {
       setError(e.message || "An unexpected response was received from the server.");
@@ -148,7 +151,7 @@ export default function AnalysisView() {
             <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>{t('Analysis Failed')}</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription>{t(error) || error}</AlertDescription>
             </Alert>
           )}
           <Button type="submit" disabled={!preview || isPending} className="w-full">
