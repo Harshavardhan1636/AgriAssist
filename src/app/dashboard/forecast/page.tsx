@@ -21,8 +21,8 @@ export default function ForecastPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>{t('7-Day Forecast')}</CardTitle>
-                    <CardDescription>{t('Detailed weather forecast for the upcoming week.')}</CardDescription>
+                    <CardTitle>{t('14-Day Forecast')}</CardTitle>
+                    <CardDescription>{t('Detailed weather forecast for the upcoming two weeks.')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="overflow-x-auto">
@@ -122,3 +122,5 @@ export default function ForecastPage() {
         </div>
     );
 }
+
+    

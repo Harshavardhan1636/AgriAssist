@@ -119,8 +119,8 @@ export default function DashboardPage() {
         <CardHeader>
             <div className='flex justify-between items-center'>
                 <div>
-                    <CardTitle>{t('7-Day Forecast')}</CardTitle>
-                    <CardDescription>{t('Minimal weather forecast for the upcoming week.')}</CardDescription>
+                    <CardTitle>{t('14-Day Forecast')}</CardTitle>
+                    <CardDescription>{t('Minimal weather forecast for the upcoming two weeks.')}</CardDescription>
                 </div>
                  <Button asChild size="sm" variant="outline">
                     <Link href="/dashboard/forecast">{t('View Detailed Forecast')}</Link>
@@ -207,3 +207,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    

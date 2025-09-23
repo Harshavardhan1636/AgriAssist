@@ -17,14 +17,14 @@ const ForecastOutbreakRiskInputSchema = z.object({
   disease: z.string().describe('The name of the detected disease.'),
   historicalDetections: z
     .array(z.number())
-    .describe('Historical detection counts in the last 7 days.'),
+    .describe('Historical detection counts in the last 14 days.'),
   weatherFeatures: z
     .object({
       temperature: z.number(),
       humidity: z.number(),
       rainfall: z.number(),
     })
-    .describe('Local weather features (7-day average).'),
+    .describe('Local weather features (14-day average).'),
   cropType: z.string().describe('Type of crop.'),
   soilType: z.string().describe('Type of soil.'),
   language: z.string().optional().describe('The language for the output, as a two-letter ISO 639-1 code (e.g., "en", "hi").'),
@@ -64,9 +64,9 @@ const prompt = ai.definePrompt({
   Analysis Details:
   - Detected Disease: {{{disease}}}
   - Crop Type: {{{cropType}}}
-  - 7-Day Avg Weather: Temperature={{{weatherFeatures.temperature}}}°C, Humidity={{{weatherFeatures.humidity}}}%, Rainfall={{{weatherFeatures.rainfall}}}mm
+  - 14-Day Avg Weather: Temperature={{{weatherFeatures.temperature}}}°C, Humidity={{{weatherFeatures.humidity}}}%, Rainfall={{{weatherFeatures.rainfall}}}mm
   - Soil Type: {{{soilType}}}
-  - Historical Detections (last 7 days): {{{historicalDetections}}}
+  - Historical Detections (last 14 days): {{{historicalDetections}}}
 
   Your Task:
   1.  **Calculate a Risk Score:** Provide a risk score between 0 and 1, representing the probability of a significant outbreak in the next 7-14 days.
@@ -93,3 +93,5 @@ const forecastOutbreakRiskFlow = ai.defineFlow(
     return output!;
   }
 );
+
+    

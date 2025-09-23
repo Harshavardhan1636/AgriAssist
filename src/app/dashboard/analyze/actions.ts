@@ -7,7 +7,7 @@ import { assessDiseaseSeverity } from "@/ai/flows/assess-disease-severity";
 import { forecastOutbreakRisk } from "@/ai/flows/forecast-outbreak-risk";
 import { explainClassificationWithGradCAM } from "@/ai/flows/explain-classification-with-grad-cam";
 import { generateRecommendations } from "@/ai/flows/generate-recommendations";
-import { askFollowUpQuestion as askFollowUpQuestionFlow } from "@/ai/flows/ask-follow-up-question";
+import { askFollowUpQuestion as askFollowUpQuestionFlow } from "@/aiflows/ask-follow-up-question";
 import { transcribeAudio } from "@/ai/flows/transcribe-audio";
 import type { AskFollowUpQuestionOutput } from "@/ai/flows/ask-follow-up-question";
 import type { FullAnalysisResponse } from "@/lib/types";
@@ -134,8 +134,8 @@ export async function analyzeImage(
         // Forecast Risk
         forecastOutbreakRisk({
           disease: topPrediction.label,
-          historicalDetections: [1, 0, 2, 1, 3, 0, 4],
-          weatherFeatures: { temperature: 25, humidity: 80, rainfall: 5 },
+          historicalDetections: [1, 0, 2, 1, 3, 0, 4, 2, 3, 1, 5, 2, 4, 3], // Mock data for 14 days
+          weatherFeatures: { temperature: 28, humidity: 82, rainfall: 8 }, // Mock 14-day average
           cropType: 'Tomato', // Mock data
           soilType: 'Loam', // Mock data
           language: locale,
@@ -186,3 +186,5 @@ export async function askFollowUpQuestion(
         return { answer: "Sorry, I encountered an error trying to answer your question." };
     }
 }
+
+    

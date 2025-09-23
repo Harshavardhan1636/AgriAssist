@@ -142,11 +142,11 @@
     "Forecast": "முன்னறிவிப்பு",
     "High-Risk Alert: Tomato Late Blight": "அதிக ஆபத்துள்ள எச்சரிக்கை: தக்காளி தாமதமான கருகல் நோய்",
     "High humidity forecasted. Your tomato crops are at immediate risk. Review preventive actions now.": "அதிக ஈரப்பதம் கணிக்கப்பட்டுள்ளது. உங்கள் தக்காளி பயிர்கள் உடனடி ஆபத்தில் உள்ளன. தடுப்பு நடவடிக்கைகளை இப்போது மதிப்பாய்வு செய்யவும்.",
-    "7-Day Forecast": "7-நாள் முன்னறிவிப்பு",
+    "14-Day Forecast": "14-நாள் முன்னறிவிப்பு",
     "View Detailed Forecast": "விரிவான முன்னறிவிப்பைக் காண்க",
-    "Minimal weather forecast for the upcoming week.": "வரவிருக்கும் வாரத்திற்கான குறைந்தபட்ச வானிலை முன்னறிவிப்பு.",
+    "Minimal weather forecast for the upcoming two weeks.": "வரவிருக்கும் இரண்டு வாரங்களுக்கான குறைந்தபட்ச வானிலை முன்னறிவிப்பு.",
     "Weather Forecast & Advisory": "வானிலை முன்னறிவிப்பு மற்றும் ஆலோசனை",
-    "Detailed weather forecast for the upcoming week.": "வரவிருக்கும் வாரத்திற்கான விரிவான வானிலை முன்னறிவிப்பு.",
+    "Detailed weather forecast for the upcoming two weeks.": "வரவிருக்கும் இரண்டு வாரங்களுக்கான விரிவான வானிலை முன்னறிவிப்பு.",
     "Condition": "நிலை",
     "Temperature": "வெப்பநிலை",
     "Humidity": "ஈரப்பதம்",
@@ -170,3 +170,5 @@
     "Scout for Early Symptoms": "ஆரம்ப அறிகுறிகளுக்காக கண்காணிக்கவும்",
     "Be extra vigilant in the mornings after rainfall. Look for the first signs of blight on lower leaves and stems.": "மழைக்குப் பிறகு காலையில் கூடுதல் கவனமாக இருங்கள். கீழ் இலைகள் மற்றும் தண்டுகளில் கருகல் நோயின் முதல் அறிகுறிகளைத் தேடுங்கள்."
 }
+
+    

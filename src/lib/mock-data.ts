@@ -338,4 +338,13 @@ export const mockForecast: WeatherForecast[] = [
     { condition: 'Rain', temp: { max: 28, min: 22 }, humidity: 92, rainChance: 60 },
     { condition: 'Partly Cloudy', temp: { max: 31, min: 24 }, humidity: 85, rainChance: 20 },
     { condition: 'Sunny', temp: { max: 34, min: 26 }, humidity: 70, rainChance: 10 },
+    { condition: 'Sunny', temp: { max: 35, min: 27 }, humidity: 68, rainChance: 5 },
+    { condition: 'Partly Cloudy', temp: { max: 34, min: 26 }, humidity: 72, rainChance: 15 },
+    { condition: 'Cloudy', temp: { max: 31, min: 24 }, humidity: 78, rainChance: 25 },
+    { condition: 'Rain', temp: { max: 29, min: 23 }, humidity: 85, rainChance: 55 },
+    { condition: 'Thunderstorms', temp: { max: 30, min: 24 }, humidity: 88, rainChance: 65 },
+    { condition: 'Partly Cloudy', temp: { max: 32, min: 25 }, humidity: 80, rainChance: 20 },
+    { condition: 'Sunny', temp: { max: 34, min: 26 }, humidity: 75, rainChance: 10 },
 ];
+
+    

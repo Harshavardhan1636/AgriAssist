@@ -142,11 +142,11 @@
     "Forecast": "సూచన",
     "High-Risk Alert: Tomato Late Blight": "అధిక-ప్రమాద హెచ్చరిక: టమోటా లేట్ బ్లైట్",
     "High humidity forecasted. Your tomato crops are at immediate risk. Review preventive actions now.": "అధిక తేమ అంచనా వేయబడింది. మీ టమోటా పంటలు తక్షణ ప్రమాదంలో ఉన్నాయి. ఇప్పుడు నివారణ చర్యలను సమీక్షించండి.",
-    "7-Day Forecast": "7-రోజుల సూచన",
+    "14-Day Forecast": "14-రోజుల సూచన",
     "View Detailed Forecast": "వివరణాత్మక సూచనను వీక్షించండి",
-    "Minimal weather forecast for the upcoming week.": "రాబోయే వారానికి కనీస వాతావరణ సూచన.",
+    "Minimal weather forecast for the upcoming two weeks.": "రాబోయే రెండు వారాలకు కనీస వాతావరణ సూచన.",
     "Weather Forecast & Advisory": "వాతావరణ సూచన & సలహా",
-    "Detailed weather forecast for the upcoming week.": "రాబోయే వారానికి వివరణాత్మక వాతావరణ సూచన.",
+    "Detailed weather forecast for the upcoming two weeks.": "రాబోయే రెండు వారాలకు వివరణాత్మక వాతావరణ సూచన.",
     "Condition": "పరిస్థితి",
     "Temperature": "ఉష్ణోగ్రత",
     "Humidity": "తేమ",
@@ -170,3 +170,5 @@
     "Scout for Early Symptoms": "ప్రారంభ లక్షణాల కోసం వెతకండి",
     "Be extra vigilant in the mornings after rainfall. Look for the first signs of blight on lower leaves and stems.": "వర్షం తర్వాత ఉదయం పూట అదనపు జాగ్రత్తగా ఉండండి. తక్కువ ఆకులు మరియు కాండాలపై బ్లైట్ యొక్క మొదటి సంకేతాల కోసం చూడండి."
 }
+
+    
