@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -18,6 +19,7 @@ const AssessDiseaseSeverityInputSchema = z.object({
       "A photo of a plant, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
   description: z.string().describe('The description of the plant and its symptoms.'),
+  language: z.string().optional().describe('The language for the output, as a two-letter ISO 639-1 code (e.g., "en", "hi").'),
 });
 export type AssessDiseaseSeverityInput = z.infer<typeof AssessDiseaseSeverityInputSchema>;
 
@@ -50,6 +52,8 @@ const prompt = ai.definePrompt({
 
   Analyze the provided image and description to estimate the severity of the disease. Provide both a percentage representing the severity and a qualitative description (Low, Medium, or High).
   Also, provide a confidence score for your assessment.
+
+  IMPORTANT: All output text MUST be in the language with the code: {{{language}}}.
 
   Description: {{{description}}}
   Image: {{media url=photoDataUri}}

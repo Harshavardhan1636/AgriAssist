@@ -1,3 +1,4 @@
+
 // forecast-outbreak-risk.ts
 'use server';
 
@@ -26,6 +27,7 @@ const ForecastOutbreakRiskInputSchema = z.object({
   cropType: z.string().describe('Type of crop.'),
   soilType: z.string().describe('Type of soil.'),
   recentSeverityAverages: z.number().describe('Recent severity averages.'),
+  language: z.string().optional().describe('The language for the output, as a two-letter ISO 639-1 code (e.g., "en", "hi").'),
 });
 export type ForecastOutbreakRiskInput = z.infer<typeof ForecastOutbreakRiskInputSchema>;
 
@@ -57,17 +59,19 @@ const prompt = ai.definePrompt({
   output: {schema: ForecastOutbreakRiskOutputSchema},
   prompt: `You are an expert agricultural advisor. You will receive data about recent disease detections, weather patterns, and farm characteristics to forecast potential disease outbreaks.
 
-Historical Detections: {{{historicalDetections}}}
-Weather Features: Temperature={{{weatherFeatures.temperature}}}, Humidity={{{weatherFeatures.humidity}}}, Rainfall={{{weatherFeatures.rainfall}}}
-Crop Type: {{{cropType}}}
-Soil Type: {{{soilType}}}
-Recent Severity Averages: {{{recentSeverityAverages}}}
+  IMPORTANT: All output text MUST be in the language with the code: {{{language}}}.
 
-Based on this data, provide a risk score between 0 and 1, an explanation for your assessment, and a list of recommendations to mitigate the outbreak risk.  The risk score should be between 0 and 1, representing the probability of an outbreak.
+  Historical Detections: {{{historicalDetections}}}
+  Weather Features: Temperature={{{weatherFeatures.temperature}}}, Humidity={{{weatherFeatures.humidity}}}, Rainfall={{{weatherFeatures.rainfall}}}
+  Crop Type: {{{cropType}}}
+  Soil Type: {{{soilType}}}
+  Recent Severity Averages: {{{recentSeverityAverages}}}
 
-Consider factors such as favorable weather conditions for disease spread, the vulnerability of the crop type, and the impact of soil conditions.
+  Based on this data, provide a risk score between 0 and 1, an explanation for your assessment, and a list of recommendations to mitigate the outbreak risk.  The risk score should be between 0 and 1, representing the probability of an outbreak.
 
-Provide specific and actionable recommendations tailored to the situation.
+  Consider factors such as favorable weather conditions for disease spread, the vulnerability of the crop type, and the impact of soil conditions.
+
+  Provide specific and actionable recommendations tailored to the situation.
 `,
 });
 

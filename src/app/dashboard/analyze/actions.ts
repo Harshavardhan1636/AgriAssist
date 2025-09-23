@@ -1,3 +1,4 @@
+
 'use server';
 
 import { classifyPlantDisease } from "@/ai/flows/classify-plant-disease";
@@ -49,6 +50,7 @@ const analyzeImageSchema = z.object({
   photoDataUri: z.string().refine(val => val.startsWith('data:image/'), {
     message: "Invalid image data URI"
   }),
+  locale: z.string().optional(),
 });
 
 
@@ -66,9 +68,10 @@ export async function analyzeImage(
 ): Promise<{ data: FullAnalysisResponse | null, error: string | null }> {
 
   const photoDataUri = formData.get('photoDataUri') as string;
+  const locale = formData.get('locale') as string || 'en';
 
   // 1. Validate the input to ensure it's a valid data URI.
-  const validatedFields = analyzeImageSchema.safeParse({ photoDataUri });
+  const validatedFields = analyzeImageSchema.safeParse({ photoDataUri, locale });
   if (!validatedFields.success) {
     return { data: null, error: "Invalid input: Please upload a valid image." };
   }
@@ -76,7 +79,7 @@ export async function analyzeImage(
   try {
     // 2. First, classify the disease to get the primary diagnosis.
     // This is done first because its output is used as input for other flows.
-    const classification = await classifyPlantDisease({ photoDataUri });
+    const classification = await classifyPlantDisease({ photoDataUri, language: locale });
     
     // Get the top prediction to pass to other AI flows for more context.
     const topPrediction = classification.predictions?.[0] ?? { label: "unknown", confidence: 0 };
@@ -85,7 +88,7 @@ export async function analyzeImage(
     // These flows provide deeper insights into the diagnosis.
     const [severity, explanation, forecast, recommendations] = await Promise.all([
       // Assess the severity of the identified disease.
-      assessDiseaseSeverity({ photoDataUri, description: `Image of a plant leaf, classified as ${topPrediction.label}` }),
+      assessDiseaseSeverity({ photoDataUri, description: `Image of a plant leaf, classified as ${topPrediction.label}`, language: locale }),
       // Generate an "explainable AI" overlay to show what the AI focused on.
       explainClassificationWithGradCAM({ photoDataUri, classificationResult: topPrediction.label }),
       // Forecast the risk of a disease outbreak based on mock data.
@@ -95,9 +98,10 @@ export async function analyzeImage(
         cropType: 'Tomato', // Mock data
         soilType: 'Loam', // Mock data
         recentSeverityAverages: 0.35, // Mock data
+        language: locale,
       }),
        // Generate ethical recommendations.
-      generateRecommendations({ disease: topPrediction.label, severity: 'Medium' /* Placeholder */, cropType: 'Tomato' }),
+      generateRecommendations({ disease: topPrediction.label, severity: 'Medium' /* Placeholder */, cropType: 'Tomato', language: locale }),
     ]);
     
     // 4. Fallback for the Grad-CAM explanation. If the AI fails to generate an
@@ -115,6 +119,7 @@ export async function analyzeImage(
         forecast,
         recommendations,
         originalImage: photoDataUri,
+        locale,
       },
       error: null
     };
@@ -135,9 +140,10 @@ export async function analyzeImage(
 export async function askFollowUpQuestion(
   analysisContext: string,
   question: string,
+  language: string,
 ): Promise<AskFollowUpQuestionOutput> {
     try {
-        const result = await askFollowUpQuestionFlow({ analysisContext, question });
+        const result = await askFollowUpQuestionFlow({ analysisContext, question, language });
         return result;
     } catch(e: any) {
         console.error("Follow-up question failed:", e);

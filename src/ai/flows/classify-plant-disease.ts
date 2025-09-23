@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -17,6 +18,7 @@ const ClassifyPlantDiseaseInputSchema = z.object({
     .describe(
       "A photo of a plant, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
+  language: z.string().optional().describe('The language for the output, as a two-letter ISO 639-1 code (e.g., "en", "hi").'),
 });
 export type ClassifyPlantDiseaseInput = z.infer<typeof ClassifyPlantDiseaseInputSchema>;
 
@@ -40,7 +42,9 @@ const prompt = ai.definePrompt({
   output: {schema: ClassifyPlantDiseaseOutputSchema},
   prompt: `You are an expert in plant pathology. Given an image of a plant, identify potential diseases and provide a confidence level for each prediction.
 
-  Analyze the following image and provide a list of potential diseases with confidence levels:
+  Analyze the following image and provide a list of potential diseases with confidence levels.
+
+  IMPORTANT: All output labels MUST be in the language with the code: {{{language}}}.
 
   Image: {{media url=photoDataUri}}
 

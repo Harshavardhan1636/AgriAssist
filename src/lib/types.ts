@@ -1,3 +1,4 @@
+
 import type {
   ClassifyPlantDiseaseOutput,
   AssessDiseaseSeverityOutput,
@@ -38,4 +39,5 @@ export type FullAnalysisResponse = {
   forecast: ForecastOutbreakRiskOutput;
   recommendations: GenerateRecommendationsOutput;
   originalImage: string;
+  locale: string;
 };

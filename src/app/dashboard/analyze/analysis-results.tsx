@@ -25,7 +25,7 @@ interface ChatMessage {
 }
 
 export default function AnalysisResults({ result }: AnalysisResultsProps) {
-  const { classification, severity, explanation, forecast, recommendations } = result;
+  const { classification, severity, explanation, forecast, recommendations, locale } = result;
   const topPrediction = classification.predictions[0];
   const { t } = useI18n();
 
@@ -49,7 +49,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     setQuestion('');
     setIsAsking(true);
 
-    const response: AskFollowUpQuestionOutput = await askFollowUpQuestion(analysisContext, question);
+    const response: AskFollowUpQuestionOutput = await askFollowUpQuestion(analysisContext, question, locale);
 
     const newAiMessage: ChatMessage = { sender: 'bot', text: response.answer };
     setChatHistory(prev => [...prev, newAiMessage]);
@@ -79,7 +79,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                 {recommendations.recommendations.map((rec, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">{index + 1}</div>
-                    <p className="flex-1 pt-0.5 text-sm">{t(rec)}</p>
+                    <p className="flex-1 pt-0.5 text-sm">{rec}</p>
                   </li>
                 ))}
               </ul>
@@ -130,7 +130,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
               <RadialChart 
                 value={severity.severityPercentage}
                 mainText={`${Math.round(severity.severityPercentage)}%`}
-                subText={t(severity.severityBand as 'Low' | 'Medium' | 'High')}
+                subText={severity.severityBand}
               />
             </CardContent>
           </Card>

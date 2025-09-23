@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -15,6 +16,7 @@ const GenerateRecommendationsInputSchema = z.object({
   disease: z.string().describe('The name of the diagnosed plant disease.'),
   severity: z.string().describe('The severity of the disease (e.g., Low, Medium, High).'),
   cropType: z.string().describe('The type of crop affected.'),
+  language: z.string().optional().describe('The language for the output, as a two-letter ISO 639-1 code (e.g., "en", "hi").'),
 });
 export type GenerateRecommendationsInput = z.infer<typeof GenerateRecommendationsInputSchema>;
 
@@ -34,6 +36,8 @@ const prompt = ai.definePrompt({
   input: {schema: GenerateRecommendationsInputSchema},
   output: {schema: GenerateRecommendationsOutputSchema},
   prompt: `You are an ethical agricultural advisor creating a recommendation plan for a farmer in India.
+
+  IMPORTANT: All output text MUST be in the language with the code: {{{language}}}.
 
   Disease: {{{disease}}}
   Severity: {{{severity}}}

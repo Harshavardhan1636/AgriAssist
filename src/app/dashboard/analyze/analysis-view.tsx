@@ -30,7 +30,7 @@ export default function AnalysisView() {
   const [formState, formAction, isPending] = useActionState(analyzeImage, initialState);
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -71,6 +71,7 @@ export default function AnalysisView() {
       <CardContent>
         <form action={formAction} className="space-y-6">
             {preview && <input type="hidden" name="photoDataUri" value={preview} />}
+            <input type="hidden" name="locale" value={locale} />
           <div className="space-y-2">
             <label htmlFor="file-upload" className="block text-sm font-medium text-foreground">
               {t('Crop Image')}

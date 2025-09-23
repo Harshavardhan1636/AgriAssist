@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -14,6 +15,7 @@ import {z} from 'genkit';
 const AskFollowUpQuestionInputSchema = z.object({
   analysisContext: z.string().describe("The context of the original analysis, including disease, severity, and risk."),
   question: z.string().describe('The farmer\'s follow-up question.'),
+  language: z.string().optional().describe('The language for the output, as a two-letter ISO 639-1 code (e.g., "en", "hi").'),
 });
 export type AskFollowUpQuestionInput = z.infer<typeof AskFollowUpQuestionInputSchema>;
 
@@ -34,11 +36,13 @@ const prompt = ai.definePrompt({
   output: {schema: AskFollowUpQuestionOutputSchema},
   prompt: `You are a friendly and helpful agricultural assistant for a farmer. The farmer has received an analysis and is asking a follow-up question.
 
+  IMPORTANT: Your answer MUST be in the language with the code: {{{language}}}. The user's question may be in a different language, but your answer must be in the target language.
+
   CONTEXT of the analysis: {{{analysisContext}}}
 
   FARMER'S QUESTION: {{{question}}}
 
-  Your task is to answer the farmer's question in a simple, clear, and encouraging way. Speak in the same language as the user's question. Do not use complex jargon.
+  Your task is to answer the farmer's question in a simple, clear, and encouraging way. Do not use complex jargon.
 
   Provide a direct answer to the question based on the context.
   `,
