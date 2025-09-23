@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -10,15 +9,13 @@ import {
   SidebarFooter,
   SidebarMenuLink,
 } from '@/components/ui/sidebar';
-import { Leaf, LayoutDashboard, History, FlaskConical, LifeBuoy, Settings, Users, PanelLeft } from 'lucide-react';
+import { Leaf, LayoutDashboard, History, FlaskConical, LifeBuoy, Settings, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useI18n } from '@/context/i18n-context';
 import { useSidebar } from './ui/sidebar';
-import { SheetTrigger } from './ui/sheet';
-import { Button } from './ui/button';
 
 
-function MobileMenu() {
+export default function AppSidebar() {
     const { t } = useI18n();
     const { isCollapsed } = useSidebar();
   
@@ -33,7 +30,7 @@ function MobileMenu() {
     const settingsItem = { href: '#', label: t('Settings'), icon: Settings };
 
     return (
-    <>
+    <Sidebar>
         <SidebarHeader>
             <Link href="/" className="flex items-center gap-2 font-semibold">
                 <Leaf className="h-6 w-6 text-primary" />
@@ -64,33 +61,6 @@ function MobileMenu() {
             </SidebarMenuItem>
         </SidebarMenu>
         </SidebarFooter>
-    </>
+    </Sidebar>
     )
-
-}
-
-
-export default function AppSidebar() {
-  const { isMobile, isOpen, setIsOpen } = useSidebar();
-
-  return (
-    <>
-      {isMobile && !isOpen && (
-         <SheetTrigger asChild>
-            <Button 
-                size="icon" 
-                variant="outline" 
-                className="sm:hidden fixed top-3 left-4 z-40"
-                onClick={() => setIsOpen(true)}
-              >
-                <PanelLeft className="h-5 w-5" />
-                <span className="sr-only">Toggle Menu</span>
-              </Button>
-        </SheetTrigger>
-      )}
-      <Sidebar mobileContent={<MobileMenu />}>
-        <MobileMenu />
-      </Sidebar>
-    </>
-  );
 }

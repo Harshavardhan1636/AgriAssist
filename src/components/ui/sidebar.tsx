@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -11,12 +10,6 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from './sheet';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -44,11 +37,6 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = React.useState(false);
   const [isCollapsed, setIsCollapsed] = React.useState(false);
-  const [isClient, setIsClient] = React.useState(false);
-
-  React.useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   React.useEffect(() => {
     if (isMobile) {
@@ -57,7 +45,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     } else {
       setIsCollapsed(false);
     }
-  }, [isMobile, isClient]);
+  }, [isMobile]);
 
   const value = {
     isOpen,
@@ -69,37 +57,23 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarContext.Provider value={value}>
-      <TooltipProvider>{isClient ? children : null}</TooltipProvider>
+      <TooltipProvider>{children}</TooltipProvider>
     </SidebarContext.Provider>
   );
 }
 
 export const Sidebar = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & { mobileContent?: React.ReactNode }
->(({ className, children, mobileContent, ...props }, ref) => {
-  const { isMobile, isOpen, setIsOpen } = useSidebar();
-
-  if (isMobile) {
-    return (
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetContent
-          side="left"
-          className="sm:max-w-xs p-0"
-          withCloseButton={true}
-        >
-          {mobileContent || children}
-        </SheetContent>
-      </Sheet>
-    );
-  }
-
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, children, ...props }, ref) => {
+  const { isCollapsed } = useSidebar();
+  
   return (
     <aside
       ref={ref}
       className={cn(
         'fixed inset-y-0 left-0 z-10 hidden flex-col border-r bg-background sm:flex transition-[width]',
-        useSidebar().isCollapsed ? 'w-14' : 'w-64',
+        isCollapsed ? 'w-14' : 'w-64',
         className
       )}
       {...props}
