@@ -8,6 +8,7 @@ import { useI18n } from '@/context/i18n-context';
 import { mockForecast } from '@/lib/mock-data';
 import { Badge } from '@/components/ui/badge';
 import { addDays, format } from 'date-fns';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 export default function ForecastPage() {
     const { t } = useI18n();
@@ -25,8 +26,8 @@ export default function ForecastPage() {
                     <CardDescription>{t('Detailed weather forecast for the upcoming two weeks.')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="overflow-x-auto">
-                        <Table>
+                    <ScrollArea>
+                        <Table className="whitespace-nowrap">
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>{t('Date')}</TableHead>
@@ -66,7 +67,8 @@ export default function ForecastPage() {
                                 ))}
                             </TableBody>
                         </Table>
-                    </div>
+                        <ScrollBar orientation="horizontal" />
+                    </ScrollArea>
                 </CardContent>
             </Card>
 
