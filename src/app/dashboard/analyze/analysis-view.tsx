@@ -1,11 +1,11 @@
 
 'use client';
 
-import { useState, useRef, ChangeEvent, FormEvent } from 'react';
+import { useState, useRef, ChangeEvent, FormEvent, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Upload, X, Loader2, AlertCircle, Image as ImageIcon, FileText } from 'lucide-react';
+import { Upload, X, Loader2, AlertCircle, Image as ImageIcon, FileText, Mic, Square } from 'lucide-react';
 import Image from 'next/image';
 import type { FullAnalysisResponse } from '@/lib/types';
 import AnalysisResults from './analysis-results';
@@ -30,8 +30,14 @@ export default function AnalysisView() {
   
   const [activeTab, setActiveTab] = useState('image');
   const [preview, setPreview] = useState<string | null>(null);
+  const [textQuery, setTextQuery] = useState('');
+  const [audioDataUri, setAudioDataUri] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+
   const { t, locale } = useI18n();
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +59,41 @@ export default function AnalysisView() {
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     setError(null);
+    setPreview(null);
+    setTextQuery('');
+    setAudioDataUri(null);
+  };
+
+  const startRecording = async () => {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorderRef.current = new MediaRecorder(stream);
+        audioChunksRef.current = [];
+
+        mediaRecorderRef.current.ondataavailable = (event) => {
+            audioChunksRef.current.push(event.data);
+        };
+
+        mediaRecorderRef.current.onstop = async () => {
+            const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+            const dataUri = await fileToDataUri(audioBlob);
+            setAudioDataUri(dataUri);
+            stream.getTracks().forEach(track => track.stop()); // Stop microphone
+        };
+
+        mediaRecorderRef.current.start();
+        setIsRecording(true);
+    } catch (err) {
+        console.error("Error accessing microphone:", err);
+        setError("Microphone access denied. Please enable it in your browser settings.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+        mediaRecorderRef.current.stop();
+        setIsRecording(false);
+    }
   };
   
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -64,16 +105,16 @@ export default function AnalysisView() {
     const formData = new FormData();
     formData.append('locale', locale);
 
-    const form = formRef.current;
-    if (!form) return;
-
     if (activeTab === 'image' && preview) {
       formData.append('photoDataUri', preview);
-    } else if (activeTab === 'text') {
-      const textQuery = (form.elements.namedItem('textQuery') as HTMLTextAreaElement)?.value;
-      if (textQuery) {
-        formData.append('textQuery', textQuery);
-      }
+    } else if (activeTab === 'text' && textQuery) {
+      formData.append('textQuery', textQuery);
+    } else if (activeTab === 'audio' && audioDataUri) {
+      formData.append('audioDataUri', audioDataUri);
+    } else {
+        setError("Please provide an input before starting the analysis.");
+        setIsPending(false);
+        return;
     }
     
     try {
@@ -107,11 +148,12 @@ export default function AnalysisView() {
   }
   
   return (
-    <form onSubmit={handleSubmit} ref={formRef}>
+    <form onSubmit={handleSubmit}>
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="image"><ImageIcon className="mr-2 h-4 w-4" />{t('Analyze with Image')}</TabsTrigger>
                 <TabsTrigger value="text"><FileText className="mr-2 h-4 w-4"/>{t('Describe the Issue')}</TabsTrigger>
+                <TabsTrigger value="audio"><Mic className="mr-2 h-4 w-4"/>{t('Record Audio')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="image">
@@ -179,11 +221,38 @@ export default function AnalysisView() {
                     </CardHeader>
                     <CardContent>
                         <Textarea 
-                            name="textQuery"
+                            value={textQuery}
+                            onChange={(e) => setTextQuery(e.target.value)}
                             placeholder={t("e.g., 'My tomato leaves have yellow spots and brown edges.'")}
                             className="min-h-[200px]"
-                            onChange={() => setError(null)}
                         />
+                    </CardContent>
+                </Card>
+            </TabsContent>
+            <TabsContent value="audio">
+                 <Card>
+                    <CardHeader>
+                        <CardTitle>{t('Record Audio Query')}</CardTitle>
+                        <CardDescription>{t("Record your question or observation in your local language.")}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-col items-center justify-center space-y-4 min-h-[200px]">
+                        {!isRecording ? (
+                            <Button type="button" size="lg" onClick={startRecording} disabled={isRecording}>
+                                <Mic className="mr-2"/>
+                                {t('Start Recording')}
+                            </Button>
+                        ) : (
+                             <Button type="button" size="lg" variant="destructive" onClick={stopRecording} disabled={!isRecording}>
+                                <Square className="mr-2"/>
+                                {t('Stop Recording')}
+                            </Button>
+                        )}
+                        {audioDataUri && (
+                            <div className="w-full">
+                                <p className="text-sm text-center text-muted-foreground mb-2">{t('Recording complete. Ready for analysis.')}</p>
+                                <audio src={audioDataUri} controls className="w-full" />
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </TabsContent>
@@ -199,7 +268,11 @@ export default function AnalysisView() {
             </div>
 
             <div className="flex justify-end">
-                <Button type="submit" disabled={isPending || (activeTab === 'image' && !preview)} className="w-full sm:w-auto">
+                <Button 
+                  type="submit" 
+                  disabled={isPending || isRecording || (activeTab === 'image' && !preview) || (activeTab === 'text' && !textQuery) || (activeTab === 'audio' && !audioDataUri)} 
+                  className="w-full sm:w-auto"
+                >
                     {isPending ? t('Analyzing...') : t('Start Analysis')}
                 </Button>
             </div>

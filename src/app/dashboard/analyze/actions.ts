@@ -8,6 +8,7 @@ import { forecastOutbreakRisk } from "@/ai/flows/forecast-outbreak-risk";
 import { explainClassificationWithGradCAM } from "@/ai/flows/explain-classification-with-grad-cam";
 import { generateRecommendations } from "@/ai/flows/generate-recommendations";
 import { askFollowUpQuestion as askFollowUpQuestionFlow } from "@/ai/flows/ask-follow-up-question";
+import { transcribeAudio } from "@/ai/flows/transcribe-audio";
 import type { AskFollowUpQuestionOutput } from "@/ai/flows/ask-follow-up-question";
 import type { FullAnalysisResponse } from "@/lib/types";
 import { z } from "zod";
@@ -48,13 +49,19 @@ export type {
   AskFollowUpQuestionInput,
 } from '@/ai/flows/ask-follow-up-question';
 
+export type {
+  TranscribeAudioOutput,
+  TranscribeAudioInput,
+} from '@/ai/flows/transcribe-audio';
+
 
 const analyzeImageSchema = z.object({
   photoDataUri: z.string().optional(),
   textQuery: z.string().optional(),
+  audioDataUri: z.string().optional(),
   locale: z.string().optional(),
-}).refine(data => !!data.photoDataUri || !!data.textQuery, {
-  message: "Either an image or a text query must be provided."
+}).refine(data => !!data.photoDataUri || !!data.textQuery || !!data.audioDataUri, {
+  message: "Either an image, a text query, or an audio recording must be provided."
 });
 
 
@@ -64,11 +71,13 @@ export async function analyzeImage(
     
     const rawPhotoDataUri = formData.get('photoDataUri') as string | null;
     const rawTextQuery = formData.get('textQuery') as string | null;
+    const rawAudioDataUri = formData.get('audioDataUri') as string | null;
     const locale = (formData.get('locale') as string) || 'en';
 
     const validatedFields = analyzeImageSchema.safeParse({ 
         photoDataUri: rawPhotoDataUri, 
-        textQuery: rawTextQuery, 
+        textQuery: rawTextQuery,
+        audioDataUri: rawAudioDataUri, 
         locale 
     });
 
@@ -77,20 +86,29 @@ export async function analyzeImage(
       return { data: null, error: "Invalid input: Please upload an image or describe the issue." };
     }
     
-    const { photoDataUri, textQuery } = validatedFields.data;
+    let { photoDataUri, textQuery, audioDataUri } = validatedFields.data;
 
     try {
       let classification;
       let usedPhoto = photoDataUri;
       let textDescription = textQuery || '';
 
+      // Main logic for multimodal input
+      if (audioDataUri) {
+          console.log("Transcribing audio...");
+          const transcriptionResult = await transcribeAudio({ audioDataUri });
+          textDescription = transcriptionResult.transcription;
+          console.log(`Transcription result: ${textDescription}`);
+      }
+
       if (photoDataUri) {
         console.log("Analyzing with image...");
         classification = await classifyPlantDisease({ photoDataUri, language: locale });
-      } else if (textQuery) {
+      } else if (textDescription) {
         console.log("Analyzing with text...");
-        const textDiagnosis = await diagnoseWithText({ query: textQuery, language: locale });
+        const textDiagnosis = await diagnoseWithText({ query: textDescription, language: locale });
         classification = { predictions: textDiagnosis.predictions };
+        // Use a placeholder image since none was provided
         usedPhoto = "https://picsum.photos/seed/placeholder/600/400";
       } else {
          return { data: null, error: "Invalid input: Please upload an image or describe the issue." };
@@ -98,7 +116,7 @@ export async function analyzeImage(
 
       if (!classification || !classification.predictions || classification.predictions.length === 0) {
         console.error("Classification failed to return predictions.");
-        return { data: null, error: "The AI model could not identify a disease. Please try a different photo or description." };
+        return { data: null, error: "The AI model could not identify a disease. Please try again." };
       }
 
       const topPrediction = classification.predictions[0];
@@ -106,12 +124,12 @@ export async function analyzeImage(
       
       const [severity, explanation, forecast, recommendations] = await Promise.all([
         // Assess Severity
-        assessDiseaseSeverity({ photoDataUri: usedPhoto!, description: `Classified as ${topPrediction.label}. ${textDescription}`, language: locale })
+        assessDiseaseSeverity({ photoDataUri: usedPhoto, description: textDescription, language: locale })
           .catch(e => { console.error("Severity assessment failed:", e); return { severityPercentage: 0, severityBand: 'Unknown', confidence: 0 }; }),
         
         // Explain with Grad-CAM (or fallback for text)
-        explainClassificationWithGradCAM({ photoDataUri: usedPhoto!, classificationResult: topPrediction.label })
-          .catch(e => { console.error("Grad-CAM explanation failed:", e); return { gradCAMOverlay: usedPhoto! }; }),
+        explainClassificationWithGradCAM({ photoDataUri: usedPhoto, classificationResult: topPrediction.label })
+          .catch(e => { console.error("Grad-CAM explanation failed:", e); return { gradCAMOverlay: usedPhoto }; }),
         
         // Forecast Risk
         forecastOutbreakRisk({
@@ -136,7 +154,7 @@ export async function analyzeImage(
           explanation,
           forecast,
           recommendations,
-          originalImage: usedPhoto!,
+          originalImage: usedPhoto,
           locale,
         },
         error: null

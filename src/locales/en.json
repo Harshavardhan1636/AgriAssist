@@ -98,5 +98,11 @@
     "Organic/Cultural": "Organic/Cultural",
     "Chemical": "Chemical",
     "Preventive": "Preventive",
-    "Preventive Actions": "Preventive Actions"
+    "Preventive Actions": "Preventive Actions",
+    "Record Audio": "Record Audio",
+    "Record Audio Query": "Record Audio Query",
+    "Record your question or observation in your local language.": "Record your question or observation in your local language.",
+    "Start Recording": "Start Recording",
+    "Stop Recording": "Stop Recording",
+    "Recording complete. Ready for analysis.": "Recording complete. Ready for analysis."
 }
