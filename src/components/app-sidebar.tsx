@@ -55,7 +55,6 @@ export default function AppSidebar() {
                 asChild
                 isActive={pathname === item.href}
                 tooltip={item.label}
-                isCollapsed={isCollapsed}
               >
                 <Link href={item.href} onClick={handleLinkClick}>
                   <item.icon />
@@ -69,7 +68,7 @@ export default function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
             <SidebarMenuItem>
-                <SidebarMenuButton tooltip={t('Settings')} isCollapsed={isCollapsed}>
+                <SidebarMenuButton tooltip={t('Settings')}>
                     <Settings />
                     <span>{t('Settings')}</span>
                 </SidebarMenuButton>
