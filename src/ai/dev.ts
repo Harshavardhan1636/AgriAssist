@@ -1,3 +1,4 @@
+
 import { config } from 'dotenv';
 config();
 
@@ -7,3 +8,4 @@ import '@/ai/flows/explain-classification-with-grad-cam.ts';
 import '@/ai/flows/forecast-outbreak-risk.ts';
 import '@/ai/flows/generate-recommendations.ts';
 import '@/ai/flows/ask-follow-up-question.ts';
+import '@/ai/flows/diagnose-with-text.ts';

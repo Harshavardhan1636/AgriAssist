@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarFooter,
 } from '@/components/ui/sidebar';
-import { Leaf, LayoutDashboard, History, FlaskConical, LifeBuoy, Settings } from 'lucide-react';
+import { Leaf, LayoutDashboard, History, FlaskConical, LifeBuoy, Settings, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@/context/i18n-context';
@@ -27,17 +27,18 @@ export default function AppSidebar() {
     { href: '/dashboard', label: t('Dashboard'), icon: LayoutDashboard },
     { href: '/dashboard/analyze', label: t('New Analysis'), icon: FlaskConical },
     { href: '/dashboard/history', label: t('History'), icon: History },
+    { href: '/dashboard/community', label: t('Community Outbreaks'), icon: Users },
     { href: '/dashboard/review', label: t('Review Queue'), icon: LifeBuoy },
   ];
 
   return (
     <Sidebar>
       <SidebarHeader>
-        <div className="flex items-center gap-2 p-2">
-            <Leaf className="h-8 w-8 text-primary" />
-            <span className={isCollapsed ? 'hidden' : 'inline'}>
-                <h1 className="text-xl font-bold font-headline">AgriAssist</h1>
-            </span>
+        <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+            <Link href="/" className="flex items-center gap-2 font-semibold">
+                <Leaf className="h-6 w-6 text-primary" />
+                <span className="">AgriAssist</span>
+            </Link>
         </div>
       </SidebarHeader>
       <SidebarContent>

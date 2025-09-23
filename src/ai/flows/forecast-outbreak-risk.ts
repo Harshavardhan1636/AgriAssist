@@ -14,6 +14,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const ForecastOutbreakRiskInputSchema = z.object({
+  disease: z.string().describe('The name of the detected disease.'),
   historicalDetections: z
     .array(z.number())
     .describe('Historical detection counts in the last 7 days.'),
@@ -26,7 +27,6 @@ const ForecastOutbreakRiskInputSchema = z.object({
     .describe('Local weather features (7-day average).'),
   cropType: z.string().describe('Type of crop.'),
   soilType: z.string().describe('Type of soil.'),
-  recentSeverityAverages: z.number().describe('Recent severity averages.'),
   language: z.string().optional().describe('The language for the output, as a two-letter ISO 639-1 code (e.g., "en", "hi").'),
 });
 export type ForecastOutbreakRiskInput = z.infer<typeof ForecastOutbreakRiskInputSchema>;
@@ -40,10 +40,10 @@ const ForecastOutbreakRiskOutputSchema = z.object({
       .describe(
         'The risk score for a potential outbreak, ranging from 0 to 1 (0-100%).'
       ),
-  explanation: z.string().describe('Explanation of the risk score.'),
-  recommendations: z
+  explanation: z.string().describe('A detailed explanation of the factors contributing to the risk score.'),
+  preventiveActions: z
     .array(z.string())
-    .describe('A list of recommendations to mitigate the outbreak risk.'),
+    .describe('A list of preventive actions to mitigate the outbreak risk.'),
 });
 export type ForecastOutbreakRiskOutput = z.infer<typeof ForecastOutbreakRiskOutputSchema>;
 
@@ -57,21 +57,27 @@ const prompt = ai.definePrompt({
   name: 'forecastOutbreakRiskPrompt',
   input: {schema: ForecastOutbreakRiskInputSchema},
   output: {schema: ForecastOutbreakRiskOutputSchema},
-  prompt: `You are an expert agricultural advisor. You will receive data about recent disease detections, weather patterns, and farm characteristics to forecast potential disease outbreaks.
+  prompt: `You are an expert agricultural advisor forecasting a disease outbreak for a farm in India.
 
   IMPORTANT: All output text MUST be in the language with the code: {{{language}}}.
 
-  Historical Detections: {{{historicalDetections}}}
-  Weather Features: Temperature={{{weatherFeatures.temperature}}}, Humidity={{{weatherFeatures.humidity}}}, Rainfall={{{weatherFeatures.rainfall}}}
-  Crop Type: {{{cropType}}}
-  Soil Type: {{{soilType}}}
-  Recent Severity Averages: {{{recentSeverityAverages}}}
+  Analysis Details:
+  - Detected Disease: {{{disease}}}
+  - Historical Detections (last 7 days): {{{historicalDetections}}}
+  - 7-Day Avg Weather: Temperature={{{weatherFeatures.temperature}}}°C, Humidity={{{weatherFeatures.humidity}}}%, Rainfall={{{weatherFeatures.rainfall}}}mm
+  - Crop Type: {{{cropType}}}
+  - Soil Type: {{{soilType}}}
 
-  Based on this data, provide a risk score between 0 and 1, an explanation for your assessment, and a list of recommendations to mitigate the outbreak risk.  The risk score should be between 0 and 1, representing the probability of an outbreak.
+  Your Task:
+  1.  **Calculate a Risk Score:** Provide a risk score between 0 and 1, representing the probability of a significant outbreak in the next 7-14 days.
+  2.  **Provide a Detailed Explanation:** Explain the "why" behind the score. Mention how the weather, disease type, and crop vulnerability contribute. For example, high humidity is favorable for fungal diseases like Late Blight.
+  3.  **Suggest Preventive Actions:** Provide a list of 3-4 clear, simple, and actionable steps the farmer can take *before* the outbreak gets worse. Prioritize cultural and organic methods.
 
-  Consider factors such as favorable weather conditions for disease spread, the vulnerability of the crop type, and the impact of soil conditions.
-
-  Provide specific and actionable recommendations tailored to the situation.
+  Example Preventive Actions:
+  - "Improve air circulation by pruning lower leaves."
+  - "Avoid overhead watering to keep leaves dry."
+  - "Proactively spray with a Neem oil solution."
+  - "Monitor fields daily, especially in the early morning."
 `,
 });
 

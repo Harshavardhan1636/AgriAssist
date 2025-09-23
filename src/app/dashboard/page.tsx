@@ -4,6 +4,7 @@
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -21,6 +22,7 @@ import {
   ClipboardCheck,
   FlaskConical,
   ShieldAlert,
+  ArrowUpRight
 } from "lucide-react";
 
 import { mockHistory } from "@/lib/mock-data";
@@ -29,6 +31,8 @@ import Image from "next/image";
 import { useI18n } from "@/context/i18n-context";
 import dynamic from 'next/dynamic';
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const DetectionsChart = dynamic(() => import('./detections-chart'), { 
     ssr: false,
@@ -52,7 +56,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('Total Scans')}</CardTitle>
@@ -95,8 +99,8 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
-        <Card className="lg:col-span-3">
+      <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
+        <Card className="xl:col-span-2">
           <CardHeader>
             <CardTitle>{t('Detections This Week')}</CardTitle>
           </CardHeader>
@@ -105,9 +109,18 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>{t('Recent Analyses')}</CardTitle>
+        <Card>
+          <CardHeader className="flex flex-row items-center">
+            <div className="grid gap-2">
+              <CardTitle>{t('Recent Analyses')}</CardTitle>
+              <CardDescription>{t('Recent disease and pest analyses from your farm.')}</CardDescription>
+            </div>
+            <Button asChild size="sm" className="ml-auto gap-1">
+              <Link href="/dashboard/history">
+                {t('View All')}
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
+            </Button>
           </CardHeader>
           <CardContent>
             <Table>
@@ -115,29 +128,21 @@ export default function DashboardPage() {
                 <TableRow>
                   <TableHead>{t('Crop')}</TableHead>
                   <TableHead>{t('Diagnosis')}</TableHead>
-                  <TableHead>{t('Time')}</TableHead>
+                  <TableHead className="text-right">{t('Time')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {recentAnalyses.map((analysis) => (
                   <TableRow key={analysis.id}>
-                    <TableCell className="flex items-center gap-2">
-                      <Image
-                        src={analysis.image}
-                        alt={analysis.crop}
-                        width={32}
-                        height={32}
-                        className="h-8 w-8 rounded-md object-cover"
-                        data-ai-hint={analysis.imageHint}
-                      />
-                      <span className="font-medium">{analysis.crop}</span>
+                    <TableCell>
+                      <div className="font-medium">{analysis.crop}</div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={analysis.predictions[0].label === 'Healthy' ? "secondary" : "destructive"}>
+                      <Badge variant={analysis.predictions[0].label === 'Healthy' ? "secondary" : "destructive"} className="text-xs" >
                         {analysis.predictions[0].label}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
+                    <TableCell className="text-right text-muted-foreground text-xs">
                       {formatDistanceToNow(new Date(analysis.timestamp), {
                         addSuffix: true,
                       })}

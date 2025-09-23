@@ -13,6 +13,18 @@ export type Prediction = {
   confidence: number;
 };
 
+export type CommunityOutbreak = {
+  id: string;
+  disease: string;
+  crop: 'Tomato' | 'Potato' | 'Maize' | 'Wheat' | 'Rice' | 'Unknown';
+  location: string; // e.g., "District, State"
+  latitude: number;
+  longitude: number;
+  detectedCases: number;
+  riskLevel: 'High' | 'Medium' | 'Low';
+  firstReported: string; // ISO date string
+}
+
 export type AnalysisResult = {
   id: string;
   timestamp: string;
@@ -21,7 +33,7 @@ export type AnalysisResult = {
   predictions: Prediction[];
   severity: {
     percentage: number;
-    band: string;
+    band: 'Low' | 'Medium' | 'High';
   };
   gradCamImage: string;
   risk: {

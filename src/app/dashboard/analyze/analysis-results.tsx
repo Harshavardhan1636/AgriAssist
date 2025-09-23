@@ -7,12 +7,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import Image from 'next/image';
 import { useI18n } from '@/context/i18n-context';
-import { Bot, User, Send } from 'lucide-react';
+import { Bot, User, Send, CheckCircle, AlertTriangle, Wind } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { askFollowUpQuestion } from './actions';
 import type { AskFollowUpQuestionOutput } from './actions';
 import { RadialChart } from '@/components/ui/radial-chart';
+import { Badge } from '@/components/ui/badge';
 
 
 interface AnalysisResultsProps {
@@ -23,6 +24,16 @@ interface ChatMessage {
   sender: 'user' | 'bot';
   text: string;
 }
+
+const RecommendationIcon = ({type}: {type: string}) => {
+    switch (type) {
+        case 'Organic/Cultural': return <CheckCircle className="text-green-600" />;
+        case 'Chemical': return <AlertTriangle className="text-amber-600" />;
+        case 'Preventive': return <Wind className="text-blue-600" />;
+        default: return <CheckCircle className="text-green-600" />;
+    }
+}
+
 
 export default function AnalysisResults({ result }: AnalysisResultsProps) {
   const { classification, severity, explanation, forecast, recommendations, locale } = result;
@@ -57,7 +68,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 mt-4">
       <Card>
         <CardHeader>
           <CardTitle>{t('Analysis Complete')}</CardTitle>
@@ -72,17 +83,25 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
            <Card>
             <CardHeader>
               <CardTitle>{t('Step-by-Step Recommendations')}</CardTitle>
-              <CardDescription>{t('Follow these steps to treat the issue.')}</CardDescription>
+              <CardDescription>{t('Follow these ethical and effective steps to treat the issue.')}</CardDescription>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-4">
+              <Accordion type="single" collapsible className="w-full" defaultValue="item-0">
                 {recommendations.recommendations.map((rec, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">{index + 1}</div>
-                    <p className="flex-1 pt-0.5 text-sm">{rec}</p>
-                  </li>
+                  <AccordionItem value={`item-${index}`} key={index}>
+                    <AccordionTrigger>
+                      <div className="flex items-center gap-3">
+                        <RecommendationIcon type={rec.type} />
+                        <span className="font-semibold">{rec.title}</span>
+                        <Badge variant="outline">{t(rec.type as any)}</Badge>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <p className="text-sm text-muted-foreground pl-9">{rec.description}</p>
+                    </AccordionContent>
+                  </AccordionItem>
                 ))}
-              </ul>
+              </Accordion>
             </CardContent>
           </Card>
 
@@ -130,7 +149,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
               <RadialChart 
                 value={severity.severityPercentage}
                 mainText={`${Math.round(severity.severityPercentage)}%`}
-                subText={severity.severityBand}
+                subText={t(severity.severityBand as 'Low' | 'Medium' | 'High')}
               />
             </CardContent>
           </Card>
@@ -147,7 +166,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t('Outbreak Risk Forecast (7-Day)')}</CardTitle>
+              <CardTitle>{t('Outbreak Risk Forecast (7-14 Day)')}</CardTitle>
             </CardHeader>
             <CardContent>
               <RadialChart 
@@ -159,7 +178,20 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                 <AccordionItem value="item-1">
                   <AccordionTrigger>{t('Why this score?')}</AccordionTrigger>
                   <AccordionContent>
-                    {forecast.explanation}
+                    <p className="text-sm">{forecast.explanation}</p>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-2">
+                  <AccordionTrigger>{t('Preventive Actions')}</AccordionTrigger>
+                  <AccordionContent>
+                    <ul className="space-y-2 text-sm">
+                      {forecast.preventiveActions.map((action, index) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <Wind className="h-4 w-4 mt-0.5 text-blue-500 flex-shrink-0" />
+                          <span>{action}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
