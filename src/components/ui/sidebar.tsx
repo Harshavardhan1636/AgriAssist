@@ -16,9 +16,7 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from './sheet';
-import { PanelLeft, PanelLeftClose, PanelRightClose } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -50,6 +48,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     if (isMobile) {
       setIsCollapsed(true);
+    } else {
+      setIsCollapsed(false);
     }
   }, [isMobile]);
 
@@ -68,44 +68,37 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function MobileSidebar({children}: {children: React.ReactNode}) {
-  const {isOpen, setIsOpen, isMobile} = useSidebar();
-
-  if (!isMobile) return null;
-
-  return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetContent
-        side="left"
-        className="sm:max-w-xs p-0"
-        withCloseButton={true}
-      >
-        <SheetHeader className="h-14 flex items-center border-b px-4 lg:h-[60px] lg:px-6">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <SheetTitle>AgriAssist</SheetTitle>
-          </Link>
-        </SheetHeader>
-        {children}
-      </SheetContent>
-    </Sheet>
-  );
-}
-
-
 export const Sidebar = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, children, ...props }, ref) => {
-  const { isCollapsed, isMobile } = useSidebar();
+  React.HTMLAttributes<HTMLDivElement> & { mobileContent?: React.ReactNode }
+>(({ className, children, mobileContent, ...props }, ref) => {
+  const { isMobile, isOpen, setIsOpen } = useSidebar();
 
-  if (isMobile) return null;
+  if (isMobile) {
+    return (
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <SheetContent
+          side="left"
+          className="sm:max-w-xs p-0"
+          withCloseButton={true}
+        >
+          <SheetHeader className="h-14 flex items-center border-b px-4 lg:h-[60px] lg:px-6">
+             <Link href="/" className="flex items-center gap-2 font-semibold">
+                <SheetTitle>AgriAssist</SheetTitle>
+            </Link>
+          </SheetHeader>
+          {mobileContent || children}
+        </SheetContent>
+      </Sheet>
+    );
+  }
 
   return (
     <aside
       ref={ref}
       className={cn(
         'fixed inset-y-0 left-0 z-10 hidden flex-col border-r bg-background sm:flex transition-[width]',
-        isCollapsed ? 'w-14' : 'w-64',
+        useSidebar().isCollapsed ? 'w-14' : 'w-64',
         className
       )}
       {...props}
@@ -116,10 +109,14 @@ export const Sidebar = React.forwardRef<
 });
 Sidebar.displayName = 'Sidebar';
 
+
 export const SidebarHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
+  const {isMobile} = useSidebar();
+  if (isMobile) return null;
+
   return (
     <div
       ref={ref}
@@ -162,19 +159,21 @@ SidebarMenuItem.displayName = 'SidebarMenuItem';
 export const SidebarFooter = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn('mt-auto', className)} {...props} />
-));
+>(({ className, ...props }, ref) => {
+    const {isMobile} = useSidebar();
+    if (isMobile) return null;
+    return <div ref={ref} className={cn('mt-auto', className)} {...props} />
+});
 SidebarFooter.displayName = 'SidebarFooter';
 
 
-type SidebarMenuButtonProps = {
+type SidebarMenuLinkProps = {
     href: string;
     label: string;
     icon: React.ElementType;
 };
 
-export const SidebarMenuLink = ({ href, label, icon: Icon }: SidebarMenuButtonProps) => {
+export const SidebarMenuLink = ({ href, label, icon: Icon }: SidebarMenuLinkProps) => {
     const pathname = usePathname();
     const { isCollapsed, isMobile, setIsOpen } = useSidebar();
     const isActive = pathname === href;
