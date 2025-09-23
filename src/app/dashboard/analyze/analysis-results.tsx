@@ -3,27 +3,20 @@
 
 import { useState } from 'react';
 import type { FullAnalysisResponse } from '@/lib/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Progress } from '@/components/ui/progress';
 import Image from 'next/image';
-import { ChartContainer } from '@/components/ui/chart';
-import { RadialBar, RadialBarChart } from 'recharts';
 import { useI18n } from '@/context/i18n-context';
-import { Bot, Check, Send, User } from 'lucide-react';
+import { Bot, User, Send } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { askFollowUpQuestion } from './actions';
 import type { AskFollowUpQuestionOutput } from './actions';
+import { RadialChart } from '@/components/ui/radial-chart';
+
 
 interface AnalysisResultsProps {
   result: FullAnalysisResponse;
-}
-
-const getSeverityColor = (percentage: number) => {
-  if (percentage > 50) return "hsl(var(--destructive))";
-  if (percentage > 20) return "hsl(var(--accent))";
-  return "hsl(var(--primary))";
 }
 
 interface ChatMessage {
@@ -32,7 +25,7 @@ interface ChatMessage {
 }
 
 export default function AnalysisResults({ result }: AnalysisResultsProps) {
-  const { classification, severity, explanation, forecast, recommendations, originalImage } = result;
+  const { classification, severity, explanation, forecast, recommendations } = result;
   const topPrediction = classification.predictions[0];
   const { t } = useI18n();
 
@@ -63,13 +56,12 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     setIsAsking(false);
   };
 
-
   const severityData = [
-    { name: 'severity', value: severity.severityPercentage, fill: getSeverityColor(severity.severityPercentage) }
+    { name: 'severity', value: severity.severityPercentage }
   ];
   
   const riskData = [
-    { name: 'risk', value: forecast.riskScore * 100, fill: getSeverityColor(forecast.riskScore * 100) }
+    { name: 'risk', value: forecast.riskScore * 100 }
   ];
 
   return (
@@ -143,17 +135,11 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
               <CardTitle>{t('Severity Assessment')}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center">
-               <ChartContainer config={{}} className="mx-auto aspect-square h-[200px]">
-                <RadialBarChart data={severityData} startAngle={90} endAngle={-270} innerRadius="70%" outerRadius="100%">
-                  <RadialBar dataKey="value" background={{ fill: 'hsl(var(--muted))' }} />
-                  <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="fill-foreground text-3xl font-bold">
-                    {Math.round(severity.severityPercentage)}%
-                  </text>
-                   <text x="50%" y="65%" textAnchor="middle" dominantBaseline="middle" className="fill-muted-foreground text-sm">
-                    {t(severity.severityBand as 'Low' | 'Medium' | 'High')}
-                  </text>
-                </RadialBarChart>
-              </ChartContainer>
+              <RadialChart 
+                data={severityData} 
+                mainText={`${Math.round(severity.severityPercentage)}%`}
+                subText={t(severity.severityBand as 'Low' | 'Medium' | 'High')}
+              />
             </CardContent>
           </Card>
           
@@ -172,17 +158,11 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
               <CardTitle>{t('Outbreak Risk Forecast (7-Day)')}</CardTitle>
             </CardHeader>
             <CardContent>
-               <ChartContainer config={{}} className="mx-auto aspect-square h-[200px]">
-                <RadialBarChart data={riskData} startAngle={90} endAngle={-270} innerRadius="70%" outerRadius="100%">
-                  <RadialBar dataKey="value" background={{ fill: 'hsl(var(--muted))' }} />
-                  <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="fill-foreground text-3xl font-bold">
-                    {Math.round(forecast.riskScore * 100)}%
-                  </text>
-                   <text x="50%" y="65%" textAnchor="middle" dominantBaseline="middle" className="fill-muted-foreground text-sm">
-                    {t('Risk Score')}
-                  </text>
-                </RadialBarChart>
-              </ChartContainer>
+              <RadialChart 
+                data={riskData}
+                mainText={`${Math.round(forecast.riskScore * 100)}%`}
+                subText={t('Risk Score')}
+              />
               <Accordion type="single" collapsible className="w-full mt-4">
                 <AccordionItem value="item-1">
                   <AccordionTrigger>{t('Why this score?')}</AccordionTrigger>
