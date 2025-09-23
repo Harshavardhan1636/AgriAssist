@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import Image from 'next/image';
 import { useI18n } from '@/context/i18n-context';
-import { Bot, User, Send, CheckCircle, AlertTriangle, Wind } from 'lucide-react';
+import { Bot, User, Send, CheckCircle, AlertTriangle, Wind, Sprout } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { askFollowUpQuestion } from './actions';
@@ -27,7 +27,7 @@ interface ChatMessage {
 
 const RecommendationIcon = ({type}: {type: string}) => {
     switch (type) {
-        case 'Organic/Cultural': return <CheckCircle className="text-green-600 h-5 w-5" />;
+        case 'Organic/Cultural': return <Sprout className="text-green-600 h-5 w-5" />;
         case 'Chemical': return <AlertTriangle className="text-amber-600 h-5 w-5" />;
         case 'Preventive': return <Wind className="text-blue-600 h-5 w-5" />;
         default: return <CheckCircle className="text-green-600 h-5 w-5" />;
@@ -170,7 +170,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
 
           <Card>
             <CardHeader>
-              <CardTitle>{t('Outbreak Risk Forecast (7-14 Day)')}</CardTitle>
+              <CardTitle>{t('Outbreak Risk Forecast (14 Day)')}</CardTitle>
             </CardHeader>
             <CardContent>
               <RadialChart 
@@ -208,3 +208,4 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     </div>
   );
 }
+

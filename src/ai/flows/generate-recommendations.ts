@@ -25,8 +25,8 @@ const GenerateRecommendationsOutputSchema = z.object({
     z.object({
         step: z.number().describe("The step number in the plan."),
         title: z.string().describe("A short, clear title for the recommendation."),
-        description: z.string().describe("A simple, detailed explanation of the action to take."),
-        type: z.enum(["Organic/Cultural", "Chemical", "Preventive"]).describe("The type of recommendation.")
+        description: z.string().describe("A simple, detailed explanation of the action to take and why it's important."),
+        type: z.enum(["Organic/Cultural", "Chemical", "Preventive"]).describe("The category of the recommendation (e.g., Organic/Cultural, Chemical, Preventive).")
     })
   ).describe('A list of clear, step-by-step recommendations for the farmer.'),
 });
@@ -51,13 +51,13 @@ const prompt = ai.definePrompt({
   Crop: {{{cropType}}}
 
   Generate a list of clear, step-by-step recommendations. Follow these ethical guardrails:
-  1.  **Prioritize Organic/Cultural Methods:** Always suggest non-chemical solutions first (e.g., removing infected leaves, improving air circulation, using neem oil). These should be the first steps.
-  2.  **Responsible Chemical Use:** If and only if the severity is 'High', you may suggest a common, government-approved pesticide as a *later* step. Emphasize using the exact recommended dose and following all safety precautions (like wearing gloves and a mask).
-  3.  **Simplicity:** Write in simple language that is easy for a farmer to understand. Avoid jargon.
-  4.  **Actionable Steps:** Each recommendation should be a clear, actionable instruction with a title and a simple description.
-  5.  **Structure:** Provide 3-5 steps.
+  1.  **Start with Organic/Cultural Methods:** Always suggest non-chemical solutions first. These should be the initial steps, focusing on remedies like neem oil, removing infected leaves, or improving air circulation.
+  2.  **Responsible Chemical Use:** Only if the severity is 'High', you may suggest a common, government-approved pesticide as a *later* step. Clearly state that this is for severe cases. Emphasize using the exact recommended dose and all safety precautions (like wearing gloves and a mask).
+  3.  **Include Preventive Actions:** Add recommendations for future prevention, such as crop rotation, improving soil health, or using disease-resistant varieties.
+  4.  **Be Transparent:** For each step, briefly explain *why* it is being recommended. (e.g., "Remove infected leaves to reduce the source of the fungus.")
+  5.  **Simplicity & Clarity:** Write in simple language that is easy for a farmer to understand. Provide 3-5 actionable steps in total.
 
-  Format the output as a JSON object with a "recommendations" array, where each item in the array is an object with "step", "title", "description", and "type".
+  Format the output as a JSON object with a "recommendations" array, where each item is an object with "step", "title", "description" (including the 'why'), and "type".
   `,
 });
 
@@ -72,3 +72,4 @@ const generateRecommendationsFlow = ai.defineFlow(
     return output!;
   }
 );
+
