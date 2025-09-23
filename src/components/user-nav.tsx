@@ -17,9 +17,13 @@ import {
 import { LogOut, User, Settings } from "lucide-react"
 import { useI18n } from "@/context/i18n-context"
 import Link from "next/link";
+import { useAuth } from "@/context/auth-context"
+
 
 export function UserNav() {
   const { t } = useI18n();
+  const { logout } = useAuth();
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -55,12 +59,10 @@ export function UserNav() {
           </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-         <Link href="#">
-            <DropdownMenuItem>
-              <LogOut className="mr-2" />
-              <span>{t('Log out')}</span>
-            </DropdownMenuItem>
-        </Link>
+        <DropdownMenuItem onClick={logout}>
+          <LogOut className="mr-2" />
+          <span>{t('Log out')}</span>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

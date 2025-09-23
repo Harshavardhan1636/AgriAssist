@@ -22,10 +22,14 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { UserNav } from "@/components/user-nav";
+import { useTheme } from "next-themes";
+import { useAuth } from "@/context/auth-context";
 
 
 export default function SettingsPage() {
   const { t, locale, setLocale } = useI18n();
+  const { theme, setTheme } = useTheme();
+  const { logout } = useAuth();
 
   const languages = [
     { code: 'en', name: 'English' },
@@ -74,7 +78,11 @@ export default function SettingsPage() {
                     <Label htmlFor="dark-mode" className="font-medium">{t('Dark Mode')}</Label>
                     <p className="text-sm text-muted-foreground">{t('Toggle between light and dark themes.')}</p>
                 </div>
-                <Switch id="dark-mode" />
+                <Switch 
+                  id="dark-mode" 
+                  checked={theme === 'dark'}
+                  onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+                />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="language">{t('Language')}</Label>
@@ -101,7 +109,7 @@ export default function SettingsPage() {
           <CardDescription>{t('Manage your account settings.')}</CardDescription>
         </CardHeader>
         <CardContent>
-            <Button variant="outline">{t('Log out')}</Button>
+            <Button variant="outline" onClick={logout}>{t('Log out')}</Button>
         </CardContent>
          <CardFooter className="border-t px-6 py-4">
             <div className="flex items-center justify-between w-full">
