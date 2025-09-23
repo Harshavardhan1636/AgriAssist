@@ -3,7 +3,7 @@
 
 import { UserNav } from "@/components/user-nav";
 import { Button } from "@/components/ui/button";
-import { Languages, PanelLeftClose, PanelRightClose } from "lucide-react";
+import { Languages, PanelLeft } from "lucide-react";
 import { useI18n } from "@/context/i18n-context";
 import {
   DropdownMenu,
@@ -11,13 +11,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSidebar } from "./ui/sidebar";
 
+interface HeaderProps {
+  onMenuClick: () => void;
+}
 
-export default function Header() {
+export default function Header({ onMenuClick }: HeaderProps) {
   const { setLocale, locale } = useI18n();
-  const { isCollapsed, setIsCollapsed, isMobile } = useSidebar();
-
 
   const languages = [
     { code: 'en', name: 'English' },
@@ -27,19 +27,17 @@ export default function Header() {
     { code: 'ml', name: 'മലയാളം' },
   ];
 
-
   return (
     <>
-      {!isMobile && (
-          <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsCollapsed(!isCollapsed)}
-          >
-              {isCollapsed ? <PanelRightClose /> : <PanelLeftClose />}
-              <span className="sr-only">Toggle Sidebar</span>
-          </Button>
-      )}
+      <Button
+        variant="outline"
+        size="icon"
+        className="shrink-0 md:hidden"
+        onClick={onMenuClick}
+      >
+        <PanelLeft className="h-5 w-5" />
+        <span className="sr-only">Toggle navigation menu</span>
+      </Button>
       
       <div className="flex w-full flex-1 items-center justify-end gap-4">
         <DropdownMenu>
