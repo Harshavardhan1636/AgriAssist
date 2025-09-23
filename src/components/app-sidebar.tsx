@@ -13,12 +13,10 @@ import {
 import { Leaf, LayoutDashboard, History, FlaskConical, LifeBuoy, Settings, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useI18n } from '@/context/i18n-context';
-import { useSidebar } from './ui/sidebar';
 
 
 export default function AppSidebar() {
     const { t } = useI18n();
-    const { isCollapsed } = useSidebar();
   
     const menuItems = [
       { href: '/dashboard', label: t('Dashboard'), icon: LayoutDashboard },
@@ -35,7 +33,7 @@ export default function AppSidebar() {
         <SidebarHeader>
             <Link href="/" className="flex items-center gap-2 font-semibold">
                 <Leaf className="h-6 w-6 text-primary" />
-                {!isCollapsed && <span className="">AgriAssist</span>}
+                <span className="">AgriAssist</span>
             </Link>
         </SidebarHeader>
         <SidebarContent>

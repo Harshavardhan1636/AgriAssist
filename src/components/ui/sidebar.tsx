@@ -15,8 +15,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 type SidebarContextProps = {
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isMobile: boolean;
   isCollapsed: boolean;
   setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
@@ -36,21 +34,17 @@ export function useSidebar() {
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const isMobile = useIsMobile();
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [isCollapsed, setIsCollapsed] = React.useState(isMobile);
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   React.useEffect(() => {
     if (isMobile) {
       setIsCollapsed(true);
-      setIsOpen(false);
     } else {
-      setIsCollapsed(false);
+        setIsCollapsed(false);
     }
   }, [isMobile]);
 
   const value = {
-    isOpen,
-    setIsOpen,
     isMobile,
     isCollapsed,
     setIsCollapsed,
@@ -66,21 +60,15 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 export const Sidebar = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
->(({ className, children, ...props }, ref) => {
-  const { isCollapsed } = useSidebar();
-  
+>(({ className, children, ...props }, ref) => {  
   return (
-    <aside
+    <div
       ref={ref}
-      className={cn(
-        'fixed inset-y-0 left-0 z-10 hidden flex-col border-r bg-background sm:flex transition-[width]',
-        isCollapsed ? 'w-14' : 'w-64',
-        className
-      )}
+      className={cn('flex h-full max-h-screen flex-col gap-2', className)}
       {...props}
     >
       {children}
-    </aside>
+    </div>
   );
 });
 Sidebar.displayName = 'Sidebar';
@@ -108,7 +96,7 @@ export const SidebarContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn('flex-grow overflow-y-auto', className)} {...props} />
+  <div ref={ref} className={cn('flex-1', className)} {...props} />
 ));
 SidebarContent.displayName = 'SidebarContent';
 
@@ -116,7 +104,7 @@ export const SidebarMenu = React.forwardRef<
   HTMLUListElement,
   React.HTMLAttributes<HTMLUListElement>
 >(({ className, ...props }, ref) => {
-  return <ul ref={ref} className={cn('flex flex-col gap-y-1 p-2', className)} {...props} />;
+  return <ul ref={ref} className={cn('grid gap-y-1 p-2 md:px-4', className)} {...props} />;
 });
 SidebarMenu.displayName = 'SidebarMenu';
 
@@ -125,7 +113,7 @@ export const SidebarMenuItem = React.forwardRef<
     HTMLLIElement,
     React.HTMLAttributes<HTMLLIElement>
   >(({ className, ...props }, ref) => (
-    <li ref={ref} className={cn(className)} {...props} />
+    <li ref={ref} className={cn('grid', className)} {...props} />
 ));
 SidebarMenuItem.displayName = 'SidebarMenuItem';
 
@@ -147,20 +135,14 @@ type SidebarMenuLinkProps = {
 
 export const SidebarMenuLink = ({ href, label, icon: Icon }: SidebarMenuLinkProps) => {
     const pathname = usePathname();
-    const { isCollapsed, isMobile, setIsOpen } = useSidebar();
+    const { isCollapsed } = useSidebar();
     const isActive = pathname === href;
   
-    const handleClick = () => {
-      if (isMobile) {
-        setIsOpen(false);
-      }
-    };
-  
-    if (isCollapsed && !isMobile) {
+    if (isCollapsed) {
       return (
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link href={href} onClick={handleClick}>
+            <Link href={href}>
               <Button
                 variant={isActive ? 'secondary' : 'ghost'}
                 size="icon"
@@ -178,7 +160,7 @@ export const SidebarMenuLink = ({ href, label, icon: Icon }: SidebarMenuLinkProp
     }
   
     return (
-      <Link href={href} onClick={handleClick}>
+      <Link href={href}>
         <Button
           variant={isActive ? 'secondary' : 'ghost'}
           size="default"

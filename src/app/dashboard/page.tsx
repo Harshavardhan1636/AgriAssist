@@ -98,13 +98,15 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="lg:col-span-4">
           <CardHeader>
             <CardTitle>{t('Detections This Week')}</CardTitle>
           </CardHeader>
-          <CardContent className="pl-2 overflow-x-auto">
-            <DetectionsChart />
+          <CardContent className="pl-2">
+            <div className="overflow-x-auto">
+              <DetectionsChart />
+            </div>
           </CardContent>
         </Card>
 
