@@ -18,18 +18,21 @@ import { LogOut, User, Settings } from "lucide-react"
 import { useI18n } from "@/context/i18n-context"
 import Link from "next/link";
 import { useAuth } from "@/context/auth-context"
+import { PlaceHolderImages } from "@/lib/placeholder-images"
 
 
 export function UserNav() {
   const { t } = useI18n();
   const { logout } = useAuth();
   
+  const userAvatar = PlaceHolderImages.find(img => img.id === 'user_avatar');
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10 border-2 border-primary/50">
-            <AvatarImage src="https://picsum.photos/seed/user/100/100" data-ai-hint="professional headshot" alt="@agronomist" />
+            <AvatarImage src={userAvatar?.imageUrl} data-ai-hint={userAvatar?.imageHint} alt="@agronomist" />
             <AvatarFallback>AG</AvatarFallback>
           </Avatar>
         </Button>

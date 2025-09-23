@@ -1,3 +1,112 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "user_avatar",
+      "description": "User avatar for the top navigation",
+      "imageUrl": "https://images.unsplash.com/photo-1573496358961-3c82861ab8f4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdHxlbnwwfHx8fDE3NTg1ODQ4MTl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "professional headshot"
+    },
+    {
+      "id": "tomato_late_blight_leaf",
+      "description": "A tomato leaf affected by late blight disease.",
+      "imageUrl": "https://images.unsplash.com/photo-1672153902713-28e0a02acdde?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxkaXNlYXNlZCUyMHRvbWF0byUyMGxlYWZ8ZW58MHx8fHwxNzU4NjQ5OTIzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "diseased tomato leaf"
+    },
+    {
+      "id": "tomato_late_blight_cam",
+      "description": "Grad-CAM overlay for a tomato leaf with late blight.",
+      "imageUrl": "https://images.unsplash.com/photo-1677678711761-09e049805d97?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxoZWF0bWFwJTIwb3ZlcmxheXxlbnwwfHx8fDE3NTg2NDk5MjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "heatmap overlay"
+    },
+    {
+      "id": "maize_common_rust_leaf",
+      "description": "A maize (corn) leaf showing symptoms of common rust.",
+      "imageUrl": "https://images.unsplash.com/photo-1628285149531-9a97643c87f8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxkaXNlYXNlZCUyMGNvcm4lMjBsZWFmfGVufDB8fHx8MTc1ODY0OTkyM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "diseased corn leaf"
+    },
+    {
+      "id": "maize_common_rust_cam",
+      "description": "Grad-CAM overlay for a maize leaf with common rust.",
+      "imageUrl": "https://images.unsplash.com/photo-1731514539819-e852c4de4785?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxoZWF0bWFwJTIwb3ZlcmxheXxlbnwwfHx8fDE3NTg2NDk5MjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "heatmap overlay"
+    },
+    {
+      "id": "potato_early_blight_leaf",
+      "description": "A potato leaf with signs of early blight.",
+      "imageUrl": "https://images.unsplash.com/photo-1672153902713-28e0a02acdde?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxkaXNlYXNlZCUyMHBvdGF0byUyMGxlYWZ8ZW58MHx8fHwxNzU4NjQ5OTIzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "diseased potato leaf"
+    },
+    {
+      "id": "potato_early_blight_cam",
+      "description": "Grad-CAM overlay for a potato leaf with early blight.",
+      "imageUrl": "https://images.unsplash.com/photo-1731514539819-e852c4de4785?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxoZWF0bWFwJTIwb3ZlcmxheXxlbnwwfHx8fDE3NTg2NDk5MjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "heatmap overlay"
+    },
+    {
+      "id": "healthy_tomato_leaf",
+      "description": "A healthy, green tomato leaf.",
+      "imageUrl": "https://images.unsplash.com/photo-1654171570628-e7a4602f56ad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxoZWFsdGh5JTIwdG9tYXRvJTIwbGVhZnxlbnwwfHx8fDE3NTg2NDk5MjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "healthy tomato leaf"
+    },
+    {
+      "id": "healthy_tomato_cam",
+      "description": "Grad-CAM overlay for a healthy tomato leaf, showing no specific focus.",
+      "imageUrl": "https://images.unsplash.com/photo-1631783847971-a6277b5495c7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxncmVlbiUyMG92ZXJsYXl8ZW58MHx8fHwxNzU4NjQ5OTIzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "green overlay"
+    },
+    {
+      "id": "potato_late_blight_leaf_2",
+      "description": "Another example of a potato leaf with severe late blight.",
+      "imageUrl": "https://images.unsplash.com/photo-1749414417866-a76fd626a97e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxkaXNlYXNlZCUyMHBvdGF0byUyMGxlYWZ8ZW58MHx8fHwxNzU4NjQ5OTIzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "diseased potato leaf"
+    },
+    {
+      "id": "potato_late_blight_cam_2",
+      "description": "Grad-CAM for a potato leaf with severe late blight.",
+      "imageUrl": "https://images.unsplash.com/photo-1686899506498-a1e545eb0f93?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxoZWF0bWFwJTIwb3ZlcmxheXxlbnwwfHx8fDE3NTg2NDk5MjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "heatmap overlay"
+    },
+    {
+      "id": "product_neem_oil",
+      "description": "A bottle of neem oil concentrate, an organic fungicide.",
+      "imageUrl": "https://images.unsplash.com/photo-1652282556241-0ce13285d00f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxuZWVtJTIwb2lsfGVufDB8fHx8MTc1ODY0MDU5OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "neem oil"
+    },
+    {
+      "id": "product_trichoderma",
+      "description": "A packet of Trichoderma Viride, a bio-fungicide.",
+      "imageUrl": "https://images.unsplash.com/photo-1704650311291-0e001b7e2b9f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxiaW8tZnVuZ2ljaWRlJTIwcG93ZGVyfGVufDB8fHx8MTc1ODY0OTkyM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "bio-fungicide powder"
+    },
+    {
+      "id": "product_mancozeb",
+      "description": "A bag of Mancozeb, a chemical fungicide.",
+      "imageUrl": "https://images.unsplash.com/photo-1674582198006-4e0777b40312?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxjaGVtaWNhbCUyMGZ1bmdpY2lkZXxlbnwwfHx8fDE3NTg2NDk5MjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "chemical fungicide"
+    },
+    {
+      "id": "product_copper_oxychloride",
+      "description": "A container of Copper Oxychloride powder.",
+      "imageUrl": "https://images.unsplash.com/photo-1653057677005-808191686c3a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxibHVlJTIwY2hlbWljYWwlMjBwb3dkZXJ8ZW58MHx8fHwxNzU4NjQ5OTIzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "blue chemical powder"
+    },
+    {
+      "id": "product_beauveria",
+      "description": "A bottle of Beauveria Bassiana bio-insecticide.",
+      "imageUrl": "https://images.unsplash.com/photo-1695634238039-1e79e4d71576?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxiaW8taW5zZWN0aWNpZGUlMjBib3R0bGV8ZW58MHx8fHwxNzU4NjQ5OTIzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "bio-insecticide bottle"
+    },
+    {
+      "id": "product_seaweed_extract",
+      "description": "A bottle of seaweed extract bio-stimulant.",
+      "imageUrl": "https://images.unsplash.com/photo-1661999869863-062c84b837ad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxzZWF3ZWVkJTIwYmlvLXN0aW11bGFudHxlbnwwfHx8fDE3NTg2NDk5MjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "seaweed bio-stimulant"
+    },
+    {
+      "id": "product_verticillium",
+      "description": "A packet of Verticillium Lecanii, an organic insecticide.",
+      "imageUrl": "https://images.unsplash.com/photo-1646012832285-28260a6e65d6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8b3JnYW5pYyUyMGluc2VjdGljaWRlfGVufDB8fHx8MTc1ODY0OTkyM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "organic insecticide"
+    }
+  ]
 }
