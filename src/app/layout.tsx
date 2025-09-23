@@ -1,12 +1,19 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from "@/components/ui/toaster"
+import { I18nProvider } from '@/context/i18n-context';
 
 export const metadata: Metadata = {
   title: 'AgriAssist',
   description: 'A Digital Health Twin for your farm.',
   viewport: 'minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover',
+  manifest: '/manifest.json',
+  themeColor: '#ffffff',
+  icons: {
+    apple: '/icon-192x192.png',
+  }
 };
 
 export default function RootLayout({
@@ -22,7 +29,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
       </head>
       <body className={cn("font-body antialiased", "min-h-screen bg-background font-sans")}>
-        {children}
+        <I18nProvider>
+          {children}
+        </I18nProvider>
         <Toaster />
       </body>
     </html>

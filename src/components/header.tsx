@@ -1,29 +1,49 @@
+
 'use client';
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { UserNav } from "@/components/user-nav";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Upload, Languages } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useI18n } from "@/context/i18n-context";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-const getTitle = (pathname: string) => {
-    switch (pathname) {
-        case "/dashboard":
-            return "Dashboard";
-        case "/dashboard/analyze":
-            return "New Analysis";
-        case "/dashboard/history":
-            return "Analysis History";
-        case "/dashboard/review":
-            return "Review Queue";
-        default:
-            return "AgriAssist";
-    }
-};
 
 export default function Header() {
   const pathname = usePathname();
+  const { t, setLocale, locale } = useI18n();
+
+  const getTitle = (pathname: string) => {
+    switch (pathname) {
+      case "/dashboard":
+        return t('Dashboard');
+      case "/dashboard/analyze":
+        return t('New Analysis');
+      case "/dashboard/history":
+        return t('Analysis History');
+      case "/dashboard/review":
+        return t('Review Queue');
+      default:
+        return "AgriAssist";
+    }
+  };
+
+  const languages = [
+    { code: 'en', name: 'English' },
+    { code: 'hi', name: 'हिंदी' },
+    { code: 'te', name: 'తెలుగు' },
+    { code: 'ta', name: 'தமிழ்' },
+    { code: 'ml', name: 'മലയാളം' },
+  ];
+
+
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur-sm sm:px-6">
       <div className="flex items-center gap-2">
@@ -34,9 +54,30 @@ export default function Header() {
         <Button asChild className="hidden sm:inline-flex">
           <Link href="/dashboard/analyze">
             <Upload className="mr-2" />
-            New Analysis
+            {t('New Analysis')}
           </Link>
         </Button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon">
+              <Languages className="h-[1.2rem] w-[1.2rem]" />
+              <span className="sr-only">Change language</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {languages.map((lang) => (
+              <DropdownMenuItem
+                key={lang.code}
+                onClick={() => setLocale(lang.code)}
+                className={locale === lang.code ? 'font-bold' : ''}
+              >
+                {lang.name}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         <UserNav />
       </div>
     </header>

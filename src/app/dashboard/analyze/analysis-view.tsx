@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, ChangeEvent, useActionState } from 'react';
@@ -9,6 +10,7 @@ import { Upload, X, Loader2, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import type { FullAnalysisResponse } from '@/lib/types';
 import AnalysisResults from './analysis-results';
+import { useI18n } from '@/context/i18n-context';
 
 const initialState = {
   data: null,
@@ -28,6 +30,8 @@ export default function AnalysisView() {
   const [formState, formAction, isPending] = useActionState(analyzeImage, initialState);
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { t } = useI18n();
+
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -48,8 +52,8 @@ export default function AnalysisView() {
     return (
         <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-card p-12 text-center h-[500px]">
             <Loader2 className="h-16 w-16 animate-spin text-primary mb-4" />
-            <h3 className="text-xl font-semibold font-headline">Analyzing your crop...</h3>
-            <p className="text-muted-foreground">This may take a moment. The AI is hard at work!</p>
+            <h3 className="text-xl font-semibold font-headline">{t('Analyzing your crop...')}</h3>
+            <p className="text-muted-foreground">{t('This may take a moment. The AI is hard at work!')}</p>
         </div>
     );
   }
@@ -61,15 +65,15 @@ export default function AnalysisView() {
   return (
     <Card className="max-w-4xl mx-auto">
       <CardHeader>
-        <CardTitle>Analyze Crop Health</CardTitle>
-        <CardDescription>Upload an image of a plant leaf to get an AI-powered health analysis and risk assessment.</CardDescription>
+        <CardTitle>{t('Analyze Crop Health')}</CardTitle>
+        <CardDescription>{t('Upload an image of a plant leaf to get an AI-powered health analysis and risk assessment.')}</CardDescription>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-6">
             {preview && <input type="hidden" name="photoDataUri" value={preview} />}
           <div className="space-y-2">
             <label htmlFor="file-upload" className="block text-sm font-medium text-foreground">
-              Crop Image
+              {t('Crop Image')}
             </label>
             {preview ? (
               <div className="relative group w-full max-w-lg mx-auto">
@@ -99,7 +103,7 @@ export default function AnalysisView() {
                   <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
                   <div className="flex text-sm text-muted-foreground">
                     <span className="relative rounded-md font-medium text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary">
-                      Upload a file
+                      {t('Upload a file')}
                     </span>
                     <input
                       ref={fileInputRef}
@@ -110,9 +114,9 @@ export default function AnalysisView() {
                       accept="image/*"
                       onChange={handleFileChange}
                     />
-                    <p className="pl-1">or drag and drop</p>
+                    <p className="pl-1">{t('or drag and drop')}</p>
                   </div>
-                  <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 10MB</p>
+                  <p className="text-xs text-muted-foreground">{t('PNG, JPG, GIF up to 10MB')}</p>
                 </div>
               </div>
             )}
@@ -120,12 +124,12 @@ export default function AnalysisView() {
           {formState.error && (
             <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Analysis Failed</AlertTitle>
+                <AlertTitle>{t('Analysis Failed')}</AlertTitle>
                 <AlertDescription>{formState.error}</AlertDescription>
             </Alert>
           )}
           <Button type="submit" disabled={!preview || isPending} className="w-full">
-            {isPending ? 'Analyzing...' : 'Start Analysis'}
+            {isPending ? t('Analyzing...') : t('Start Analysis')}
           </Button>
         </form>
       </CardContent>

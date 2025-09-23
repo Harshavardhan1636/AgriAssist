@@ -1,3 +1,6 @@
+
+'use client';
+
 import {
   Card,
   CardContent,
@@ -23,6 +26,7 @@ import DetectionsChart from "./detections-chart";
 import { mockHistory } from "@/lib/mock-data";
 import { formatDistanceToNow } from "date-fns";
 import Image from "next/image";
+import { useI18n } from "@/context/i18n-context";
 
 const chartData = [
   { day: "Mon", detections: 5 },
@@ -36,48 +40,49 @@ const chartData = [
 
 export default function DashboardPage() {
   const recentAnalyses = mockHistory.slice(0, 5);
+  const { t } = useI18n();
 
   return (
     <div className="flex flex-col gap-8">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Scans</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('Total Scans')}</CardTitle>
             <FlaskConical className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">1,254</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+            <p className="text-xs text-muted-foreground">{t('+20.1% from last month')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">High-Risk Alerts</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('High-Risk Alerts')}</CardTitle>
             <ShieldAlert className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">32</div>
-            <p className="text-xs text-muted-foreground">+12 since last week</p>
+            <p className="text-xs text-muted-foreground">{t('+12 since last week')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Reviews</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('Pending Reviews')}</CardTitle>
             <ClipboardCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{mockHistory.filter(h => h.status === 'Pending Review').length}</div>
-            <p className="text-xs text-muted-foreground">2 new today</p>
+            <p className="text-xs text-muted-foreground">{t('2 new today')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Weekly Detections</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('Weekly Detections')}</CardTitle>
             <BarChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{chartData.reduce((acc, cur) => acc + cur.detections, 0)}</div>
-            <p className="text-xs text-muted-foreground">Total for this week</p>
+            <p className="text-xs text-muted-foreground">{t('Total for this week')}</p>
           </CardContent>
         </Card>
       </div>
@@ -85,7 +90,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>Detections This Week</CardTitle>
+            <CardTitle>{t('Detections This Week')}</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
             <DetectionsChart />
@@ -94,15 +99,15 @@ export default function DashboardPage() {
 
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Recent Analyses</CardTitle>
+            <CardTitle>{t('Recent Analyses')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Crop</TableHead>
-                  <TableHead>Diagnosis</TableHead>
-                  <TableHead>Time</TableHead>
+                  <TableHead>{t('Crop')}</TableHead>
+                  <TableHead>{t('Diagnosis')}</TableHead>
+                  <TableHead>{t('Time')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from "react";
@@ -29,10 +30,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/context/i18n-context";
 
 export default function HistoryPage() {
   const [search, setSearch] = useState("");
   const [cropFilter, setCropFilter] = useState("all");
+  const { t } = useI18n();
 
   const filteredHistory = mockHistory.filter((analysis) => {
     const searchLower = search.toLowerCase();
@@ -50,23 +53,23 @@ export default function HistoryPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Analysis History</CardTitle>
+        <CardTitle>{t('Analysis History')}</CardTitle>
         <CardDescription>
-          Browse and review all past crop analyses.
+          {t('Browse and review all past crop analyses.')}
         </CardDescription>
         <div className="flex items-center gap-4 pt-4">
           <Input 
-            placeholder="Search by disease..." 
+            placeholder={t('Search by disease...')}
             className="max-w-sm"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <Select value={cropFilter} onValueChange={setCropFilter}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by crop" />
+              <SelectValue placeholder={t('Filter by crop')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Crops</SelectItem>
+              <SelectItem value="all">{t('All Crops')}</SelectItem>
               <SelectItem value="Tomato">Tomato</SelectItem>
               <SelectItem value="Potato">Potato</SelectItem>
               <SelectItem value="Maize">Maize</SelectItem>
@@ -79,16 +82,16 @@ export default function HistoryPage() {
           <TableHeader>
             <TableRow>
               <TableHead className="hidden w-[100px] sm:table-cell">
-                Image
+                {t('Image')}
               </TableHead>
-              <TableHead>Crop</TableHead>
-              <TableHead>Top Diagnosis</TableHead>
-              <TableHead>Severity</TableHead>
-              <TableHead>Risk</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead>{t('Crop')}</TableHead>
+              <TableHead>{t('Top Diagnosis')}</TableHead>
+              <TableHead>{t('Severity')}</TableHead>
+              <TableHead>{t('Risk')}</TableHead>
+              <TableHead>{t('Status')}</TableHead>
+              <TableHead>{t('Date')}</TableHead>
               <TableHead>
-                <span className="sr-only">Actions</span>
+                <span className="sr-only">{t('Actions')}</span>
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -109,7 +112,7 @@ export default function HistoryPage() {
                 <TableCell>{analysis.predictions[0].label}</TableCell>
                 <TableCell>
                   <Badge variant={analysis.severity.band === 'High' ? 'destructive' : 'secondary'}>
-                    {analysis.severity.band} ({analysis.severity.percentage}%)
+                    {t(analysis.severity.band as 'Low' | 'Medium' | 'High')} ({analysis.severity.percentage}%)
                   </Badge>
                 </TableCell>
                  <TableCell>
@@ -119,14 +122,14 @@ export default function HistoryPage() {
                 </TableCell>
                 <TableCell>
                   <Badge variant={analysis.status === 'Pending Review' ? 'default' : 'outline'}>
-                    {analysis.status}
+                    {t(analysis.status as 'Completed' | 'Pending Review')}
                   </Badge>
                 </TableCell>
                 <TableCell>
                   {format(new Date(analysis.timestamp), "PPP")}
                 </TableCell>
                 <TableCell>
-                  <Button size="sm" variant="outline">View</Button>
+                  <Button size="sm" variant="outline">{t('View')}</Button>
                 </TableCell>
               </TableRow>
             ))}

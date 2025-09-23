@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -12,16 +13,18 @@ import {
 import { Leaf, LayoutDashboard, History, FlaskConical, LifeBuoy, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-const menuItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/dashboard/analyze', label: 'New Analysis', icon: FlaskConical },
-  { href: '/dashboard/history', label: 'History', icon: History },
-  { href: '/dashboard/review', label: 'Review Queue', icon: LifeBuoy },
-];
+import { useI18n } from '@/context/i18n-context';
 
 export default function AppSidebar() {
   const pathname = usePathname();
+  const { t } = useI18n();
+
+  const menuItems = [
+    { href: '/dashboard', label: t('Dashboard'), icon: LayoutDashboard },
+    { href: '/dashboard/analyze', label: t('New Analysis'), icon: FlaskConical },
+    { href: '/dashboard/history', label: t('History'), icon: History },
+    { href: '/dashboard/review', label: t('Review Queue'), icon: LifeBuoy },
+  ];
 
   return (
     <Sidebar>
@@ -52,9 +55,9 @@ export default function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
             <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Settings">
+                <SidebarMenuButton tooltip={t('Settings')}>
                     <Settings />
-                    <span>Settings</span>
+                    <span>{t('Settings')}</span>
                 </SidebarMenuButton>
             </SidebarMenuItem>
         </SidebarMenu>

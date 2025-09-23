@@ -1,3 +1,6 @@
+
+'use client';
+
 import {
   Card,
   CardContent,
@@ -14,24 +17,26 @@ import { Textarea } from "@/components/ui/textarea";
 import { reviewQueue } from "@/lib/mock-data";
 import Image from "next/image";
 import { ThumbsDown, ThumbsUp } from "lucide-react";
+import { useI18n } from "@/context/i18n-context";
 
 export default function ReviewPage() {
+  const { t } = useI18n();
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold font-headline">Agronomist Review Queue</h1>
+        <h1 className="text-2xl font-bold font-headline">{t('Agronomist Review Queue')}</h1>
         <p className="text-muted-foreground">
-          These analyses have low confidence scores and require expert review.
+          {t('These analyses have low confidence scores and require expert review.')}
         </p>
       </div>
 
       {reviewQueue.length === 0 ? (
         <Card className="flex flex-col items-center justify-center p-12 text-center">
             <CardHeader>
-                <CardTitle>Queue is Clear!</CardTitle>
+                <CardTitle>{t('Queue is Clear!')}</CardTitle>
             </CardHeader>
             <CardContent>
-                <p className="text-muted-foreground">There are no analyses pending review. Great job!</p>
+                <p className="text-muted-foreground">{t('There are no analyses pending review. Great job!')}</p>
             </CardContent>
         </Card>
       ) : (
@@ -39,9 +44,9 @@ export default function ReviewPage() {
           {reviewQueue.map((item) => (
             <Card key={item.id} className="flex flex-col">
               <CardHeader>
-                <CardTitle>Case #{item.id.split('_')[1]}</CardTitle>
+                <CardTitle>{t('Case')} #{item.id.split('_')[1]}</CardTitle>
                 <CardDescription>
-                  AI Prediction: <strong>{item.predictions[0].label}</strong>
+                  {t('AI Prediction:')} <strong>{item.predictions[0].label}</strong>
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-grow space-y-4">
@@ -54,21 +59,21 @@ export default function ReviewPage() {
                   data-ai-hint={item.imageHint}
                 />
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">AI Confidence</p>
+                  <p className="text-sm font-medium">{t('AI Confidence')}</p>
                   <Badge variant="destructive">{Math.round(item.predictions[0].confidence * 100)}%</Badge>
                 </div>
                  <div className="space-y-2">
-                    <Label htmlFor={`correction-${item.id}`}>Correct Label (if needed)</Label>
+                    <Label htmlFor={`correction-${item.id}`}>{t('Correct Label (if needed)')}</Label>
                     <Input id={`correction-${item.id}`} placeholder={item.predictions[0].label} />
                  </div>
                  <div className="space-y-2">
-                    <Label htmlFor={`notes-${item.id}`}>Agronomist Notes</Label>
-                    <Textarea id={`notes-${item.id}`} placeholder="Add observations..." />
+                    <Label htmlFor={`notes-${item.id}`}>{t('Agronomist Notes')}</Label>
+                    <Textarea id={`notes-${item.id}`} placeholder={t('Add observations...')} />
                  </div>
               </CardContent>
               <CardFooter className="flex justify-between">
-                <Button variant="outline"><ThumbsDown className="mr-2"/>Incorrect</Button>
-                <Button><ThumbsUp className="mr-2"/>Approve AI</Button>
+                <Button variant="outline"><ThumbsDown className="mr-2"/>{t('Incorrect')}</Button>
+                <Button><ThumbsUp className="mr-2"/>{t('Approve AI')}</Button>
               </CardFooter>
             </Card>
           ))}
