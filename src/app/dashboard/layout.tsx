@@ -8,6 +8,7 @@ import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useI18n } from '@/context/i18n-context';
 import { cn } from '@/lib/utils';
+import ClientOnly from '@/components/client-only';
 
 function DashboardLayoutContent({
   children,
@@ -57,7 +58,9 @@ export default function DashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <DashboardLayoutContent>{children}</DashboardLayoutContent>
+      <ClientOnly>
+        <DashboardLayoutContent>{children}</DashboardLayoutContent>
+      </ClientOnly>
     </SidebarProvider>
   )
 }
