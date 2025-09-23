@@ -43,15 +43,21 @@ export function useSidebar() {
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = React.useState(false);
-  const [isCollapsed, setIsCollapsed] = React.useState(isMobile);
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const [isClient, setIsClient] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   React.useEffect(() => {
     if (isMobile) {
       setIsCollapsed(true);
+      setIsOpen(false);
     } else {
       setIsCollapsed(false);
     }
-  }, [isMobile]);
+  }, [isMobile, isClient]);
 
   const value = {
     isOpen,
@@ -63,7 +69,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarContext.Provider value={value}>
-      <TooltipProvider>{children}</TooltipProvider>
+      <TooltipProvider>{isClient ? children : null}</TooltipProvider>
     </SidebarContext.Provider>
   );
 }
@@ -82,11 +88,6 @@ export const Sidebar = React.forwardRef<
           className="sm:max-w-xs p-0"
           withCloseButton={true}
         >
-          <SheetHeader className="h-14 flex items-center border-b px-4 lg:h-[60px] lg:px-6">
-             <Link href="/" className="flex items-center gap-2 font-semibold">
-                <SheetTitle>AgriAssist</SheetTitle>
-            </Link>
-          </SheetHeader>
           {mobileContent || children}
         </SheetContent>
       </Sheet>
@@ -114,8 +115,6 @@ export const SidebarHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
-  const {isMobile} = useSidebar();
-  if (isMobile) return null;
 
   return (
     <div
@@ -160,8 +159,6 @@ export const SidebarFooter = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
-    const {isMobile} = useSidebar();
-    if (isMobile) return null;
     return <div ref={ref} className={cn('mt-auto', className)} {...props} />
 });
 SidebarFooter.displayName = 'SidebarFooter';
