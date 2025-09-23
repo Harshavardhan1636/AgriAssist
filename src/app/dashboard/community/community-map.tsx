@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -67,5 +68,3 @@ export default function CommunityMap({ outbreaks }: CommunityMapProps) {
     <div ref={mapContainerRef} className="h-[400px] w-full rounded-lg border overflow-hidden z-10" />
   );
 }
-
-    
