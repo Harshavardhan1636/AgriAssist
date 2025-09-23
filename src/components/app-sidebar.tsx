@@ -9,16 +9,19 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Leaf, LayoutDashboard, History, FlaskConical, LifeBuoy, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@/context/i18n-context';
+import { useSidebar } from './ui/sidebar';
+
 
 export default function AppSidebar() {
   const pathname = usePathname();
   const { t } = useI18n();
+  const { isCollapsed } = useSidebar();
+
 
   const menuItems = [
     { href: '/dashboard', label: t('Dashboard'), icon: LayoutDashboard },
@@ -32,7 +35,9 @@ export default function AppSidebar() {
       <SidebarHeader>
         <div className="flex items-center gap-2 p-2">
             <Leaf className="h-8 w-8 text-primary" />
-            <h1 className="text-xl font-bold font-headline">AgriAssist</h1>
+            <span className={isCollapsed ? 'hidden' : 'inline'}>
+                <h1 className="text-xl font-bold font-headline">AgriAssist</h1>
+            </span>
         </div>
       </SidebarHeader>
       <SidebarContent>
