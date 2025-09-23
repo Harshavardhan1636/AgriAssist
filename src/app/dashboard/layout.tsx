@@ -9,6 +9,11 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { useI18n } from '@/context/i18n-context';
 import { cn } from '@/lib/utils';
 import ClientOnly from '@/components/client-only';
+import { useToast } from '@/hooks/use-toast';
+import { communityOutbreaks } from '@/lib/mock-data';
+import { AlertTriangle } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 function DashboardLayoutContent({
   children,
@@ -18,6 +23,36 @@ function DashboardLayoutContent({
   const { isCollapsed, isMobile } = useSidebar();
   const { t } = useI18n();
   const [isOpen, setIsOpen] = React.useState(false);
+  const { toast } = useToast();
+
+  React.useEffect(() => {
+    // Simulate checking for new high-risk community alerts on load
+    const highRiskAlerts = communityOutbreaks.filter(o => o.riskLevel === 'High');
+    if (highRiskAlerts.length > 0) {
+        const latestAlert = highRiskAlerts[0];
+        setTimeout(() => {
+            toast({
+              title: (
+                <div className="flex items-center gap-2 font-bold">
+                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                  {t('Community Alert')}
+                </div>
+              ),
+              description: (
+                <div>
+                  <p>{t('High-risk outbreak detected')}: <strong>{t(latestAlert.disease as any)}</strong> {t('in')} {latestAlert.location}.</p>
+                  <Link href="/dashboard/community">
+                    <Button variant="link" className="p-0 h-auto mt-2">{t('View Details')}</Button>
+                  </Link>
+                </div>
+              ),
+              variant: 'destructive',
+              duration: 15000, 
+            });
+        }, 3000);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className={cn(

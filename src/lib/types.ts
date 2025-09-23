@@ -66,6 +66,7 @@ export type StoreProduct = {
     type: 'Organic Fungicide' | 'Chemical Fungicide' | 'Organic Insecticide' | 'Bio-stimulant';
     isGovtApproved: boolean;
     toxicity?: 'Low' | 'Medium' | 'High';
+    quantity?: number;
 };
 
 export type StoreLocation = {

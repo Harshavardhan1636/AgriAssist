@@ -11,6 +11,8 @@ import { ShoppingCart, Leaf, AlertTriangle } from 'lucide-react';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import dynamic from 'next/dynamic';
+import { useCart } from '@/context/cart-context';
+import { useToast } from '@/hooks/use-toast';
 
 const StoreMap = dynamic(() => import('./store-map'), {
   ssr: false,
@@ -19,6 +21,16 @@ const StoreMap = dynamic(() => import('./store-map'), {
 
 const ProductCard = ({ product }: { product: StoreProduct }) => {
     const { t } = useI18n();
+    const { addToCart } = useCart();
+    const { toast } = useToast();
+
+    const handleAddToCart = () => {
+        addToCart(product);
+        toast({
+            title: t('Product Added'),
+            description: `${t(product.name as any)} ${t('has been added to your cart.')}`,
+        });
+    }
 
     const getProductTypeIcon = (type: StoreProduct['type']) => {
         if (type.includes('Organic')) {
@@ -51,7 +63,7 @@ const ProductCard = ({ product }: { product: StoreProduct }) => {
                 </div>
                 <div className="mt-4 flex justify-between items-center">
                     <p className="text-xl font-bold">₹{product.price}</p>
-                    <Button>
+                    <Button onClick={handleAddToCart}>
                         <ShoppingCart className="mr-2 h-4 w-4" />
                         {t('Add to Cart')}
                     </Button>

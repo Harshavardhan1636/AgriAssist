@@ -1,9 +1,10 @@
 
 'use client';
 
+import { useState } from 'react';
 import { UserNav } from "@/components/user-nav";
 import { Button } from "@/components/ui/button";
-import { Languages, PanelLeft } from "lucide-react";
+import { Languages, PanelLeft, ShoppingCart } from "lucide-react";
 import { useI18n } from "@/context/i18n-context";
 import {
   DropdownMenu,
@@ -11,6 +12,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useCart } from '@/context/cart-context';
+import { Badge } from './ui/badge';
+import CartSheet from './cart-sheet';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -18,6 +22,10 @@ interface HeaderProps {
 
 export default function Header({ onMenuClick }: HeaderProps) {
   const { setLocale, locale } = useI18n();
+  const { cart } = useCart();
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const cartItemCount = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
 
   const languages = [
     { code: 'en', name: 'English' },
@@ -60,8 +68,17 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </DropdownMenuContent>
         </DropdownMenu>
 
+        <Button variant="outline" size="icon" className="relative" onClick={() => setIsCartOpen(true)}>
+            <ShoppingCart className="h-[1.2rem] w-[1.2rem]" />
+            {cartItemCount > 0 && (
+                <Badge className="absolute -top-2 -right-2 h-5 w-5 justify-center p-0">{cartItemCount}</Badge>
+            )}
+            <span className="sr-only">Open cart</span>
+        </Button>
+
         <UserNav />
       </div>
+      <CartSheet isOpen={isCartOpen} onOpenChange={setIsCartOpen} />
     </>
   );
 }
