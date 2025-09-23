@@ -66,7 +66,13 @@ export async function analyzeImage(
 
     try {
       const classification = await classifyPlantDisease({ photoDataUri, language: locale });
-      const topPrediction = classification.predictions?.[0] ?? { label: "unknown", confidence: 0 };
+
+      // **CRITICAL FIX**: Handle cases where the AI returns no predictions.
+      if (!classification.predictions || classification.predictions.length === 0) {
+        throw new Error("The AI model could not identify a disease. Please try a different image.");
+      }
+
+      const topPrediction = classification.predictions[0];
       
       const [severity, explanation, forecast, recommendations] = await Promise.all([
         assessDiseaseSeverity({ photoDataUri, description: `Image of a plant leaf, classified as ${topPrediction.label}`, language: locale }),
@@ -82,6 +88,7 @@ export async function analyzeImage(
         generateRecommendations({ disease: topPrediction.label, severity: 'Medium', cropType: 'Tomato', language: locale }),
       ]);
       
+      // Fallback if Grad-CAM fails
       if (!explanation.gradCAMOverlay) {
           explanation.gradCAMOverlay = photoDataUri;
       }
