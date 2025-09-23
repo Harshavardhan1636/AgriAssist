@@ -94,10 +94,10 @@ export default function ForecastPage() {
                         <p className="text-lg font-bold">{mockSoilData.ph}</p>
                     </div>
                     <div className="p-4 rounded-lg bg-muted/50 flex flex-col items-center justify-center text-center space-y-1">
-                        <p className="text-sm font-medium text-muted-foreground">{t('Nutrients')}</p>
-                        <p className="text-xs">N: <Badge variant={mockSoilData.nutrients.nitrogen === 'High' ? 'default' : 'secondary'}>{t(mockSoilData.nutrients.nitrogen)}</Badge></p>
-                        <p className="text-xs">P: <Badge variant={mockSoilData.nutrients.phosphorus === 'High' ? 'default' : 'secondary'}>{t(mockSoilData.nutrients.phosphorus)}</Badge></p>
-                        <p className="text-xs">K: <Badge variant={mockSoilData.nutrients.potassium === 'High' ? 'default' : 'secondary'}>{t(mockSoilData.nutrients.potassium)}</Badge></p>
+                        <div className="text-sm font-medium text-muted-foreground">{t('Nutrients')}</div>
+                        <div className="text-xs">N: <Badge variant={mockSoilData.nutrients.nitrogen === 'High' ? 'default' : 'secondary'}>{t(mockSoilData.nutrients.nitrogen)}</Badge></div>
+                        <div className="text-xs">P: <Badge variant={mockSoilData.nutrients.phosphorus === 'High' ? 'default' : 'secondary'}>{t(mockSoilData.nutrients.phosphorus)}</Badge></div>
+                        <div className="text-xs">K: <Badge variant={mockSoilData.nutrients.potassium === 'High' ? 'default' : 'secondary'}>{t(mockSoilData.nutrients.potassium)}</Badge></div>
                     </div>
                 </CardContent>
             </Card>
