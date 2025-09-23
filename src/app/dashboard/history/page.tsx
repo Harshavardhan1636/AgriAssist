@@ -57,10 +57,10 @@ export default function HistoryPage() {
         <CardDescription>
           {t('Browse and review all past crop analyses.')}
         </CardDescription>
-        <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
+        <div className="flex flex-col sm:flex-row items-center gap-2 pt-4">
           <Input 
             placeholder={t('Search by disease...')}
-            className="w-full sm:max-w-sm"
+            className="w-full sm:max-w-xs"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />

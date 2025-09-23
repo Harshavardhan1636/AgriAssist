@@ -68,7 +68,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
   };
 
   return (
-    <div className="space-y-8 mt-4">
+    <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>{t('Analysis Complete')}</CardTitle>
@@ -78,8 +78,8 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-        <div className="lg:col-span-3 space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+        <div className="md:col-span-3 space-y-6">
            <Card>
             <CardHeader>
               <CardTitle>{t('Step-by-Step Recommendations')}</CardTitle>
@@ -93,7 +93,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                         <AccordionTrigger>
                           <div className="flex items-center gap-3">
                             <RecommendationIcon type={rec.type} />
-                            <span className="font-semibold">{t(rec.title as any)}</span>
+                            <span className="font-semibold text-left">{t(rec.title as any)}</span>
                             <Badge variant="outline">{t(rec.type as any)}</Badge>
                           </div>
                         </AccordionTrigger>
@@ -144,7 +144,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
           </Card>
         </div>
 
-        <div className="lg:col-span-2 space-y-8">
+        <div className="md:col-span-2 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>{t('Severity Assessment')}</CardTitle>
