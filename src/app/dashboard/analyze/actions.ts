@@ -123,7 +123,9 @@ export async function analyzeImage(
       const topPrediction = classification.predictions[0];
       console.log("Top prediction:", topPrediction);
       
-      const [severity, explanation, forecast, recommendations] = await Promise.all([
+      const soilType = 'Loam'; // Mock data
+      
+      const [severity, explanation, forecast] = await Promise.all([
         // Assess Severity
         assessDiseaseSeverity({ photoDataUri: usedPhoto, description: textDescription, language: locale })
           .catch(e => { console.error("Severity assessment failed:", e); return { severityPercentage: 0, severityBand: 'Unknown', confidence: 0 }; }),
@@ -138,14 +140,20 @@ export async function analyzeImage(
           historicalDetections: [1, 0, 2, 1, 3, 0, 4, 2, 3, 1, 5, 2, 4, 3], // Mock data for 14 days
           weatherFeatures: { temperature: 28, humidity: 82, rainfall: 8 }, // Mock 14-day average
           cropType: 'Tomato', // Mock data
-          soilType: 'Loam', // Mock data
+          soilType,
           language: locale,
         }).catch(e => { console.error("Risk forecast failed:", e); return { riskScore: 0, explanation: 'Not available', preventiveActions: [] }; }),
-
-        // Generate Recommendations
-        generateRecommendations({ disease: topPrediction.label, severity: 'Medium', cropType: 'Tomato', language: locale }) // Mock severity for now
-          .catch(e => { console.error("Recommendations generation failed:", e); return { recommendations: [] }; }),
       ]);
+
+      // Generate Recommendations using the results from the other flows
+      const recommendations = await generateRecommendations({ 
+          disease: topPrediction.label, 
+          severity: severity.severityBand, 
+          cropType: 'Tomato', // Mock data
+          language: locale,
+          forecastSummary: `Risk score is ${forecast.riskScore}. ${forecast.explanation}`,
+          soilType: soilType,
+      }).catch(e => { console.error("Recommendations generation failed:", e); return { recommendations: [] }; });
       
       const conversationId = uuidv4();
       
