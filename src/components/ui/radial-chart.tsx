@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -13,18 +14,20 @@ const getSeverityColor = (percentage: number) => {
 
 
 type RadialChartProps = {
-    data: { name: string; value: number }[];
+    value: number;
     mainText: string;
     subText: string;
 };
 
-export function RadialChart({ data, mainText, subText }: RadialChartProps) {
-    const coloredData = data.map(item => ({...item, fill: getSeverityColor(item.value)}));
+export function RadialChart({ value, mainText, subText }: RadialChartProps) {
+    const chartData = [
+      { name: 'value', value: value, fill: getSeverityColor(value) }
+    ];
 
     return (
         <ChartContainer config={{}} className="mx-auto aspect-square h-[200px]">
             <RechartsRadialBarChart
-                data={coloredData}
+                data={chartData}
                 startAngle={90}
                 endAngle={-270}
                 innerRadius="70%"

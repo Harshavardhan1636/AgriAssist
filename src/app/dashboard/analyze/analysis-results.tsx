@@ -56,14 +56,6 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
     setIsAsking(false);
   };
 
-  const severityData = [
-    { name: 'severity', value: severity.severityPercentage }
-  ];
-  
-  const riskData = [
-    { name: 'risk', value: forecast.riskScore * 100 }
-  ];
-
   return (
     <div className="space-y-8">
       <Card>
@@ -136,7 +128,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center">
               <RadialChart 
-                data={severityData} 
+                value={severity.severityPercentage}
                 mainText={`${Math.round(severity.severityPercentage)}%`}
                 subText={t(severity.severityBand as 'Low' | 'Medium' | 'High')}
               />
@@ -159,7 +151,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
             </CardHeader>
             <CardContent>
               <RadialChart 
-                data={riskData}
+                value={forecast.riskScore * 100}
                 mainText={`${Math.round(forecast.riskScore * 100)}%`}
                 subText={t('Risk Score')}
               />
