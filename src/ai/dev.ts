@@ -10,3 +10,4 @@ import '@/ai/flows/generate-recommendations.ts';
 import '@/ai/flows/ask-follow-up-question.ts';
 import '@/ai/flows/diagnose-with-text.ts';
 import '@/ai/flows/transcribe-audio.ts';
+import '@/ai/flows/recommend-products.ts';

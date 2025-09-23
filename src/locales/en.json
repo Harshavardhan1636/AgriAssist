@@ -131,5 +131,12 @@
     "Account": "Account",
     "Manage your account settings.": "Manage your account settings.",
     "Delete Account": "Delete Account",
-    "Permanently delete your account and all associated data.": "Permanently delete your account and all associated data."
+    "Permanently delete your account and all associated data.": "Permanently delete your account and all associated data.",
+    "Store": "Store",
+    "Recommended Products": "Recommended Products",
+    "Safe and effective products based on your crop's needs.": "Safe and effective products based on your crop's needs.",
+    "Add to Cart": "Add to Cart",
+    "Local Retailer Map": "Local Retailer Map",
+    "Find approved retailers near you.": "Find approved retailers near you.",
+    "Get Directions": "Get Directions"
 }

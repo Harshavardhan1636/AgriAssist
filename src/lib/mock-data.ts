@@ -1,5 +1,5 @@
 
-import type { AnalysisResult, CommunityOutbreak } from './types';
+import type { AnalysisResult, CommunityOutbreak, StoreProduct, StoreLocation } from './types';
 
 export const mockHistory: AnalysisResult[] = [
   {
@@ -132,4 +132,102 @@ export const communityOutbreaks: CommunityOutbreak[] = [
         riskLevel: 'High',
         firstReported: '2024-07-15T11:30:00Z',
     }
+];
+
+export const mockProducts: StoreProduct[] = [
+  {
+    id: 'prod_001',
+    name: 'Neem Oil Concentrate',
+    description: 'A natural, organic fungicide and pesticide effective against blights and rusts. Safe for all crops.',
+    price: 450,
+    currency: 'INR',
+    image: 'https://picsum.photos/seed/neem_oil/300/300',
+    imageHint: 'bottle of neem oil',
+    type: 'Organic Fungicide',
+    isGovtApproved: true,
+  },
+  {
+    id: 'prod_002',
+    name: 'Trichoderma Viride Bio Fungicide',
+    description: 'A powerful bio-fungicide that protects crops from soil-borne diseases. Enhances root growth.',
+    price: 750,
+    currency: 'INR',
+    image: 'https://picsum.photos/seed/trichoderma/300/300',
+    imageHint: 'bio-fungicide powder',
+    type: 'Organic Fungicide',
+    isGovtApproved: true,
+  },
+  {
+    id: 'prod_003',
+    name: 'Mancozeb 75% WP',
+    description: 'A widely-used contact fungicide for controlling a broad spectrum of diseases in potato and tomato.',
+    price: 600,
+    currency: 'INR',
+    image: 'https://picsum.photos/seed/mancozeb/300/300',
+    imageHint: 'bag of chemical fungicide',
+    type: 'Chemical Fungicide',
+    isGovtApproved: true,
+    toxicity: 'Medium',
+  },
+  {
+    id: 'prod_004',
+    name: 'Copper Oxychloride',
+    description: 'A protective fungicide used to control late blight in potatoes and tomatoes. Govt approved.',
+    price: 550,
+    currency: 'INR',
+    image: 'https://picsum.photos/seed/copper_oxychloride/300/300',
+    imageHint: 'blue chemical powder',
+    type: 'Chemical Fungicide',
+    isGovtApproved: true,
+    toxicity: 'Low',
+  },
+  {
+    id: 'prod_005',
+    name: 'Beauveria Bassiana Bio-insecticide',
+    description: 'An eco-friendly bio-insecticide for managing a wide range of pests. Safe for beneficial insects.',
+    price: 800,
+    currency: 'INR',
+    image: 'https://picsum.photos/seed/beauveria/300/300',
+    imageHint: 'bio-insecticide bottle',
+    type: 'Organic Insecticide',
+    isGovtApproved: true,
+  },
+];
+
+export const mockStoreLocations: StoreLocation[] = [
+  {
+    id: 'store_01',
+    name: 'Kisan Seva Kendra',
+    address: '123, Main Market, Karnal, Haryana',
+    latitude: 29.6857,
+    longitude: 76.9905,
+  },
+  {
+    id: 'store_02',
+    name: 'Agri Junction',
+    address: '45, Ring Road, Guntur, Andhra Pradesh',
+    latitude: 16.3067,
+    longitude: 80.4365,
+  },
+  {
+    id: 'store_03',
+    name: 'Farm Essentials',
+    address: '78, Mumbai-Agra Highway, Nashik, Maharashtra',
+    latitude: 20.00,
+    longitude: 73.78,
+  },
+  {
+    id: 'store_04',
+    name: 'Himachal Agro Solutions',
+    address: '9, Mall Road, Solan, Himachal Pradesh',
+    latitude: 30.9083,
+    longitude: 77.0996,
+  },
+  {
+    id: 'store_05',
+    name: 'Deccan Farm Supplies',
+    address: '56, Pune-Bangalore Highway, Pune, Maharashtra',
+    latitude: 18.5204,
+    longitude: 73.8567,
+  }
 ];

@@ -11,7 +11,7 @@ import {
   SidebarMenuLink,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { Leaf, LayoutDashboard, History, FlaskConical, LifeBuoy, Settings, Users, ChevronLeft } from 'lucide-react';
+import { Leaf, LayoutDashboard, History, FlaskConical, LifeBuoy, Settings, Users, ChevronLeft, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import { useI18n } from '@/context/i18n-context';
 import { Button } from './ui/button';
@@ -51,6 +51,7 @@ export default function AppSidebar({isMobile = false}: {isMobile?: boolean}) {
       { href: '/dashboard', label: t('Dashboard'), icon: LayoutDashboard },
       { href: '/dashboard/analyze', label: t('New Analysis'), icon: FlaskConical },
       { href: '/dashboard/history', label: t('History'), icon: History },
+      { href: '/dashboard/store', label: t('Store'), icon: ShoppingCart },
       { href: '/dashboard/community', label: t('Community Outbreak Alerts'), icon: Users },
       { href: '/dashboard/review', label: t('Review Queue'), icon: LifeBuoy },
     ];

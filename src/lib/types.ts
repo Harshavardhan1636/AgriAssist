@@ -53,3 +53,25 @@ export type FullAnalysisResponse = {
   originalImage: string;
   locale: string;
 };
+
+
+export type StoreProduct = {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    currency: 'INR';
+    image: string;
+    imageHint: string;
+    type: 'Organic Fungicide' | 'Chemical Fungicide' | 'Organic Insecticide' | 'Bio-stimulant';
+    isGovtApproved: boolean;
+    toxicity?: 'Low' | 'Medium' | 'High';
+};
+
+export type StoreLocation = {
+    id: string;
+    name: string;
+    address: string;
+    latitude: number;
+    longitude: number;
+};
