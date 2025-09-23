@@ -65,18 +65,28 @@ export async function analyzeImage(
     }
 
     try {
+      // 1. Classify the disease first, as other steps depend on it.
       const classification = await classifyPlantDisease({ photoDataUri, language: locale });
 
       // **CRITICAL FIX**: Handle cases where the AI returns no predictions.
-      if (!classification.predictions || classification.predictions.length === 0) {
-        throw new Error("The AI model could not identify a disease. Please try a different image.");
+      if (!classification || !classification.predictions || classification.predictions.length === 0) {
+        // This stops the action gracefully and returns a specific error to the client.
+        return { data: null, error: "The AI model could not identify a disease in the image. Please try a different photo." };
       }
 
       const topPrediction = classification.predictions[0];
       
+      // 2. Run subsequent analyses, now with robust error handling for each.
       const [severity, explanation, forecast, recommendations] = await Promise.all([
-        assessDiseaseSeverity({ photoDataUri, description: `Image of a plant leaf, classified as ${topPrediction.label}`, language: locale }),
-        explainClassificationWithGradCAM({ photoDataUri, classificationResult: topPrediction.label }),
+        // Assess Severity
+        assessDiseaseSeverity({ photoDataUri, description: `Image of a plant leaf, classified as ${topPrediction.label}`, language: locale })
+          .catch(e => { console.error("Severity assessment failed:", e); return { severityPercentage: 0, severityBand: 'Unknown', confidence: 0 }; }),
+        
+        // Explain with Grad-CAM
+        explainClassificationWithGradCAM({ photoDataUri, classificationResult: topPrediction.label })
+          .catch(e => { console.error("Grad-CAM explanation failed:", e); return { gradCAMOverlay: photoDataUri }; }), // Fallback to original image
+        
+        // Forecast Risk
         forecastOutbreakRisk({
           historicalDetections: [1, 0, 2, 1, 3, 0, 4],
           weatherFeatures: { temperature: 25, humidity: 80, rainfall: 5 },
@@ -84,14 +94,13 @@ export async function analyzeImage(
           soilType: 'Loam',
           recentSeverityAverages: 0.35,
           language: locale,
-        }),
-        generateRecommendations({ disease: topPrediction.label, severity: 'Medium', cropType: 'Tomato', language: locale }),
+        }).catch(e => { console.error("Risk forecast failed:", e); return { riskScore: 0, explanation: 'Not available', recommendations: [] }; }),
+
+        // Generate Recommendations
+        generateRecommendations({ disease: topPrediction.label, severity: 'Medium', cropType: 'Tomato', language: locale })
+          .catch(e => { console.error("Recommendations generation failed:", e); return { recommendations: ['Could not generate recommendations.'] }; }),
       ]);
       
-      // Fallback if Grad-CAM fails
-      if (!explanation.gradCAMOverlay) {
-          explanation.gradCAMOverlay = photoDataUri;
-      }
 
       return {
         data: {
@@ -108,6 +117,7 @@ export async function analyzeImage(
 
     } catch (e: any) {
       console.error("Analysis failed:", e);
+      // This will catch the error from the initial classification step or any other unexpected error.
       return { data: null, error: e.message || "An unexpected error occurred during analysis." };
     }
   }
