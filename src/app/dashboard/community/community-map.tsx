@@ -1,4 +1,3 @@
-
 'use client';
 
 import 'leaflet/dist/leaflet.css';
@@ -8,7 +7,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import type { CommunityOutbreak } from '@/lib/types';
-import { AlertTriangle, Wheat } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 // Fix for default icon not showing in Next.js
 const defaultIcon = new L.Icon({
