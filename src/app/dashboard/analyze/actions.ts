@@ -7,7 +7,7 @@ import { assessDiseaseSeverity } from "@/ai/flows/assess-disease-severity";
 import { forecastOutbreakRisk } from "@/ai/flows/forecast-outbreak-risk";
 import { explainClassificationWithGradCAM } from "@/ai/flows/explain-classification-with-grad-cam";
 import { generateRecommendations } from "@/ai/flows/generate-recommendations";
-import { askFollowUpQuestion as askFollowUpQuestionFlow } from "@/aiflows/ask-follow-up-question";
+import { askFollowUpQuestion as askFollowUpQuestionFlow } from "@/ai/flows/ask-follow-up-question";
 import { transcribeAudio } from "@/ai/flows/transcribe-audio";
 import type { AskFollowUpQuestionOutput } from "@/ai/flows/ask-follow-up-question";
 import type { FullAnalysisResponse } from "@/lib/types";
