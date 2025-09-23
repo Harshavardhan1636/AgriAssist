@@ -9,14 +9,43 @@ import {
   SidebarMenuItem,
   SidebarFooter,
   SidebarMenuLink,
+  useSidebar,
 } from '@/components/ui/sidebar';
-import { Leaf, LayoutDashboard, History, FlaskConical, LifeBuoy, Settings, Users } from 'lucide-react';
+import { Leaf, LayoutDashboard, History, FlaskConical, LifeBuoy, Settings, Users, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useI18n } from '@/context/i18n-context';
+import { Button } from './ui/button';
+import { cn } from '@/lib/utils';
+
+
+const SidebarToggle = () => {
+    const { isCollapsed, setIsCollapsed } = useSidebar();
+
+    if (!setIsCollapsed) return null;
+
+    return (
+        <div className="hidden md:flex justify-end p-2">
+            <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full"
+                onClick={() => setIsCollapsed(!isCollapsed)}
+            >
+                <ChevronLeft
+                className={cn(
+                    'h-6 w-6 transition-transform',
+                    isCollapsed && 'rotate-180'
+                )}
+                />
+            </Button>
+        </div>
+    );
+}
 
 
 export default function AppSidebar({isMobile = false}: {isMobile?: boolean}) {
     const { t } = useI18n();
+    const { isCollapsed } = useSidebar();
   
     const menuItems = [
       { href: '/dashboard', label: t('Dashboard'), icon: LayoutDashboard },
@@ -33,7 +62,7 @@ export default function AppSidebar({isMobile = false}: {isMobile?: boolean}) {
         <SidebarHeader>
             <Link href="/" className="flex items-center gap-2 font-semibold">
                 <Leaf className="h-6 w-6 text-primary" />
-                <span className="">AgriAssist</span>
+                <span className={cn(isCollapsed && 'hidden')}>{!isMobile && "AgriAssist"}</span>
             </Link>
         </SidebarHeader>
         <SidebarContent>
@@ -61,6 +90,7 @@ export default function AppSidebar({isMobile = false}: {isMobile?: boolean}) {
                 />
             </SidebarMenuItem>
         </SidebarMenu>
+        <SidebarToggle />
         </SidebarFooter>
     </Sidebar>
     )

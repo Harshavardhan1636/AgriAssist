@@ -36,14 +36,6 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const isMobile = useIsMobile();
   const [isCollapsed, setIsCollapsed] = React.useState(false);
 
-  React.useEffect(() => {
-    if (isMobile) {
-      setIsCollapsed(true);
-    } else {
-        setIsCollapsed(false);
-    }
-  }, [isMobile]);
-
   const value = {
     isMobile,
     isCollapsed,
@@ -84,12 +76,13 @@ export const SidebarHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
-
+    const { isCollapsed } = useSidebar();
   return (
     <div
       ref={ref}
       className={cn(
-        'flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6',
+        'flex h-14 items-center border-b p-4 lg:h-[60px]',
+        isCollapsed ? 'justify-center' : 'justify-start px-6',
         className
       )}
       {...props}
@@ -110,7 +103,8 @@ export const SidebarMenu = React.forwardRef<
   HTMLUListElement,
   React.HTMLAttributes<HTMLUListElement>
 >(({ className, ...props }, ref) => {
-  return <ul ref={ref} className={cn('grid gap-y-1 p-2 md:px-4', className)} {...props} />;
+    const { isCollapsed } = useSidebar();
+  return <ul ref={ref} className={cn('grid gap-y-1', isCollapsed ? 'justify-center px-2' : 'px-4', className)} {...props} />;
 });
 SidebarMenu.displayName = 'SidebarMenu';
 
@@ -128,7 +122,7 @@ export const SidebarFooter = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
-    return <div ref={ref} className={cn('mt-auto', className)} {...props} />
+    return <div ref={ref} className={cn('mt-auto border-t', className)} {...props} />
 });
 SidebarFooter.displayName = 'SidebarFooter';
 
@@ -150,19 +144,19 @@ export const SidebarMenuLink = ({ href, label, icon: Icon, isMobile = false }: S
   
     if (showIconsOnly) {
       return (
-        <Tooltip>
+        <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>
             <Link href={href}>
               <Button
                 variant={isActive ? 'secondary' : 'ghost'}
                 size="icon"
-                className="w-full rounded-lg"
+                className="h-12 w-12 rounded-lg"
               >
                 <Icon className="h-5 w-5" />
               </Button>
             </Link>
           </TooltipTrigger>
-          <TooltipContent side="right">
+          <TooltipContent side="right" className="flex items-center gap-4">
             <p>{label}</p>
           </TooltipContent>
         </Tooltip>
@@ -174,7 +168,7 @@ export const SidebarMenuLink = ({ href, label, icon: Icon, isMobile = false }: S
         <Button
           variant={isActive ? 'secondary' : 'ghost'}
           size="default"
-          className="w-full justify-start gap-2 rounded-lg"
+          className="w-full justify-start gap-2 rounded-lg h-12"
         >
           <Icon className="h-5 w-5" />
           <span>{label}</span>
