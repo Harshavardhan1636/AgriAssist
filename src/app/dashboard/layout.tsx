@@ -1,3 +1,4 @@
+
 'use client';
 
 import AppSidebar from '@/components/app-sidebar';
@@ -6,6 +7,7 @@ import ClientOnly from '@/components/client-only';
 import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/context/i18n-context';
 
 
 function DashboardLayoutContent({
@@ -14,6 +16,7 @@ function DashboardLayoutContent({
     children: React.ReactNode;
   }) {
     const { isCollapsed, isMobile, isOpen, setIsOpen } = useSidebar();
+    const { t } = useI18n();
   
     if (isMobile) {
       return (
@@ -26,7 +29,7 @@ function DashboardLayoutContent({
           </div>
           <SheetContent side="left" className="p-0" withCloseButton={true}>
             <SheetHeader className='p-4 border-b'>
-                <SheetTitle className='text-left'>AgriAssist Menu</SheetTitle>
+                <SheetTitle className='text-left'>{t('AgriAssist Menu')}</SheetTitle>
             </SheetHeader>
             <AppSidebar />
           </SheetContent>

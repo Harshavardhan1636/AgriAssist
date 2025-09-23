@@ -1,3 +1,4 @@
+
 import {
   Avatar,
   AvatarFallback,
@@ -14,8 +15,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { LogOut, User, Settings } from "lucide-react"
+import { useI18n } from "@/context/i18n-context"
 
 export function UserNav() {
+  const { t } = useI18n();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -39,17 +42,17 @@ export function UserNav() {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <User className="mr-2" />
-            <span>Profile</span>
+            <span>{t('Profile')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Settings className="mr-2" />
-            <span>Settings</span>
+            <span>{t('Settings')}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <LogOut className="mr-2" />
-          <span>Log out</span>
+          <span>{t('Log out')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

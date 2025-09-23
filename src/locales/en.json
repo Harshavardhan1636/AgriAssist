@@ -99,10 +99,21 @@
     "Chemical": "Chemical",
     "Preventive": "Preventive",
     "Preventive Actions": "Preventive Actions",
+    "No preventive actions available.": "No preventive actions available.",
+    "No recommendations could be generated at this time.": "No recommendations could be generated at this time.",
     "Record Audio": "Record Audio",
     "Record Audio Query": "Record Audio Query",
     "Record your question or observation in your local language.": "Record your question or observation in your local language.",
     "Start Recording": "Start Recording",
     "Stop Recording": "Stop Recording",
-    "Recording complete. Ready for analysis.": "Recording complete. Ready for analysis."
+    "Recording complete. Ready for analysis.": "Recording complete. Ready for analysis.",
+    "Invalid input: Please upload an image or describe the issue.": "Invalid input: Please upload an image or describe the issue.",
+    "New Analysis Page": "New Analysis",
+    "Profile": "Profile",
+    "Log out": "Log out",
+    "AgriAssist Menu": "AgriAssist Menu",
+    "Community Outbreak Alerts": "Community Outbreaks",
+    "Tomato": "Tomato",
+    "Potato": "Potato",
+    "Maize": "Maize"
 }

@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -23,7 +24,7 @@ export default function AppSidebar() {
       { href: '/dashboard', label: t('Dashboard'), icon: LayoutDashboard },
       { href: '/dashboard/analyze', label: t('New Analysis'), icon: FlaskConical },
       { href: '/dashboard/history', label: t('History'), icon: History },
-      { href: '/dashboard/community', label: t('Community Outbreaks'), icon: Users },
+      { href: '/dashboard/community', label: t('Community Outbreak Alerts'), icon: Users },
       { href: '/dashboard/review', label: t('Review Queue'), icon: LifeBuoy },
     ];
   

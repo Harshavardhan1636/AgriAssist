@@ -70,9 +70,9 @@ export default function HistoryPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t('All Crops')}</SelectItem>
-              <SelectItem value="Tomato">Tomato</SelectItem>
-              <SelectItem value="Potato">Potato</SelectItem>
-              <SelectItem value="Maize">Maize</SelectItem>
+              <SelectItem value="Tomato">{t('Tomato')}</SelectItem>
+              <SelectItem value="Potato">{t('Potato')}</SelectItem>
+              <SelectItem value="Maize">{t('Maize')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -108,7 +108,7 @@ export default function HistoryPage() {
                     data-ai-hint={analysis.imageHint}
                   />
                 </TableCell>
-                <TableCell className="font-medium">{analysis.crop}</TableCell>
+                <TableCell className="font-medium">{t(analysis.crop as any)}</TableCell>
                 <TableCell>{analysis.predictions[0].label}</TableCell>
                 <TableCell>
                   <Badge variant={analysis.severity.band === 'High' ? 'destructive' : 'secondary'}>
