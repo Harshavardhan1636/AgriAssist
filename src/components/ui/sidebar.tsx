@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -34,7 +35,7 @@ export function useSidebar() {
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const isMobile = useIsMobile()
   const [isOpen, setIsOpen] = React.useState(false)
-  const [isCollapsed, setIsCollapsed] = React.useState(false)
+  const [isCollapsed, setIsCollapsed] = React.useState(true) // Start collapsed on desktop
 
   return (
     <SidebarContext.Provider
@@ -112,7 +113,7 @@ export const SidebarHeader = React.forwardRef<
     <div
       ref={ref}
       className={cn(
-        "flex h-16 shrink-0 items-center border-b",
+        "relative flex h-16 shrink-0 items-center border-b",
         isCollapsed ? "justify-center" : "px-4",
         className
       )}
