@@ -43,7 +43,7 @@ export default function HistoryPage() {
       search === "" ||
       analysis.crop.toLowerCase().includes(searchLower) ||
       analysis.predictions.some((p) =>
-        p.label.toLowerCase().includes(searchLower)
+        t(p.label as any).toLowerCase().includes(searchLower)
       );
     const matchesCrop = cropFilter === "all" || analysis.crop === cropFilter;
 
@@ -78,63 +78,65 @@ export default function HistoryPage() {
         </div>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="hidden w-[100px] sm:table-cell">
-                {t('Image')}
-              </TableHead>
-              <TableHead>{t('Crop')}</TableHead>
-              <TableHead>{t('Top Diagnosis')}</TableHead>
-              <TableHead>{t('Severity')}</TableHead>
-              <TableHead>{t('Risk')}</TableHead>
-              <TableHead>{t('Status')}</TableHead>
-              <TableHead>{t('Date')}</TableHead>
-              <TableHead>
-                <span className="sr-only">{t('Actions')}</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredHistory.map((analysis) => (
-              <TableRow key={analysis.id}>
-                <TableCell className="hidden sm:table-cell">
-                  <Image
-                    alt="Crop image"
-                    className="aspect-square rounded-md object-cover"
-                    height="64"
-                    src={analysis.image}
-                    width="64"
-                    data-ai-hint={analysis.imageHint}
-                  />
-                </TableCell>
-                <TableCell className="font-medium">{t(analysis.crop as any)}</TableCell>
-                <TableCell>{analysis.predictions[0].label}</TableCell>
-                <TableCell>
-                  <Badge variant={analysis.severity.band === 'High' ? 'destructive' : 'secondary'}>
-                    {t(analysis.severity.band as 'Low' | 'Medium' | 'High')} ({analysis.severity.percentage}%)
-                  </Badge>
-                </TableCell>
-                 <TableCell>
-                  <Badge variant={analysis.risk.score > 0.7 ? 'destructive' : 'outline'}>
-                    {Math.round(analysis.risk.score * 100)}%
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={analysis.status === 'Pending Review' ? 'default' : 'outline'}>
-                    {t(analysis.status as 'Completed' | 'Pending Review')}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  {format(new Date(analysis.timestamp), "PPP")}
-                </TableCell>
-                <TableCell>
-                  <Button size="sm" variant="outline">{t('View')}</Button>
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="hidden w-[100px] sm:table-cell">
+                  {t('Image')}
+                </TableHead>
+                <TableHead>{t('Crop')}</TableHead>
+                <TableHead>{t('Top Diagnosis')}</TableHead>
+                <TableHead>{t('Severity')}</TableHead>
+                <TableHead>{t('Risk')}</TableHead>
+                <TableHead>{t('Status')}</TableHead>
+                <TableHead>{t('Date')}</TableHead>
+                <TableHead>
+                  <span className="sr-only">{t('Actions')}</span>
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredHistory.map((analysis) => (
+                <TableRow key={analysis.id}>
+                  <TableCell className="hidden sm:table-cell">
+                    <Image
+                      alt="Crop image"
+                      className="aspect-square rounded-md object-cover"
+                      height="64"
+                      src={analysis.image}
+                      width="64"
+                      data-ai-hint={analysis.imageHint}
+                    />
+                  </TableCell>
+                  <TableCell className="font-medium">{t(analysis.crop as any)}</TableCell>
+                  <TableCell>{t(analysis.predictions[0].label as any)}</TableCell>
+                  <TableCell>
+                    <Badge variant={analysis.severity.band === 'High' ? 'destructive' : 'secondary'}>
+                      {t(analysis.severity.band as 'Low' | 'Medium' | 'High')} ({analysis.severity.percentage}%)
+                    </Badge>
+                  </TableCell>
+                   <TableCell>
+                    <Badge variant={analysis.risk.score > 0.7 ? 'destructive' : 'outline'}>
+                      {Math.round(analysis.risk.score * 100)}%
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={analysis.status === 'Pending Review' ? 'secondary' : 'outline'}>
+                      {t(analysis.status as 'Completed' | 'Pending Review')}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {format(new Date(analysis.timestamp), "PPP")}
+                  </TableCell>
+                  <TableCell>
+                    <Button size="sm" variant="outline">{t('View')}</Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );

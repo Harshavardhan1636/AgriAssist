@@ -62,10 +62,14 @@ export const Sidebar = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement> & { isMobile?: boolean }
 >(({ className, children, isMobile = false, ...props }, ref) => {  
   const { isCollapsed } = useSidebar();
+  
+  // The `isMobile` prop forces the sidebar to never be collapsed visually.
+  const collapsedState = isMobile ? false : isCollapsed;
+
   return (
     <div
       ref={ref}
-      data-collapsed={isMobile ? false : isCollapsed}
+      data-collapsed={collapsedState}
       className={cn('flex h-full max-h-screen flex-col gap-2', className)}
       {...props}
     >
@@ -133,14 +137,18 @@ type SidebarMenuLinkProps = {
     href: string;
     label: string;
     icon: React.ElementType;
+    isMobile?: boolean;
 };
 
-export const SidebarMenuLink = ({ href, label, icon: Icon }: SidebarMenuLinkProps) => {
+export const SidebarMenuLink = ({ href, label, icon: Icon, isMobile = false }: SidebarMenuLinkProps) => {
     const pathname = usePathname();
     const { isCollapsed } = useSidebar();
     const isActive = pathname === href;
+
+    // The mobile sidebar should never be collapsed, so we override the hook's value.
+    const showIconsOnly = isMobile ? false : isCollapsed;
   
-    if (isCollapsed) {
+    if (showIconsOnly) {
       return (
         <Tooltip>
           <TooltipTrigger asChild>
@@ -174,5 +182,3 @@ export const SidebarMenuLink = ({ href, label, icon: Icon }: SidebarMenuLinkProp
       </Link>
     );
 };
-
-    

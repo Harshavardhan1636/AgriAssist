@@ -25,6 +25,7 @@ export default function CommunityPage() {
             case 'High': return 'destructive';
             case 'Medium': return 'secondary';
             case 'Low': return 'outline';
+            default: return 'outline';
         }
     };
 
@@ -49,40 +50,42 @@ export default function CommunityPage() {
                     <CardDescription>{t("List of active alerts based on community-reported data.")}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>{t('Disease')}</TableHead>
-                                <TableHead>{t('Location')}</TableHead>
-                                <TableHead>{t('Risk Level')}</TableHead>
-                                <TableHead>{t('Detected Cases')}</TableHead>
-                                <TableHead>{t('First Reported')}</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {communityOutbreaks.map(outbreak => (
-                                <TableRow key={outbreak.id}>
-                                    <TableCell className="font-medium flex items-center gap-2">
-                                        <AlertTriangle className="h-4 w-4 text-destructive" />
-                                        {outbreak.disease}
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center gap-2">
-                                            <MapPin className="h-4 w-4 text-muted-foreground" />
-                                            {outbreak.location}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Badge variant={getRiskVariant(outbreak.riskLevel)}>
-                                            {t(outbreak.riskLevel)}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>{outbreak.detectedCases}</TableCell>
-                                    <TableCell>{format(new Date(outbreak.firstReported), 'PPP')}</TableCell>
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>{t('Disease')}</TableHead>
+                                    <TableHead>{t('Location')}</TableHead>
+                                    <TableHead>{t('Risk Level')}</TableHead>
+                                    <TableHead>{t('Detected Cases')}</TableHead>
+                                    <TableHead>{t('First Reported')}</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {communityOutbreaks.map(outbreak => (
+                                    <TableRow key={outbreak.id}>
+                                        <TableCell className="font-medium flex items-center gap-2">
+                                            <AlertTriangle className="h-4 w-4 text-destructive" />
+                                            {t(outbreak.disease as any)}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2">
+                                                <MapPin className="h-4 w-4 text-muted-foreground" />
+                                                {outbreak.location}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant={getRiskVariant(outbreak.riskLevel)}>
+                                                {t(outbreak.riskLevel)}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell>{outbreak.detectedCases}</TableCell>
+                                        <TableCell>{format(new Date(outbreak.firstReported), 'PPP')}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </CardContent>
             </Card>
         </div>

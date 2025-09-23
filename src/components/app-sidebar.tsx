@@ -44,6 +44,7 @@ export default function AppSidebar({isMobile = false}: {isMobile?: boolean}) {
                     href={item.href}
                     label={item.label}
                     icon={item.icon}
+                    isMobile={isMobile}
                 />
             </SidebarMenuItem>
             ))}
@@ -56,6 +57,7 @@ export default function AppSidebar({isMobile = false}: {isMobile?: boolean}) {
                     href={settingsItem.href}
                     label={settingsItem.label}
                     icon={settingsItem.icon}
+                    isMobile={isMobile}
                 />
             </SidebarMenuItem>
         </SidebarMenu>
@@ -63,5 +65,3 @@ export default function AppSidebar({isMobile = false}: {isMobile?: boolean}) {
     </Sidebar>
     )
 }
-
-    
