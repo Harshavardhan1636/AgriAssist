@@ -46,7 +46,7 @@ export default function ReviewPage() {
               <CardHeader>
                 <CardTitle>{t('Case')} #{item.id.split('_')[1]}</CardTitle>
                 <CardDescription>
-                  {t('AI Prediction:')} <strong>{item.predictions[0].label}</strong>
+                  {t('AI Prediction:')} <strong>{t(item.predictions[0].label as any)}</strong>
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-grow space-y-4">
@@ -64,7 +64,7 @@ export default function ReviewPage() {
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor={`correction-${item.id}`}>{t('Correct Label (if needed)')}</Label>
-                    <Input id={`correction-${item.id}`} placeholder={item.predictions[0].label} />
+                    <Input id={`correction-${item.id}`} placeholder={t(item.predictions[0].label as any)} />
                  </div>
                  <div className="space-y-2">
                     <Label htmlFor={`notes-${item.id}`}>{t('Agronomist Notes')}</Label>

@@ -73,7 +73,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
         <CardHeader>
           <CardTitle>{t('Analysis Complete')}</CardTitle>
           <CardDescription>
-             {t('AI analysis suggests the most likely disease is')} <strong>{topPrediction.label}</strong> {t('with')} {Math.round(topPrediction.confidence * 100)}% {t('confidence')}.
+             {t('AI analysis suggests the most likely disease is')} <strong>{t(topPrediction.label as any)}</strong> {t('with')} {Math.round(topPrediction.confidence * 100)}% {t('confidence')}.
           </CardDescription>
         </CardHeader>
       </Card>
@@ -93,12 +93,12 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                         <AccordionTrigger>
                           <div className="flex items-center gap-3">
                             <RecommendationIcon type={rec.type} />
-                            <span className="font-semibold">{rec.title}</span>
+                            <span className="font-semibold">{t(rec.title as any)}</span>
                             <Badge variant="outline">{t(rec.type as any)}</Badge>
                           </div>
                         </AccordionTrigger>
                         <AccordionContent>
-                          <p className="text-sm text-muted-foreground pl-9">{rec.description}</p>
+                          <p className="text-sm text-muted-foreground pl-9">{t(rec.description as any)}</p>
                         </AccordionContent>
                       </AccordionItem>
                     ))}
@@ -182,7 +182,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                 <AccordionItem value="item-1">
                   <AccordionTrigger>{t('Why this score?')}</AccordionTrigger>
                   <AccordionContent>
-                    <p className="text-sm">{forecast.explanation}</p>
+                    <p className="text-sm">{t(forecast.explanation as any)}</p>
                   </AccordionContent>
                 </AccordionItem>
                 <AccordionItem value="item-2">
@@ -192,7 +192,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                       {forecast?.preventiveActions?.length > 0 ? forecast.preventiveActions.map((action, index) => (
                         <li key={index} className="flex items-start gap-2">
                           <Wind className="h-4 w-4 mt-0.5 text-blue-500 flex-shrink-0" />
-                          <span>{action}</span>
+                          <span>{t(action as any)}</span>
                         </li>
                       )) : (
                         <li>{t('No preventive actions available.')}</li>

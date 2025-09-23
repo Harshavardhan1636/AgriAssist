@@ -27,7 +27,6 @@ import {
 
 import { mockHistory } from "@/lib/mock-data";
 import { formatDistanceToNow } from "date-fns";
-import Image from "next/image";
 import { useI18n } from "@/context/i18n-context";
 import dynamic from 'next/dynamic';
 import { Skeleton } from "@/components/ui/skeleton";
@@ -56,7 +55,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:gap-8 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('Total Scans')}</CardTitle>
@@ -135,11 +134,11 @@ export default function DashboardPage() {
                 {recentAnalyses.map((analysis) => (
                   <TableRow key={analysis.id}>
                     <TableCell>
-                      <div className="font-medium">{analysis.crop}</div>
+                      <div className="font-medium">{t(analysis.crop as any)}</div>
                     </TableCell>
                     <TableCell>
                       <Badge variant={analysis.predictions[0].label === 'Healthy' ? "secondary" : "destructive"} className="text-xs" >
-                        {analysis.predictions[0].label}
+                        {t(analysis.predictions[0].label as any)}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right text-muted-foreground text-xs">
