@@ -72,5 +72,11 @@
     "Medium": "Medium",
     "High": "High",
     "Completed": "Completed",
-    "Pending Review": "Pending Review"
+    "Pending Review": "Pending Review",
+    "Step-by-Step Recommendations": "Step-by-Step Recommendations",
+    "Follow these steps to treat the issue.": "Follow these steps to treat the issue.",
+    "Conversational Assistant": "Conversational Assistant",
+    "Ask a follow-up question about your analysis.": "Ask a follow-up question about your analysis.",
+    "Thinking...": "Thinking...",
+    "Ask a question...": "Ask a question..."
 }

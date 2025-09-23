@@ -72,5 +72,11 @@
     "Medium": "ഇടത്തരം",
     "High": "ഉയർന്ന",
     "Completed": "പൂർത്തിയായി",
-    "Pending Review": "അവലോകനത്തിനായി ശേഷിക്കുന്നു"
+    "Pending Review": "അവലോകനത്തിനായി ശേഷിക്കുന്നു",
+    "Step-by-Step Recommendations": "ഘട്ടം ഘട്ടമായുള്ള ശുപാർശകൾ",
+    "Follow these steps to treat the issue.": "പ്രശ്നം പരിഹരിക്കുന്നതിന് ഈ ഘട്ടങ്ങൾ പാലിക്കുക.",
+    "Conversational Assistant": "സംഭാഷണ സഹായി",
+    "Ask a follow-up question about your analysis.": "നിങ്ങളുടെ വിശകലനത്തെക്കുറിച്ച് ഒരു തുടർചോദ്യം ചോദിക്കുക.",
+    "Thinking...": "ചിന്തിക്കുന്നു...",
+    "Ask a question...": "ഒരു ചോദ്യം ചോദിക്കൂ..."
 }

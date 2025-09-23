@@ -1,15 +1,20 @@
 
 'use client';
 
+import { useState } from 'react';
 import type { FullAnalysisResponse } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { Bar, BarChart, LabelList, RadialBar, RadialBarChart } from 'recharts';
+import { ChartContainer } from '@/components/ui/chart';
+import { RadialBar, RadialBarChart } from 'recharts';
 import { useI18n } from '@/context/i18n-context';
+import { Bot, Check, Send, User } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { askFollowUpQuestion } from './actions';
+import type { AskFollowUpQuestionOutput } from './actions';
 
 interface AnalysisResultsProps {
   result: FullAnalysisResponse;
@@ -21,10 +26,43 @@ const getSeverityColor = (percentage: number) => {
   return "hsl(var(--primary))";
 }
 
+interface ChatMessage {
+  sender: 'user' | 'bot';
+  text: string;
+}
+
 export default function AnalysisResults({ result }: AnalysisResultsProps) {
-  const { classification, severity, explanation, forecast, originalImage } = result;
+  const { classification, severity, explanation, forecast, recommendations, originalImage } = result;
   const topPrediction = classification.predictions[0];
   const { t } = useI18n();
+
+  const [question, setQuestion] = useState('');
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
+  const [isAsking, setIsAsking] = useState(false);
+
+  const analysisContext = JSON.stringify({
+    disease: topPrediction.label,
+    confidence: topPrediction.confidence,
+    severity: severity,
+    risk: forecast.riskScore,
+  });
+
+  const handleFollowUpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!question.trim()) return;
+
+    const newHumanMessage: ChatMessage = { sender: 'user', text: question };
+    setChatHistory(prev => [...prev, newHumanMessage]);
+    setQuestion('');
+    setIsAsking(true);
+
+    const response: AskFollowUpQuestionOutput = await askFollowUpQuestion(analysisContext, question);
+
+    const newAiMessage: ChatMessage = { sender: 'bot', text: response.answer };
+    setChatHistory(prev => [...prev, newAiMessage]);
+    setIsAsking(false);
+  };
+
 
   const severityData = [
     { name: 'severity', value: severity.severityPercentage, fill: getSeverityColor(severity.severityPercentage) }
@@ -47,39 +85,55 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         <div className="lg:col-span-3 space-y-8">
-          <Card>
+           <Card>
             <CardHeader>
-              <CardTitle>{t('Explainable AI (Grad-CAM)')}</CardTitle>
-              <CardDescription>{t('The highlighted areas show what the AI focused on to make its diagnosis.')}</CardDescription>
+              <CardTitle>{t('Step-by-Step Recommendations')}</CardTitle>
+              <CardDescription>{t('Follow these steps to treat the issue.')}</CardDescription>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-center font-medium mb-2">{t('Original Image')}</h4>
-                <Image src={originalImage} alt="Original crop" width={400} height={400} className="rounded-lg border object-cover aspect-square" />
-              </div>
-              <div>
-                <h4 className="text-center font-medium mb-2">{t('AI Focus (Grad-CAM)')}</h4>
-                <Image src={explanation.gradCAMOverlay} alt="Grad-CAM explanation" width={400} height={400} className="rounded-lg border object-cover aspect-square" />
-              </div>
+            <CardContent>
+              <ul className="space-y-4">
+                {recommendations.recommendations.map((rec, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">{index + 1}</div>
+                    <p className="flex-1 pt-0.5 text-sm">{t(rec)}</p>
+                  </li>
+                ))}
+              </ul>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
-              <CardTitle>{t('Disease Predictions')}</CardTitle>
-              <CardDescription>{t('Top potential diseases identified by the model.')}</CardDescription>
+              <CardTitle>{t('Conversational Assistant')}</CardTitle>
+              <CardDescription>{t('Ask a follow-up question about your analysis.')}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {classification.predictions.map((pred, index) => (
-                <div key={index}>
-                  <div className="flex justify-between mb-1">
-                    <span className="font-medium text-sm">{pred.label}</span>
-                    <span className="text-sm text-muted-foreground">{Math.round(pred.confidence * 100)}%</span>
-                  </div>
-                  <Progress value={pred.confidence * 100} />
-                </div>
-              ))}
+            <CardContent>
+              <div className="space-y-4">
+                  {chatHistory.map((msg, index) => (
+                    <div key={index} className={`flex items-start gap-3 ${msg.sender === 'user' ? 'justify-end' : ''}`}>
+                      {msg.sender === 'bot' && <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted"><Bot className="h-5 w-5" /></div>}
+                      <div className={`rounded-lg px-4 py-2 max-w-[80%] ${msg.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                          <p className="text-sm">{msg.text}</p>
+                      </div>
+                      {msg.sender === 'user' && <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted"><User className="h-5 w-5" /></div>}
+                    </div>
+                  ))}
+                  {isAsking && <div className="flex items-start gap-3"><div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted"><Bot className="h-5 w-5 animate-pulse" /></div><div className="rounded-lg px-4 py-2 bg-muted"><p className="text-sm">{t('Thinking...')}</p></div></div>}
+              </div>
             </CardContent>
+            <CardFooter>
+                 <form onSubmit={handleFollowUpSubmit} className="flex w-full items-center gap-2">
+                    <Input 
+                      value={question}
+                      onChange={(e) => setQuestion(e.target.value)}
+                      placeholder={t('Ask a question...')}
+                      disabled={isAsking}
+                    />
+                    <Button type="submit" size="icon" disabled={isAsking}>
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </form>
+            </CardFooter>
           </Card>
         </div>
 
@@ -100,6 +154,16 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                   </text>
                 </RadialBarChart>
               </ChartContainer>
+            </CardContent>
+          </Card>
+          
+           <Card>
+            <CardHeader>
+              <CardTitle>{t('Explainable AI (Grad-CAM)')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Image src={explanation.gradCAMOverlay} alt="Grad-CAM explanation" width={400} height={400} className="rounded-lg border object-cover aspect-square w-full" />
+                <p className="text-xs text-muted-foreground mt-2">{t('The highlighted areas show what the AI focused on to make its diagnosis.')}</p>
             </CardContent>
           </Card>
 

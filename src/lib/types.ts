@@ -2,7 +2,8 @@ import type {
   ClassifyPlantDiseaseOutput,
   AssessDiseaseSeverityOutput,
   ExplainClassificationWithGradCAMOutput,
-  ForecastOutbreakRiskOutput
+  ForecastOutbreakRiskOutput,
+  GenerateRecommendationsOutput,
 } from '@/app/dashboard/analyze/actions';
 
 
@@ -35,5 +36,6 @@ export type FullAnalysisResponse = {
   severity: AssessDiseaseSeverityOutput;
   explanation: ExplainClassificationWithGradCAMOutput;
   forecast: ForecastOutbreakRiskOutput;
+  recommendations: GenerateRecommendationsOutput;
   originalImage: string;
 };

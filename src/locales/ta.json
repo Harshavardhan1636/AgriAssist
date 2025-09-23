@@ -72,5 +72,11 @@
     "Medium": "நடுத்தர",
     "High": "அதிக",
     "Completed": "முடிந்தது",
-    "Pending Review": "மதிப்பாய்வு நிலுவையில் உள்ளது"
+    "Pending Review": "மதிப்பாய்வு நிலுவையில் உள்ளது",
+    "Step-by-Step Recommendations": "படிப்படியான பரிந்துரைகள்",
+    "Follow these steps to treat the issue.": "சிக்கலைச் சரிசெய்ய இந்தப் படிகளைப் பின்பற்றவும்.",
+    "Conversational Assistant": "உரையாடல் உதவியாளர்",
+    "Ask a follow-up question about your analysis.": "உங்கள் பகுப்பாய்வைப் பற்றி ஒரு பின்தொடர்தல் கேள்வியைக் கேளுங்கள்.",
+    "Thinking...": "சிந்திக்கிறது...",
+    "Ask a question...": "ஒரு கேள்வி கேள்..."
 }

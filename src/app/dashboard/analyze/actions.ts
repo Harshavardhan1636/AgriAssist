@@ -4,6 +4,8 @@ import { classifyPlantDisease } from "@/ai/flows/classify-plant-disease";
 import { assessDiseaseSeverity } from "@/ai/flows/assess-disease-severity";
 import { forecastOutbreakRisk } from "@/ai/flows/forecast-outbreak-risk";
 import { explainClassificationWithGradCAM } from "@/ai/flows/explain-classification-with-grad-cam";
+import { generateRecommendations } from "@/ai/flows/generate-recommendations";
+import { askFollowUpQuestion as askFollowUpQuestionFlow } from "@/ai/flows/ask-follow-up-question";
 import { z } from "zod";
 import type { FullAnalysisResponse } from "@/lib/types";
 
@@ -27,6 +29,16 @@ export type {
   ExplainClassificationWithGradCAMOutput,
   ExplainClassificationWithGradCAMInput,
 } from '@/ai/flows/explain-classification-with-grad-cam';
+
+export type {
+  GenerateRecommendationsOutput,
+  GenerateRecommendationsInput,
+} from '@/ai/flows/generate-recommendations';
+
+export type {
+  AskFollowUpQuestionOutput,
+  AskFollowUpQuestionInput,
+} from '@/ai/flows/ask-follow-up-question';
 
 
 /**
@@ -67,15 +79,15 @@ export async function analyzeImage(
     const classification = await classifyPlantDisease({ photoDataUri });
     
     // Get the top prediction to pass to other AI flows for more context.
-    const topPredictionLabel = classification.predictions?.[0]?.label ?? "unknown";
+    const topPrediction = classification.predictions?.[0] ?? { label: "unknown", confidence: 0 };
 
     // 3. In parallel, run the other analysis flows for efficiency.
     // These flows provide deeper insights into the diagnosis.
-    const [severity, explanation, forecast] = await Promise.all([
+    const [severity, explanation, forecast, recommendations] = await Promise.all([
       // Assess the severity of the identified disease.
-      assessDiseaseSeverity({ photoDataUri, description: `Image of a plant leaf, classified as ${topPredictionLabel}` }),
+      assessDiseaseSeverity({ photoDataUri, description: `Image of a plant leaf, classified as ${topPrediction.label}` }),
       // Generate an "explainable AI" overlay to show what the AI focused on.
-      explainClassificationWithGradCAM({ photoDataUri, classificationResult: topPredictionLabel }),
+      explainClassificationWithGradCAM({ photoDataUri, classificationResult: topPrediction.label }),
       // Forecast the risk of a disease outbreak based on mock data.
       forecastOutbreakRisk({
         historicalDetections: [1, 0, 2, 1, 3, 0, 4], // Mock data
@@ -84,6 +96,8 @@ export async function analyzeImage(
         soilType: 'Loam', // Mock data
         recentSeverityAverages: 0.35, // Mock data
       }),
+       // Generate ethical recommendations.
+      generateRecommendations({ disease: topPrediction.label, severity: 'Medium' /* Placeholder */, cropType: 'Tomato' }),
     ]);
     
     // 4. Fallback for the Grad-CAM explanation. If the AI fails to generate an
@@ -99,6 +113,7 @@ export async function analyzeImage(
         severity,
         explanation,
         forecast,
+        recommendations,
         originalImage: photoDataUri,
       },
       error: null
@@ -109,4 +124,23 @@ export async function analyzeImage(
     console.error("Analysis failed:", e);
     return { data: null, error: e.message || "An unexpected error occurred during analysis." };
   }
+}
+
+/**
+ * Server action for handling follow-up questions from the user.
+ * @param analysisContext - A stringified summary of the initial analysis.
+ * @param question - The user's question.
+ * @returns A promise that resolves to the AI's answer.
+ */
+export async function askFollowUpQuestion(
+  analysisContext: string,
+  question: string,
+): Promise<AskFollowUpQuestionOutput> {
+    try {
+        const result = await askFollowUpQuestionFlow({ analysisContext, question });
+        return result;
+    } catch(e: any) {
+        console.error("Follow-up question failed:", e);
+        return { answer: "Sorry, I encountered an error trying to answer your question." };
+    }
 }

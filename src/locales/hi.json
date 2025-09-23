@@ -72,5 +72,11 @@
     "Medium": "मध्यम",
     "High": "उच्च",
     "Completed": "पूरा हुआ",
-    "Pending Review": "समीक्षा के लिए लंबित"
+    "Pending Review": "समीक्षा के लिए लंबित",
+    "Step-by-Step Recommendations": "चरण-दर-चरण सिफारिशें",
+    "Follow these steps to treat the issue.": "समस्या के समाधान के लिए इन चरणों का पालन करें।",
+    "Conversational Assistant": "संवादी सहायक",
+    "Ask a follow-up question about your analysis.": "अपने विश्लेषण के बारे में एक अनुवर्ती प्रश्न पूछें।",
+    "Thinking...": "सोच रहा है...",
+    "Ask a question...": "एक प्रश्न पूछें..."
 }

@@ -72,5 +72,11 @@
     "Medium": "మధ్యస్థం",
     "High": "అధికం",
     "Completed": "పూర్తయింది",
-    "Pending Review": "సమీక్ష పెండింగ్‌లో ఉంది"
+    "Pending Review": "సమీక్ష పెండింగ్‌లో ఉంది",
+    "Step-by-Step Recommendations": "దశలవారీ సిఫార్సులు",
+    "Follow these steps to treat the issue.": "సమస్యను పరిష్కరించడానికి ఈ దశలను అనుసరించండి.",
+    "Conversational Assistant": "సంభాషణ సహాయకం",
+    "Ask a follow-up question about your analysis.": "మీ విశ్లేషణ గురించి తదుపరి ప్రశ్న అడగండి.",
+    "Thinking...": "ఆలోచిస్తున్నాను...",
+    "Ask a question...": "ప్రశ్న అడగండి..."
 }
