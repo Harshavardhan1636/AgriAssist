@@ -115,5 +115,21 @@
     "Community Outbreak Alerts": "सामुदायिक प्रकोप अलर्ट",
     "Tomato": "टमाटर",
     "Potato": "आलू",
-    "Maize": "मक्का"
+    "Maize": "मक्का",
+    "My Profile": "मेरी प्रोफाइल",
+    "Update your personal information.": "अपनी व्यक्तिगत जानकारी अपडेट करें।",
+    "Name": "नाम",
+    "Email": "ईमेल",
+    "Save": "सहेजें",
+    "Appearance": "दिखावट",
+    "Customize the look and feel of the application.": "एप्लिकेशन का रंग-रूप अनुकूलित करें।",
+    "Dark Mode": "डार्क मोड",
+    "Toggle between light and dark themes.": "लाइट और डार्क थीम के बीच टॉगल करें।",
+    "Language": "भाषा",
+    "Select a language": "एक भाषा चुनें",
+    "Choose your preferred language for the interface.": "इंटरफ़ेस के लिए अपनी पसंदीदा भाषा चुनें।",
+    "Account": "खाता",
+    "Manage your account settings.": "अपनी खाता सेटिंग प्रबंधित करें।",
+    "Delete Account": "खाता हटाएं",
+    "Permanently delete your account and all associated data.": "अपना खाता और सभी संबंधित डेटा स्थायी रूप से हटाएं।"
 }

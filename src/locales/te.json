@@ -115,5 +115,21 @@
     "Community Outbreak Alerts": "సంఘంలో వ్యాప్తి హెచ్చరికలు",
     "Tomato": "టమోటా",
     "Potato": "బంగాళదుంప",
-    "Maize": "మొక్కజొన్న"
+    "Maize": "మొక్కజొన్న",
+    "My Profile": "నా ప్రొఫైల్",
+    "Update your personal information.": "మీ వ్యక్తిగత సమాచారాన్ని నవీకరించండి.",
+    "Name": "పేరు",
+    "Email": "ఇమెయిల్",
+    "Save": "సేవ్ చేయండి",
+    "Appearance": "స్వరూపం",
+    "Customize the look and feel of the application.": "అప్లికేషన్ యొక్క రూపాన్ని మరియు అనుభూతిని అనుకూలీకరించండి.",
+    "Dark Mode": "డార్క్ మోడ్",
+    "Toggle between light and dark themes.": "కాంతి మరియు ముదురు థీమ్‌ల మధ్య మారండి.",
+    "Language": "భాష",
+    "Select a language": "ఒక భాషను ఎంచుకోండి",
+    "Choose your preferred language for the interface.": "ఇంటర్‌ఫేస్ కోసం మీకు ఇష్టమైన భాషను ఎంచుకోండి.",
+    "Account": "ఖాతా",
+    "Manage your account settings.": "మీ ఖాతా సెట్టింగ్‌లను నిర్వహించండి.",
+    "Delete Account": "ఖాతాను తొలగించండి",
+    "Permanently delete your account and all associated data.": "మీ ఖాతాను మరియు అన్ని సంబంధిత డేటాను శాశ్వతంగా తొలగించండి."
 }

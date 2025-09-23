@@ -115,5 +115,21 @@
     "Community Outbreak Alerts": "സാമൂഹിക വ്യാപന മുന്നറിയിപ്പുകൾ",
     "Tomato": "തക്കാളി",
     "Potato": "ഉരുളക്കിഴങ്ങ്",
-    "Maize": "ചോളം"
+    "Maize": "ചോളം",
+    "My Profile": "എന്റെ പ്രൊഫൈൽ",
+    "Update your personal information.": "നിങ്ങളുടെ സ്വകാര്യ വിവരങ്ങൾ അപ്ഡേറ്റ് ചെയ്യുക.",
+    "Name": "പേര്",
+    "Email": "ഇമെയിൽ",
+    "Save": "സേവ് ചെയ്യുക",
+    "Appearance": "രൂപഭാവം",
+    "Customize the look and feel of the application.": "അപ്ലിക്കേഷന്റെ രൂപവും ഭാവവും ഇഷ്ടാനുസൃതമാക്കുക.",
+    "Dark Mode": "ഡാർക്ക് മോഡ്",
+    "Toggle between light and dark themes.": "ലൈറ്റ്, ഡാർക്ക് തീമുകൾക്കിടയിൽ മാറുക.",
+    "Language": "ഭാഷ",
+    "Select a language": "ഒരു ഭാഷ തിരഞ്ഞെടുക്കുക",
+    "Choose your preferred language for the interface.": "ഇന്റർഫേസിനായി നിങ്ങൾക്കിഷ്ടമുള്ള ഭാഷ തിരഞ്ഞെടുക്കുക.",
+    "Account": "അക്കൗണ്ട്",
+    "Manage your account settings.": "നിങ്ങളുടെ അക്കൗണ്ട് ക്രമീകരണങ്ങൾ നിയന്ത്രിക്കുക.",
+    "Delete Account": "അക്കൗണ്ട് ഇല്ലാതാക്കുക",
+    "Permanently delete your account and all associated data.": "നിങ്ങളുടെ അക്കൗണ്ടും ബന്ധപ്പെട്ട എല്ലാ ഡാറ്റയും ശാശ്വതമായി ഇല്ലാതാക്കുക."
 }

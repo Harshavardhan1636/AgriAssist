@@ -55,7 +55,7 @@ export default function AppSidebar({isMobile = false}: {isMobile?: boolean}) {
       { href: '/dashboard/review', label: t('Review Queue'), icon: LifeBuoy },
     ];
   
-    const settingsItem = { href: '#', label: t('Settings'), icon: Settings };
+    const settingsItem = { href: '/dashboard/settings', label: t('Settings'), icon: Settings };
 
     return (
     <Sidebar isMobile={isMobile}>

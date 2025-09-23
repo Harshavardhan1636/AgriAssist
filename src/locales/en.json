@@ -115,5 +115,21 @@
     "Community Outbreak Alerts": "Community Outbreaks",
     "Tomato": "Tomato",
     "Potato": "Potato",
-    "Maize": "Maize"
+    "Maize": "Maize",
+    "My Profile": "My Profile",
+    "Update your personal information.": "Update your personal information.",
+    "Name": "Name",
+    "Email": "Email",
+    "Save": "Save",
+    "Appearance": "Appearance",
+    "Customize the look and feel of the application.": "Customize the look and feel of the application.",
+    "Dark Mode": "Dark Mode",
+    "Toggle between light and dark themes.": "Toggle between light and dark themes.",
+    "Language": "Language",
+    "Select a language": "Select a language",
+    "Choose your preferred language for the interface.": "Choose your preferred language for the interface.",
+    "Account": "Account",
+    "Manage your account settings.": "Manage your account settings.",
+    "Delete Account": "Delete Account",
+    "Permanently delete your account and all associated data.": "Permanently delete your account and all associated data."
 }
