@@ -132,7 +132,7 @@ export default function AnalysisView() {
     try {
       const response = await analyzeImage(formData);
       if (response.error) {
-        setError(response.error);
+        setError(t(response.error as any) || response.error);
       } else if (response.data) {
         setResult(response.data);
       } else {
@@ -276,7 +276,7 @@ export default function AnalysisView() {
                 <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>{t('Analysis Failed')}</AlertTitle>
-                    <AlertDescription>{t(error) || error}</AlertDescription>
+                    <AlertDescription>{t(error as any) || error}</AlertDescription>
                 </Alert>
               )}
             </div>
