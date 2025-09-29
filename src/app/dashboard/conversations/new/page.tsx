@@ -9,11 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Bot, User, Send, ArrowLeft, Paperclip, X, Loader2 } from 'lucide-react';
 import { useI18n } from '@/context/i18n-context';
 import { askFollowUpQuestion, AskFollowUpQuestionOutput, analyzeImage } from '@/app/dashboard/analyze/actions';
-import type { ChatMessage, FullAnalysisResponse } from '@/lib/types';
+import type { ChatMessage } from '@/lib/types';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
-import AnalysisResults from '@/app/dashboard/analyze/analysis-results';
 
 function fileToDataUri(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -33,7 +32,6 @@ export default function NewConversationPage() {
     const [question, setQuestion] = useState('');
     const [isAsking, setIsAsking] = useState(false);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const [analysisResult, setAnalysisResult] = useState<FullAnalysisResponse | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -76,6 +74,8 @@ export default function NewConversationPage() {
             setIsLoading(false);
             if (response.error) {
                 toast({ variant: 'destructive', title: t('Analysis Failed'), description: response.error });
+                 const newAiMessage: ChatMessage = { sender: 'bot', text: response.error };
+                 setChatHistory(prev => [...prev, newAiMessage]);
             } else if (response.data) {
                 // Instead of displaying results here, redirect to the new unified case history page
                 router.push(`/dashboard/history/${response.data.conversationId}`);
@@ -83,9 +83,9 @@ export default function NewConversationPage() {
             return;
         }
 
-        // If no image, it's a simple chat follow-up (without context for now)
+        // If no image, it's a simple chat follow-up
         setIsAsking(true);
-        // This simulates a general knowledge answer. A real backend would handle this better.
+        // This simulates a general knowledge answer. A real backend would need more robust context handling.
         const analysisContext = "General knowledge question."; 
         const response: AskFollowUpQuestionOutput = await askFollowUpQuestion(analysisContext, userMessage, locale);
         
