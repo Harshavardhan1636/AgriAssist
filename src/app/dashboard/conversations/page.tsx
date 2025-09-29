@@ -6,9 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useI18n } from '@/context/i18n-context';
 import { mockConversations } from '@/lib/mock-data';
 import { formatDistanceToNow } from 'date-fns';
-import { MessageSquare, ArrowRight, Search } from 'lucide-react';
+import { MessageSquare, ArrowRight, Search, PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export default function ConversationsPage() {
     const { t } = useI18n();
@@ -20,8 +21,14 @@ export default function ConversationsPage() {
 
     return (
         <div className="grid gap-8">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center justify-between gap-4">
                 <h1 className="text-3xl font-semibold">{t('AI Conversations')}</h1>
+                <Button asChild>
+                    <Link href="/dashboard/analyze">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        {t('New Chat')}
+                    </Link>
+                </Button>
             </div>
 
             <Card>
@@ -43,7 +50,7 @@ export default function ConversationsPage() {
                         {filteredConversations.length > 0 ? filteredConversations.map(convo => {
                             const lastMessage = convo.messages[convo.messages.length - 1];
                             return (
-                             <Link href={`/dashboard/conversations/${convo.id}`} key={convo.id} className="block">
+                             <Link href={`/dashboard/history/${convo.analysisId}`} key={convo.id} className="block">
                                 <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-start gap-3">

@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { UserNav } from "@/components/user-nav";
 import { Button } from "@/components/ui/button";
-import { Languages, PanelLeft, ShoppingCart } from "lucide-react";
+import { Languages, PanelLeft, ShoppingCart, PlusCircle } from "lucide-react";
 import { useI18n } from "@/context/i18n-context";
 import {
   DropdownMenu,
@@ -15,13 +15,14 @@ import {
 import { useCart } from '@/context/cart-context';
 import { Badge } from './ui/badge';
 import CartSheet from './cart-sheet';
+import Link from 'next/link';
 
 interface HeaderProps {
   onMenuClick: () => void;
 }
 
 export default function Header({ onMenuClick }: HeaderProps) {
-  const { setLocale, locale } = useI18n();
+  const { t, setLocale, locale } = useI18n();
   const { cart } = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
 
@@ -47,7 +48,14 @@ export default function Header({ onMenuClick }: HeaderProps) {
         <span className="sr-only">Toggle navigation menu</span>
       </Button>
       
-      <div className="flex w-full flex-1 items-center justify-end gap-4">
+      <div className="flex w-full flex-1 items-center justify-end gap-2 md:gap-4">
+        <Button asChild className="gap-1">
+            <Link href="/dashboard/analyze">
+                <PlusCircle className="h-4 w-4"/>
+                <span className="hidden sm:inline">{t('New Analysis')}</span>
+            </Link>
+        </Button>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon">

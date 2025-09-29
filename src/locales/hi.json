@@ -208,12 +208,14 @@
     "Review and continue your past conversations with the AI assistant.": "एआई सहायक के साथ अपनी पिछली बातचीत की समीक्षा करें और जारी रखें।",
     "Last message": "अंतिम संदेश",
     "No conversations yet.": "अभी तक कोई बातचीत नहीं हुई है।",
-    "Start a new analysis to begin a chat.": "चैट शुरू करने کے لیے ایک نیا تجزیہ شروع کریں۔",
+    "Start a new analysis to begin a chat.": "चैट शुरू करने کے लिए एक नया تجزیہ شروع کریں۔",
     "Continue your conversation with the AI assistant.": "एआई सहायक के साथ अपनी बातचीत जारी रखें।",
     "Conversation not found": "बातचीत नहीं मिली",
     "We couldn't find the chat you're looking for.": "आप जिस चैट की तलाश कर रहे हैं वह हमें नहीं मिल सकी।",
     "Back to Conversations": "बातचीत पर वापस जाएं",
     "Ask a follow-up question...": "एक अनुवर्ती प्रश्न पूछें...",
     "Search by title...": "शीर्षक से खोजें...",
-    "You": "आप"
+    "You": "आप",
+    "Case Details for": "केस विवरण",
+    "New Chat": "नई चैट"
 }

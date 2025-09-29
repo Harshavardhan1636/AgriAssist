@@ -12,6 +12,7 @@ import { mockConversations } from '@/lib/mock-data';
 import { askFollowUpQuestion, AskFollowUpQuestionOutput } from '@/app/dashboard/analyze/actions';
 import type { Conversation, ChatMessage } from '@/lib/types';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 export default function ConversationPage() {
     const { t, locale } = useI18n();
@@ -25,6 +26,10 @@ export default function ConversationPage() {
     useEffect(() => {
         // In a real app, you'd fetch this from a database.
         const foundConversation = mockConversations.find(c => c.id === id) || null;
+        if (!foundConversation) {
+            // notFound();
+            return;
+        }
         setConversation(foundConversation);
     }, [id]);
 
