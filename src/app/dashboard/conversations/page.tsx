@@ -24,7 +24,7 @@ export default function ConversationsPage() {
             <div className="flex items-center justify-between gap-4">
                 <h1 className="text-3xl font-semibold">{t('AI Conversations')}</h1>
                 <Button asChild>
-                    <Link href="/dashboard/analyze">
+                    <Link href="/dashboard/conversations/new">
                         <PlusCircle className="mr-2 h-4 w-4" />
                         {t('New Chat')}
                     </Link>
@@ -50,7 +50,7 @@ export default function ConversationsPage() {
                         {filteredConversations.length > 0 ? filteredConversations.map(convo => {
                             const lastMessage = convo.messages[convo.messages.length - 1];
                             return (
-                             <Link href={`/dashboard/history/${convo.analysisId}`} key={convo.id} className="block">
+                             <Link href={`/dashboard/conversations/${convo.id}`} key={convo.id} className="block">
                                 <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-start gap-3">
