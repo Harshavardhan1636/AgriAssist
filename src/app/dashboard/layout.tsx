@@ -34,7 +34,7 @@ function DashboardLayoutContent({
             toast({
               title: (
                 <div className="flex items-center gap-2 font-bold">
-                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                  <AlertTriangle className="h-5 w-5 text-destructive-foreground" />
                   {t('Community Alert')}
                 </div>
               ),
@@ -42,7 +42,7 @@ function DashboardLayoutContent({
                 <div>
                   <p>{t('High-risk outbreak detected')}: <strong>{t(latestAlert.disease as any)}</strong> {t('in')} {latestAlert.location}.</p>
                   <Link href="/dashboard/community">
-                    <Button variant="link" className="p-0 h-auto mt-2">{t('View Details')}</Button>
+                    <Button variant="link" className="p-0 h-auto mt-2 text-destructive-foreground underline">{t('View Details')}</Button>
                   </Link>
                 </div>
               ),
