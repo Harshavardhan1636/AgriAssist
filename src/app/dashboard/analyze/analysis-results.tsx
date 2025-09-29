@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useState } from 'react';
-import type { FullAnalysisResponse } from '@/lib/types';
+import { useState, useEffect } from 'react';
+import type { FullAnalysisResponse, ChatMessage as ChatMessageType } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import Image from 'next/image';
@@ -14,6 +14,7 @@ import { askFollowUpQuestion } from './actions';
 import type { AskFollowUpQuestionOutput } from './actions';
 import { RadialChart } from '@/components/ui/radial-chart';
 import { Badge } from '@/components/ui/badge';
+import { mockConversations } from '@/lib/mock-data';
 
 
 interface AnalysisResultsProps {
@@ -43,6 +44,16 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
   const [question, setQuestion] = useState('');
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [isAsking, setIsAsking] = useState(false);
+
+  useEffect(() => {
+    // When viewing a past analysis, load its chat history from mock data.
+    // In a real app, this would be part of the initial data fetch for the page.
+    const existingConversation = mockConversations.find(c => c.id === conversationId);
+    if (existingConversation) {
+      setChatHistory(existingConversation.messages);
+    }
+  }, [conversationId]);
+
 
   const analysisContext = JSON.stringify({
     disease: topPrediction.label,
@@ -128,7 +139,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
                     <div key={index} className={`flex items-start gap-3 ${msg.sender === 'user' ? 'justify-end' : ''}`}>
                       {msg.sender === 'bot' && <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted"><Bot className="h-5 w-5" /></div>}
                       <div className={`rounded-lg px-4 py-2 max-w-[80%] ${msg.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                          <p className="text-sm">{msg.text}</p>
+                          <p className="text-sm">{t(msg.text as any)}</p>
                       </div>
                       {msg.sender === 'user' && <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted"><User className="h-5 w-5" /></div>}
                     </div>

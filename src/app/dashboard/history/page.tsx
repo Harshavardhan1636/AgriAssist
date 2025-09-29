@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/context/i18n-context";
+import Link from "next/link";
 
 export default function HistoryPage() {
   const [search, setSearch] = useState("");
@@ -130,7 +131,9 @@ export default function HistoryPage() {
                     {format(new Date(analysis.timestamp), "PPP")}
                   </TableCell>
                   <TableCell>
-                    <Button size="sm" variant="outline">{t('View')}</Button>
+                    <Button asChild size="sm" variant="outline">
+                        <Link href={`/dashboard/history/${analysis.id}`}>{t('View')}</Link>
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

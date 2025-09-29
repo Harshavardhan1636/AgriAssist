@@ -73,7 +73,7 @@ export default function ConversationPage() {
                         <ArrowLeft />
                     </Link>
                  </Button>
-                 <h1 className="text-3xl font-semibold">{conversation.title}</h1>
+                 <h1 className="text-3xl font-semibold">{t(conversation.title as any)}</h1>
             </div>
              <Card>
                 <CardHeader>
