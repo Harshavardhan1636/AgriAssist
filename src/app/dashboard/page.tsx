@@ -65,7 +65,7 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
 
-       <Alert variant="destructive">
+       <Alert variant="destructive" className="animate-blink-alert">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>{t('High-Risk Alert: Tomato Late Blight')}</AlertTitle>
           <AlertDescription>
