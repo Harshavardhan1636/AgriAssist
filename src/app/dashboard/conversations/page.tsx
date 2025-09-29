@@ -50,7 +50,7 @@ export default function ConversationsPage() {
                         {filteredConversations.length > 0 ? filteredConversations.map(convo => {
                             const lastMessage = convo.messages[convo.messages.length - 1];
                             return (
-                             <Link href={`/dashboard/conversations/${convo.id}`} key={convo.id} className="block">
+                             <Link href={`/dashboard/history/${convo.analysisId}`} key={convo.id} className="block">
                                 <div className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-start gap-3">

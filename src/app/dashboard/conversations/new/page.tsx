@@ -77,8 +77,7 @@ export default function NewConversationPage() {
             if (response.error) {
                 toast({ variant: 'destructive', title: t('Analysis Failed'), description: response.error });
             } else if (response.data) {
-                setAnalysisResult(response.data);
-                // Redirect to the new unified case history page which will show both analysis and chat.
+                // Instead of displaying results here, redirect to the new unified case history page
                 router.push(`/dashboard/history/${response.data.conversationId}`);
             }
             return;
@@ -105,10 +104,6 @@ export default function NewConversationPage() {
         );
     }
     
-    if (analysisResult) {
-        return <AnalysisResults result={analysisResult} />;
-    }
-
     return (
         <div className="mx-auto grid w-full max-w-3xl gap-2">
             <div className="flex items-center gap-4 mb-4">
@@ -177,7 +172,7 @@ export default function NewConversationPage() {
                                     placeholder={t('Ask a question or describe your image...')}
                                     disabled={isAsking || isLoading}
                                 />
-                                <Button type="submit" size="icon" disabled={isAsking || isLoading}>
+                                <Button type="submit" size="icon" disabled={isAsking || isLoading || (!question.trim() && !imagePreview)}>
                                     <Send className="h-4 w-4" />
                                 </Button>
                             </div>

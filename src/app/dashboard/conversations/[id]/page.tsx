@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Bot, User, Send, ArrowLeft, Paperclip, X } from 'lucide-react';
 import { useI18n } from '@/context/i18n-context';
-import { mockConversations } from '@/lib/mock-data';
+import { mockConversations, mockHistory } from '@/lib/mock-data';
 import { askFollowUpQuestion, AskFollowUpQuestionOutput } from '@/app/dashboard/analyze/actions';
 import type { Conversation, ChatMessage } from '@/lib/types';
 import Link from 'next/link';
@@ -17,19 +17,20 @@ export default function ConversationPage() {
     const { t, locale } = useI18n();
     const params = useParams();
     const router = useRouter();
-    const id = params.id as string;
+    const id = params.id as string; // This is the conversationId
 
-    const [conversation, setConversation] = useState<Conversation | null>(null);
-    const [question, setQuestion] = useState('');
-    const [isAsking, setIsAsking] = useState(false);
-    
     useEffect(() => {
         // This redirects to the unified history view which is now the canonical place for viewing past items.
         // A dedicated chat-only view can be built here if desired in the future.
-        if (id) {
-            const relatedAnalysis = mockConversations.find(c => c.id === id)?.analysisId;
-            if(relatedAnalysis) {
-                router.replace(`/dashboard/history/${relatedAnalysis}`);
+        const foundAnalysis = mockHistory.find(h => h.conversationId === id);
+        if (foundAnalysis) {
+            router.replace(`/dashboard/history/${foundAnalysis.id}`);
+        } else {
+            // If there's no analysis linked (e.g., a general chat), maybe stay here?
+            // For now, we redirect to the conversations list if no direct link is found.
+            const existingConversation = mockConversations.find(c => c.id === id);
+            if (!existingConversation) {
+                 router.replace(`/dashboard/conversations`);
             }
         }
     }, [id, router]);
