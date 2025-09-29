@@ -87,12 +87,12 @@ export default {
         },
         'blink-alert': {
           '0%, 100%': { 
-            backgroundColor: 'hsl(var(--destructive))', 
-            color: 'hsl(var(--destructive-foreground))',
+            backgroundColor: 'hsl(var(--destructive) / 0.1)', 
+            color: 'hsl(var(--destructive))',
           },
           '50%': { 
-            backgroundColor: 'transparent',
-            color: 'hsl(var(--destructive))',
+            backgroundColor: 'hsl(var(--destructive))',
+            color: 'hsl(var(--destructive-foreground))',
            },
         }
       },
