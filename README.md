@@ -20,6 +20,9 @@ AgriAssist 3.0 represents a significant evolution from previous versions, with a
 - **Real Dashboard Analytics:** Dynamic charts and metrics using actual user data.
 - **User Authentication:** Supports both demo accounts for trial users and real user accounts with Firebase Authentication.
 - **Data Persistence:** Uses localStorage for demo users and prepares for Firestore integration for real users.
+- **Community Knowledge Network:** Farmer-to-farmer knowledge sharing platform with anonymous problem sharing, expert verification, regional best practices database, and success story showcase.
+- **Sustainable Farming Advisor:** Environmentally conscious recommendations with organic treatment prioritization, carbon footprint tracking, water conservation techniques, and biodiversity impact assessment.
+- **Climate Resilience Planning:** Drought-resistant crop recommendations, flood impact mitigation strategies, heat stress management, and adaptive farming techniques.
 
 ## Tech Stack
 
@@ -61,6 +64,9 @@ AgriAssist now supports two types of user accounts:
 ✅ **Complete:** Separate AI conversation system
 ✅ **Complete:** Dashboard with real analytics
 ✅ **Complete:** User authentication with demo and real user support
+✅ **Complete:** Community knowledge sharing platform
+✅ **Complete:** Sustainable farming advisor with environmental metrics
+✅ **Complete:** Climate resilience planning features
 
 ### In Progress
 🔄 **Multi-language Enhancement:** Expanding localization support for all UI elements and AI-generated content
