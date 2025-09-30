@@ -13,6 +13,7 @@ This directory contains all the routes and UI pages of the application.
 - **`src/app/layout.tsx`**: The root layout of the application.
 - **`src/app/page.tsx`**: The home page, which redirects to the login or dashboard.
 - **`src/app/login/page.tsx`**: The user login page.
+- **`src/app/signup/page.tsx`**: The user signup page.
 - **`src/app/dashboard/`**: This is the main section of the application, containing the user-facing dashboard and its sub-pages.
   - **`layout.tsx`**: The primary layout for the dashboard area, including the sidebar and header.
   - **`page.tsx`**: The main dashboard overview page.
@@ -24,6 +25,10 @@ This directory contains all the routes and UI pages of the application.
   - **`forecast/`**: The page for viewing detailed weather forecasts and soil data.
   - **`store/`**: The e-commerce section for recommended products and a retailer map.
   - **`settings/`**: The user settings page for profile, appearance, and language.
+  - **`knowledge-sharing/`**: The community knowledge sharing platform with problem sharing, solutions, best practices, and success stories.
+  - **`crop-planning/`**: The crop planning module for seasonal recommendations and crop rotation planning.
+  - **`account/`**: The user account management page.
+  - **`cart/`**: The shopping cart page.
 
 ### `src/ai`
 
@@ -48,12 +53,23 @@ This directory is for shared utilities, type definitions, and mock data.
 - **`src/lib/utils.ts`**: General utility functions.
 - **`src/lib/mock-data.ts`**: Provides mock data for populating the UI in a development environment.
 - **`src/lib/placeholder-images.json`**: Contains all placeholder image data used in the app.
+- **`src/lib/firebase.ts`**: Firebase configuration and initialization.
+- **`src/lib/tts-utils.ts`**: Text-to-speech utilities for accessibility.
 
 ### `src/context`
 This directory holds React context providers for managing global state.
 - **`src/context/auth-context.tsx`**: Manages user authentication state.
 - **`src/context/i18n-context.tsx`**: Manages internationalization and language state.
 - **`src/context/cart-context.tsx`**: Manages the state of the e-commerce shopping cart.
+- **`src/context/analysis-context.tsx`**: Manages the state of analysis data.
+
+### `src/locales`
+This directory contains translation files for internationalization.
+- **`src/locales/en.json`**: English translations.
+- **`src/locales/hi.json`**: Hindi translations.
+- **`src/locales/te.json`**: Telugu translations.
+- **`src/locales/ta.json`**: Tamil translations.
+- **`src/locales/ml.json`**: Malayalam translations.
 
 ## Business Logic Flows
 
@@ -83,3 +99,58 @@ This directory holds React context providers for managing global state.
 2.  An expert navigates to the `review/` page, which presents one case at a time.
 3.  The expert can either "Approve AI" or "Submit Correction" with a new label and notes.
 4.  This feedback is logged, and the UI moves to the next case in the queue, simulating a continuous learning loop.
+
+### Community Knowledge Network Flow
+1.  Farmers can anonymously share problems they're facing in the **Knowledge Sharing** section.
+2.  Other farmers and experts can provide solutions to these problems.
+3.  Experts can verify solutions, which are then marked as "Expert Verified."
+4.  Best practices and success stories are showcased to help other farmers.
+
+### Sustainable Farming Advisor Flow
+1.  All recommendations include environmental impact metrics.
+2.  Organic treatment alternatives are prioritized in product recommendations.
+3.  Carbon footprint tracking is provided for all agricultural activities.
+4.  Water conservation techniques specific to crop types are recommended.
+5.  Biodiversity impact assessments are included in all recommendations.
+
+### Climate Resilience Planning Flow
+1.  Crop recommendations include drought, flood, and heat tolerance ratings.
+2.  Adaptive farming techniques for changing weather patterns are suggested.
+3.  Regional climate data is used to provide location-specific recommendations.
+4.  Long-term climate adaptation strategies are included in planning.
+
+## Development Guidelines
+
+### Code Style
+- Follow the existing code style and conventions
+- Use TypeScript for all new code
+- Write clear, descriptive commit messages
+- Keep functions small and focused
+- Use meaningful variable and function names
+
+### Testing
+- Write unit tests for new functionality
+- Ensure existing tests pass before submitting PRs
+- Test across different browsers and devices
+- Consider accessibility in UI changes
+
+### Documentation
+- Update documentation when adding new features
+- Write clear comments for complex logic
+- Keep README and other documentation up to date
+- Document API changes in relevant files
+
+### Pull Request Process
+1. Fork the repository
+2. Create a new branch for your feature or bug fix
+3. Make your changes
+4. Write tests if applicable
+5. Update documentation if needed
+6. Submit a pull request with a clear description of changes
+
+## Getting Help
+
+If you need help or have questions:
+- Check existing issues and pull requests
+- Open a new issue for bugs or feature requests
+- Contact the maintainers directly for urgent matters
