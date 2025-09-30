@@ -21,7 +21,7 @@ export default function HomePage() {
   }, [isAuthenticated, isLoading, router]);
 
   return (
-    <div className="flex h-screen w-screen items-center justify-center bg-background">
+    <div className="flex min-h-screen w-full items-center justify-center bg-background overflow-x-hidden">
       <Loader2 className="h-12 w-12 animate-spin text-primary" />
     </div>
   );

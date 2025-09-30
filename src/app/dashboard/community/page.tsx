@@ -30,7 +30,7 @@ export default function CommunityPage() {
     };
 
     return (
-        <div className="grid gap-8">
+        <div className="grid gap-8 min-w-0">
             <div className="flex items-center gap-4">
                 <h1 className="text-3xl font-semibold">{t('Community Outbreaks')}</h1>
             </div>

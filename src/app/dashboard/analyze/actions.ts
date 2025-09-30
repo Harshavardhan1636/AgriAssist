@@ -14,6 +14,52 @@ import type { FullAnalysisResponse } from "@/lib/types";
 import { z } from "zod";
 import { v4 as uuidv4 } from 'uuid';
 
+// Inference server configuration (FastAPI)
+const INFER_SERVER_URL = process.env.INFER_SERVER_URL || 'http://localhost:8000';
+
+async function dataUriToBlob(dataUri: string): Promise<Blob> {
+  // data:image/jpeg;base64,...
+  const [meta, b64] = dataUri.split(',');
+  const mimeMatch = /data:(.*?);base64/gi.exec(meta || '')
+  const mime = mimeMatch?.[1] || 'image/jpeg';
+  const buffer = Buffer.from(b64, 'base64');
+  return new Blob([buffer], { type: mime });
+}
+
+async function classifyWithModel(photoDataUri: string, modelKey: 'plantvillage'|'paddy') {
+  const blob = await dataUriToBlob(photoDataUri);
+  const form = new FormData();
+  form.append('model_key', modelKey);
+  form.append('topk', '5');
+  form.append('file', blob, 'image.jpg');
+  const res = await fetch(`${INFER_SERVER_URL}/classify`, { method: 'POST', body: form as any });
+  if (!res.ok) throw new Error(`classify ${modelKey} failed ${res.status}`);
+  const json = await res.json();
+  return json?.predictions || [];
+}
+
+async function gradcamWithModel(photoDataUri: string, modelKey: 'plantvillage'|'paddy', targetLabel: string) {
+  const blob = await dataUriToBlob(photoDataUri);
+  const form = new FormData();
+  form.append('model_key', modelKey);
+  form.append('target_label', targetLabel);
+  form.append('file', blob, 'image.jpg');
+  const res = await fetch(`${INFER_SERVER_URL}/gradcam`, { method: 'POST', body: form as any });
+  if (!res.ok) throw new Error(`gradcam ${modelKey} failed ${res.status}`);
+  const json = await res.json();
+  return json?.dataUri as string;
+}
+
+async function severityFromServer(photoDataUri: string) {
+  const blob = await dataUriToBlob(photoDataUri);
+  const form = new FormData();
+  form.append('file', blob, 'image.jpg');
+  const res = await fetch(`${INFER_SERVER_URL}/severity`, { method: 'POST', body: form as any });
+  if (!res.ok) throw new Error(`severity failed ${res.status}`);
+  const json = await res.json();
+  return json as { severityPercentage: number; severityBand: 'Low'|'Medium'|'High'|'Unknown'; confidence: number };
+}
+
 
 // Re-exporting types for easier access from the client
 export type {
@@ -103,8 +149,31 @@ export async function analyzeImage(
       }
 
       if (photoDataUri) {
-        console.log("Analyzing with image...");
-        classification = await classifyPlantDisease({ photoDataUri, language: locale });
+        console.log("Analyzing with image via inference server...");
+        try {
+          // Call both models and pick the higher-confidence top-1
+          const [pv, paddy] = await Promise.all([
+            classifyWithModel(photoDataUri, 'plantvillage').catch(() => []),
+            classifyWithModel(photoDataUri, 'paddy').catch(() => []),
+          ]);
+          const pvTop = pv?.[0];
+          const paddyTop = paddy?.[0];
+          let useModel: 'plantvillage'|'paddy' = 'plantvillage';
+          let preds = pv || [];
+          if (pvTop && paddyTop) {
+            useModel = (paddyTop.confidence > pvTop.confidence) ? 'paddy' : 'plantvillage';
+            preds = (useModel === 'paddy') ? paddy : pv;
+          } else if (paddyTop && !pvTop) {
+            useModel = 'paddy';
+            preds = paddy;
+          }
+          classification = { predictions: preds };
+          // Attach chosen model key to be used by Grad-CAM later
+          (classification as any)._modelKey = useModel;
+        } catch (err) {
+          console.warn('Inference server classify failed, falling back to Genkit flow:', err);
+          classification = await classifyPlantDisease({ photoDataUri, language: locale });
+        }
       } else if (textDescription) {
         console.log("Analyzing with text...");
         const textDiagnosis = await diagnoseWithText({ query: textDescription, language: locale });
@@ -126,14 +195,37 @@ export async function analyzeImage(
       const soilType = 'Loam'; // Mock data
       
       const [severity, explanation, forecast] = await Promise.all([
-        // Assess Severity
-        assessDiseaseSeverity({ photoDataUri: usedPhoto!, description: textDescription, language: locale })
-          .catch(e => { console.error("Severity assessment failed:", e); return { severityPercentage: 0, severityBand: 'Unknown', confidence: 0 }; }),
-        
-        // Explain with Grad-CAM (or fallback for text)
-        explainClassificationWithGradCAM({ photoDataUri: usedPhoto!, classificationResult: topPrediction.label })
-          .catch(e => { console.error("Grad-CAM explanation failed:", e); return { gradCAMOverlay: usedPhoto! }; }),
-        
+        // Assess Severity via inference server if available
+        (async () => {
+          try {
+            const s = await severityFromServer(usedPhoto!);
+            return s;
+          } catch (e) {
+            console.warn('Severity server unavailable, using Genkit fallback');
+            try {
+              return await assessDiseaseSeverity({ photoDataUri: usedPhoto!, description: textDescription, language: locale });
+            } catch (err) {
+              console.error('Severity assessment failed:', err);
+              return { severityPercentage: 0, severityBand: 'Unknown', confidence: 0 } as any;
+            }
+          }
+        })(),
+        // Explain with Grad-CAM
+        (async () => {
+          try {
+            const modelKey = (classification as any)._modelKey as ('plantvillage'|'paddy'|undefined) || 'plantvillage';
+            const cam = await gradcamWithModel(usedPhoto!, modelKey, topPrediction.label);
+            return { gradCAMOverlay: cam } as any;
+          } catch (e) {
+            console.warn('Grad-CAM server unavailable, using Genkit fallback');
+            try {
+              return await explainClassificationWithGradCAM({ photoDataUri: usedPhoto!, classificationResult: topPrediction.label });
+            } catch (err) {
+              console.error('Grad-CAM explanation failed:', err);
+              return { gradCAMOverlay: usedPhoto! } as any;
+            }
+          }
+        })(),
         // Forecast Risk
         forecastOutbreakRisk({
           disease: topPrediction.label,

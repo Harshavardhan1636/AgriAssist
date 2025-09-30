@@ -45,6 +45,31 @@ export type AnalysisResult = {
   crop: 'Tomato' | 'Potato' | 'Maize' | 'Unknown';
 };
 
+export type ReviewQueueItem = {
+  id: string;
+  conversationId: string;
+  timestamp: string;
+  image: string;
+  imageHint: string;
+  predictions: Prediction[];
+  severity: {
+    percentage: number;
+    band: 'Low' | 'Medium' | 'High';
+  };
+  gradCamImage: string;
+  risk: {
+    score: number;
+    explanation: string;
+  };
+  status: 'Completed' | 'Pending Review';
+  crop: 'Tomato' | 'Potato' | 'Maize' | 'Unknown';
+  confidence: number;
+  reviewedAt?: string;
+  reviewedBy?: string;
+  expertLabel?: string;
+  notes?: string;
+};
+
 export type FullAnalysisResponse = {
   classification: ClassifyPlantDiseaseOutput;
   severity: AssessDiseaseSeverityOutput;

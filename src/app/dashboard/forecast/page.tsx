@@ -15,8 +15,8 @@ export default function ForecastPage() {
     const today = new Date();
 
     return (
-        <div className="grid gap-8">
-            <div className="flex items-center gap-4">
+        <div className="grid gap-8 min-w-0">
+            <div className="flex items-center gap-4 min-w-0">
                 <h1 className="text-3xl font-semibold">{t('Weather Forecast & Advisory')}</h1>
             </div>
 
@@ -25,7 +25,7 @@ export default function ForecastPage() {
                     <CardTitle>{t('14-Day Forecast')}</CardTitle>
                     <CardDescription>{t('Detailed weather forecast for the upcoming two weeks.')}</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="min-w-0">
                     <ScrollArea>
                         <Table className="whitespace-nowrap">
                             <TableHeader>

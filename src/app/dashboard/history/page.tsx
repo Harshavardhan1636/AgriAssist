@@ -52,7 +52,7 @@ export default function HistoryPage() {
   });
 
   return (
-    <Card>
+    <Card className="min-w-0">
       <CardHeader>
         <CardTitle>{t('Analysis History')}</CardTitle>
         <CardDescription>
@@ -78,7 +78,7 @@ export default function HistoryPage() {
           </Select>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="min-w-0">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>

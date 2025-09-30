@@ -1,5 +1,5 @@
 
-import type { AnalysisResult, CommunityOutbreak, StoreProduct, StoreLocation, WeatherForecast, SoilData, Conversation } from './types';
+import type { AnalysisResult, CommunityOutbreak, StoreProduct, StoreLocation, WeatherForecast, SoilData, Conversation, ReviewQueueItem } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 
 const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id)?.imageUrl || `https://picsum.photos/seed/${id}/600/400`;
@@ -93,7 +93,16 @@ export const mockHistory: AnalysisResult[] = [
   },
 ];
 
-export const reviewQueue = mockHistory.filter(item => item.status === 'Pending Review');
+export const reviewQueue: ReviewQueueItem[] = mockHistory
+  .filter(item => item.status === 'Pending Review')
+  .map(item => ({
+    ...item,
+    confidence: item.predictions[0]?.confidence || 0,
+    reviewedAt: undefined,
+    reviewedBy: undefined,
+    expertLabel: undefined,
+    notes: undefined,
+  }));
 
 
 export const communityOutbreaks: CommunityOutbreak[] = [

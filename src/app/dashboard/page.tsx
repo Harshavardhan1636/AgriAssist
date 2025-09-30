@@ -63,7 +63,7 @@ export default function DashboardPage() {
   const minimalForecast = mockForecast.slice(0, 7);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 min-w-0">
 
        <Alert variant="destructive" className="animate-blink-alert">
           <AlertTriangle className="h-4 w-4" />
@@ -118,7 +118,7 @@ export default function DashboardPage() {
 
        <Card>
         <CardHeader>
-            <div className='flex justify-between items-center'>
+            <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2'>
                 <div>
                     <CardTitle>{t('7-Day Forecast')}</CardTitle>
                     <CardDescription>{t('Minimal weather forecast for the upcoming week.')}</CardDescription>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
             </div>
         </CardHeader>
         <CardContent>
-            <div className="grid grid-cols-7 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2">
                 {minimalForecast.map((day, index) => (
                   <div key={index} className="flex flex-col items-center p-2 rounded-lg bg-muted/50 text-center">
                     <p className="font-semibold text-sm">{format(addDays(today, index), 'EEE')}</p>

@@ -32,22 +32,15 @@ function DashboardLayoutContent({
         const latestAlert = highRiskAlerts[0];
         setTimeout(() => {
             toast({
-              title: (
-                <div className="flex items-center gap-2 font-bold">
-                  <AlertTriangle className="h-5 w-5 text-destructive-foreground" />
-                  {t('Community Alert')}
-                </div>
-              ),
-              description: (
-                <div>
-                  <p>{t('High-risk outbreak detected')}: <strong>{t(latestAlert.disease as any)}</strong> {t('in')} {latestAlert.location}.</p>
-                  <Link href="/dashboard/community">
-                    <Button variant="link" className="p-0 h-auto mt-2 text-destructive-foreground underline">{t('View Details')}</Button>
-                  </Link>
-                </div>
-              ),
+              title: `⚠️ ${t('Community Alert')}`,
+              description: `${t('High-risk outbreak detected')}: ${t(latestAlert.disease as any)} ${t('in')} ${latestAlert.location}. Click to view details.`,
               variant: 'destructive',
-              duration: 15000, 
+              duration: 15000,
+              action: (
+                <Link href="/dashboard/community">
+                  <Button variant="outline" size="sm">{t('View Details')}</Button>
+                </Link>
+              ),
             });
         }, 3000);
     }

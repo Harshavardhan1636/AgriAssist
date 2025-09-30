@@ -80,7 +80,9 @@ export default function AnalysisView() {
 
         mediaRecorderRef.current.onstop = async () => {
             const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-            const dataUri = await fileToDataUri(audioBlob);
+            // Create a File object from the Blob
+            const audioFile = new File([audioBlob], 'recording.wav', { type: 'audio/wav' });
+            const dataUri = await fileToDataUri(audioFile);
             setAudioDataUri(dataUri);
             stream.getTracks().forEach(track => track.stop()); // Stop microphone
         };
@@ -185,7 +187,8 @@ export default function AnalysisView() {
                                 alt="Image preview"
                                 width={600}
                                 height={400}
-                                className="rounded-lg object-contain border"
+                                sizes="(max-width: 640px) 100vw, 600px"
+                                className="rounded-lg object-contain border w-full h-auto max-h-[70vh]"
                                 />
                                 <Button
                                 type="button"
