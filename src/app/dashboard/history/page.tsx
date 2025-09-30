@@ -30,24 +30,75 @@ import {
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/context/i18n-context";
 import Link from "next/link";
+import { Trash2 } from "lucide-react";
+import { useAuth } from "@/context/auth-context";
 
 export default function HistoryPage() {
   const [search, setSearch] = useState("");
   const [cropFilter, setCropFilter] = useState("all");
   const [history, setHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isDemoData, setIsDemoData] = useState(false);
   const { t } = useI18n();
+  const { isDemoUser } = useAuth(); // Get demo user status
 
   useEffect(() => {
-    // Load history from localStorage
+    fetchHistory();
+  }, [isDemoUser]);
+
+  const fetchHistory = async () => {
+    setLoading(true);
     try {
-      const historyKey = 'agriassist_analysis_history';
-      const storedHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
-      setHistory(storedHistory);
+      // For demo users, we can still use localStorage as a fallback
+      // For real users, we would fetch from the API
+      if (isDemoUser) {
+        // Load history from localStorage for demo users
+        try {
+          const historyKey = 'agriassist_analysis_history';
+          const storedHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+          setHistory(storedHistory);
+          setIsDemoData(true);
+        } catch (error) {
+          console.error("Error loading history from localStorage:", error);
+          setHistory([]);
+        }
+      } else {
+        // For real users, fetch from API
+        const response = await fetch('/api/analyses');
+        const data = await response.json();
+        
+        if (data.success) {
+          setHistory(data.data.analyses);
+          setIsDemoData(data.data.isDemoData || false);
+        } else {
+          // Fallback to localStorage if API fails
+          try {
+            const historyKey = 'agriassist_analysis_history';
+            const storedHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+            setHistory(storedHistory);
+            setIsDemoData(true);
+          } catch (error) {
+            console.error("Error loading history from localStorage:", error);
+            setHistory([]);
+          }
+        }
+      }
     } catch (error) {
-      console.error("Error loading history from localStorage:", error);
-      setHistory([]);
+      console.error("Error fetching history:", error);
+      // Fallback to localStorage
+      try {
+        const historyKey = 'agriassist_analysis_history';
+        const storedHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+        setHistory(storedHistory);
+        setIsDemoData(true);
+      } catch (error) {
+        console.error("Error loading history from localStorage:", error);
+        setHistory([]);
+      }
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  };
 
   const filteredHistory = history.filter((analysis) => {
     const searchLower = search.toLowerCase();
@@ -60,12 +111,55 @@ export default function HistoryPage() {
     return matchesSearch && matchesCrop;
   });
 
+  const deleteAnalysis = (id: string) => {
+    const updatedHistory = history.filter(analysis => analysis.id !== id);
+    setHistory(updatedHistory);
+    
+    if (isDemoUser) {
+      // For demo users, update localStorage
+      try {
+        const historyKey = 'agriassist_analysis_history';
+        localStorage.setItem(historyKey, JSON.stringify(updatedHistory));
+      } catch (error) {
+        console.error("Error updating history in localStorage:", error);
+      }
+    } else {
+      // For real users, we would make an API call to delete from database
+      // This is a placeholder for real implementation
+      console.log("Would delete analysis from database for real user");
+    }
+  };
+
+  if (loading) {
+    return (
+      <Card className="min-w-0">
+        <CardHeader>
+          <CardTitle>{t('Analysis History')}</CardTitle>
+          <CardDescription>
+            {t('Loading your analysis history...')}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">{t('Loading...')}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="min-w-0">
       <CardHeader>
         <CardTitle>{t('Analysis History')}</CardTitle>
         <CardDescription>
           {t('Browse and review all past crop analyses.')}
+          {isDemoData && (
+            <span className="block mt-2 text-sm text-yellow-600 bg-yellow-50 p-2 rounded">
+              {t('Demo Mode: Using sample data. Sign in to use real data.')}
+            </span>
+          )}
         </CardDescription>
         <div className="flex flex-col sm:flex-row items-center gap-2 pt-4">
           <Input 
@@ -125,9 +219,12 @@ export default function HistoryPage() {
                     <TableCell>
                       {analysis.timestamp ? format(new Date(analysis.timestamp), "PPP") : 'N/A'}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="flex gap-2">
                       <Button asChild size="sm" variant="outline">
                         <Link href={`/dashboard/history/${analysis.id}`}>{t('View')}</Link>
+                      </Button>
+                      <Button size="sm" variant="destructive" onClick={() => deleteAnalysis(analysis.id)}>
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </TableCell>
                   </TableRow>

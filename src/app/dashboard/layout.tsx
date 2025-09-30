@@ -48,11 +48,7 @@ function DashboardLayoutContent({
   }, []);
 
   return (
-    <div className={cn(
-      "grid min-h-screen w-full",
-      !isMobile && "md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]",
-      !isMobile && isCollapsed && "md:grid-cols-[68px_1fr] lg:grid-cols-[68px_1fr]"
-    )}>
+    <div className="flex min-h-screen w-full">
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetContent side="left" className="p-0" withCloseButton={true}>
           <SheetHeader className='p-4 border-b'>
@@ -62,11 +58,21 @@ function DashboardLayoutContent({
         </SheetContent>
       </Sheet>
 
-      <div className={cn("hidden border-r bg-muted/40 md:block h-screen sticky top-0")}>
-        <AppSidebar />
-      </div>
+      {/* Fixed sidebar for desktop */}
+      {!isMobile && (
+        <div className={cn(
+          "hidden md:block fixed h-screen top-0 left-0 z-40 bg-muted/40 border-r",
+          isCollapsed ? "w-[68px]" : "w-[220px] lg:w-[280px]"
+        )}>
+          <AppSidebar />
+        </div>
+      )}
 
-      <div className="flex flex-col">
+      {/* Main content area */}
+      <div className={cn(
+        "flex flex-col flex-1",
+        !isMobile && (isCollapsed ? "md:ml-[68px]" : "md:ml-[220px] lg:ml-[280px]")
+      )}>
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
           <Header onMenuClick={() => setIsOpen(true)} />
         </header>

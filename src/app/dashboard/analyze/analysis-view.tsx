@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { useAnalysis } from '@/context/analysis-context';
 import { v4 as uuidv4 } from 'uuid';
+import { mockProducts } from '@/lib/mock-data';
 
 function fileToDataUri(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -31,6 +32,39 @@ function fileToDataUri(file: File): Promise<string> {
         reader.readAsDataURL(file);
     });
 }
+
+// Function to map recommendations to products
+const mapRecommendationsToProducts = (recommendations: any[]): any[] => {
+  // In a real implementation, this would map specific recommendations to actual products
+  // For now, we'll use mock products but filter/sort based on recommendations
+  
+  // Extract keywords from recommendations to match with products
+  const recommendationKeywords = recommendations.flatMap(rec => {
+    const text = `${rec.title} ${rec.description}`.toLowerCase();
+    // Extract potential product types from recommendation text
+    if (text.includes('neem')) return ['neem'];
+    if (text.includes('fungicide') || text.includes('blight') || text.includes('rust')) return ['fungicide'];
+    if (text.includes('insecticide') || text.includes('pest')) return ['insecticide'];
+    if (text.includes('bio') || text.includes('organic')) return ['organic'];
+    if (text.includes('copper')) return ['copper'];
+    if (text.includes('trichoderma')) return ['trichoderma'];
+    return [];
+  });
+  
+  // Filter mock products based on keywords
+  if (recommendationKeywords.length > 0) {
+    const filteredProducts = mockProducts.filter(product => {
+      const productText = `${product.name} ${product.description} ${product.type}`.toLowerCase();
+      return recommendationKeywords.some(keyword => productText.includes(keyword));
+    });
+    
+    // If we found matching products, return them, otherwise return all mock products
+    return filteredProducts.length > 0 ? filteredProducts : mockProducts;
+  }
+  
+  // Default to all mock products if no keywords found
+  return mockProducts;
+};
 
 export default function AnalysisView() {
   const [isPending, setIsPending] = useState(false);
@@ -102,6 +136,14 @@ export default function AnalysisView() {
       // Extract top prediction
       const topPrediction = analysisData.classification?.predictions?.[0] || { label: 'Unknown', confidence: 0 };
       
+      // Map recommendations to products
+      const recommendedProducts = analysisData.recommendations?.recommendations 
+        ? mapRecommendationsToProducts(analysisData.recommendations.recommendations)
+        : [];
+      
+      // Ensure recommendedProducts is an array
+      const validRecommendedProducts = Array.isArray(recommendedProducts) ? recommendedProducts : [];
+      
       // Add the new analysis to the beginning of the history array
       const newHistoryItem = {
         id: analysisId,
@@ -130,14 +172,20 @@ export default function AnalysisView() {
           confidence: Math.round(topPrediction.confidence * 100),
           severity: analysisData.severity?.severityBand || 'Unknown',
           riskScore: Math.round((analysisData.forecast?.riskScore || 0) * 100) || 0,
-        }
+        },
+        // Store recommended products
+        recommendedProducts: recommendedProducts
       };
       
       // Limit history to 50 items
       const updatedHistory = [newHistoryItem, ...existingHistory].slice(0, 50);
       localStorage.setItem(historyKey, JSON.stringify(updatedHistory));
       
-      console.log('[INFO] Analysis saved to localStorage history');
+      // Also store the recommended products for the store page
+      const storeProductsKey = 'agriassist_store_products';
+      localStorage.setItem(storeProductsKey, JSON.stringify(validRecommendedProducts));
+      
+      console.log('[INFO] Analysis saved to localStorage history with recommended products');
     } catch (storageError) {
       console.warn('[WARN] Failed to save analysis to localStorage:', storageError);
     }

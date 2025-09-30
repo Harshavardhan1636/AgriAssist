@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Bot, User, Send, ArrowLeft, Paperclip, X, Loader2, Mic, Square } from 'lucide-react';
+import { Bot, User, Send, ArrowLeft, Paperclip, X, Loader2, Mic, Square, Volume2 } from 'lucide-react';
 import { useI18n } from '@/context/i18n-context';
 import { askFollowUpQuestion, analyzeImage } from '@/app/dashboard/analyze/fixed-actions';
 import type { ChatMessage } from '@/lib/types';
@@ -13,6 +13,7 @@ import type { AskFollowUpQuestionOutput } from '@/ai/flows/ask-follow-up-questio
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
+import { speakText, stopSpeech } from '@/lib/tts-utils';
 
 function fileToDataUri(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -34,6 +35,7 @@ export default function NewConversationPage() {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [conversationId, setConversationId] = useState<string>(''); // Track conversation ID
+    const [autoSpeak, setAutoSpeak] = useState(false);
     
     // Voice recording states
     const [isRecording, setIsRecording] = useState(false);
@@ -82,8 +84,23 @@ export default function NewConversationPage() {
             if (recognitionRef.current) {
                 recognitionRef.current.stop();
             }
+            // Stop any ongoing speech when component unmounts
+            stopSpeech();
         };
     }, [locale, t, toast]);
+
+    // Auto-speak new AI responses when autoSpeak is enabled
+    useEffect(() => {
+        if (autoSpeak && chatHistory.length > 0) {
+            const lastMessage = chatHistory[chatHistory.length - 1];
+            if (lastMessage.sender === 'bot') {
+                // Small delay to ensure the UI is updated
+                setTimeout(() => {
+                    speakText(lastMessage.text, locale);
+                }, 500);
+            }
+        }
+    }, [chatHistory, autoSpeak, locale]);
 
     // Start voice recording
     const startRecording = () => {
@@ -258,8 +275,26 @@ export default function NewConversationPage() {
             </div>
              <Card className="flex flex-col h-[70vh]">
                 <CardHeader>
-                    <CardTitle>{t('AI Assistant')}</CardTitle>
-                    <CardDescription>{t('Ask a question or upload an image to start an analysis.')}</CardDescription>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <CardTitle>{t('AI Assistant')}</CardTitle>
+                            <CardDescription>{t('Ask a question or upload an image to start an analysis.')}</CardDescription>
+                        </div>
+                        <div className="relative group">
+                            <Button 
+                                size="sm" 
+                                variant={autoSpeak ? "default" : "outline"}
+                                onClick={() => setAutoSpeak(!autoSpeak)}
+                                className="flex items-center gap-2"
+                            >
+                                <Volume2 className="h-4 w-4" />
+                                {t('Auto')}
+                            </Button>
+                            <div className="absolute right-0 mt-1 w-32 p-2 bg-black text-white text-xs rounded-md shadow-lg z-10 hidden group-hover:block">
+                                {autoSpeak ? t('Auto Speak On') : t('Auto Speak Off')}
+                            </div>
+                        </div>
+                    </div>
                 </CardHeader>
                 <CardContent className="flex-grow overflow-y-auto space-y-4">
                     {chatHistory.length === 0 && (
@@ -279,6 +314,16 @@ export default function NewConversationPage() {
                                                 {line.replace(/\*\*(.*?)\*\*/g, '$1')}
                                             </p>
                                         ))}
+                                        <div className="flex justify-end mt-2">
+                                            <Button 
+                                                size="sm" 
+                                                variant="ghost" 
+                                                className="h-6 w-6 p-0"
+                                                onClick={() => speakText(msg.text, locale)}
+                                            >
+                                                <Volume2 className="h-3 w-3" />
+                                            </Button>
+                                        </div>
                                     </div>
                                 ) : (
                                     <p className="text-sm">{t(msg.text as any)}</p>

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { auth } from '@/lib/firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
-const loginSchema = z.object({
+const signupSchema = z.object({
   email: z.string().email('Invalid email format'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
@@ -13,36 +13,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     
     // Validate input
-    const validatedData = loginSchema.parse(body);
+    const validatedData = signupSchema.parse(body);
     const { email, password } = validatedData;
 
-    // Check if this is a demo login
-    if (email === 'demo@agriassist.com' && password === 'demo123') {
-      // Demo user authentication
-      const mockToken = 'mock-jwt-token-' + Date.now();
-      
-      const user = {
-        uid: 'demo-user-id',
-        email: email,
-        displayName: 'Demo User',
-        farmLocation: {
-          latitude: 12.9716,
-          longitude: 77.5946,
-          address: 'Bangalore, Karnataka, India'
-        },
-        isDemoUser: true // Mark as demo user
-      };
-
-      return NextResponse.json({
-        success: true,
-        token: mockToken,
-        user: user
-      });
-    }
-
-    // Real user authentication with Firebase
+    // Real user signup with Firebase
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
       // Get Firebase ID token
@@ -57,13 +33,22 @@ export async function POST(request: NextRequest) {
           displayName: user.displayName,
           isDemoUser: false // Mark as real user
         }
-      });
+      }, { status: 201 });
 
     } catch (firebaseError: any) {
-      console.error('Firebase login error:', firebaseError);
+      console.error('Firebase signup error:', firebaseError);
+      
+      // Handle specific Firebase errors
+      if (firebaseError.code === 'auth/email-already-in-use') {
+        return NextResponse.json(
+          { success: false, error: 'Email already in use' },
+          { status: 409 }
+        );
+      }
+      
       return NextResponse.json(
-        { success: false, error: 'Invalid credentials' },
-        { status: 401 }
+        { success: false, error: 'Signup failed' },
+        { status: 400 }
       );
     }
 
@@ -75,7 +60,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error('Login error:', error);
+    console.error('Signup error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }

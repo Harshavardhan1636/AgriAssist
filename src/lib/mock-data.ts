@@ -1,5 +1,5 @@
 
-import type { AnalysisResult, CommunityOutbreak, StoreProduct, StoreLocation, WeatherForecast, SoilData, Conversation, ReviewQueueItem } from './types';
+import type { AnalysisResult, CommunityOutbreak, StoreProduct, StoreLocation, WeatherForecast, SoilData, Conversation, ReviewQueueItem, KnowledgeProblem, KnowledgeSolution, BestPractice, SuccessStory } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 
 const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id)?.imageUrl || `https://picsum.photos/seed/${id}/600/400`;
@@ -163,6 +163,14 @@ export const mockProducts: StoreProduct[] = [
     imageHint: getImageHint('product_neem_oil'),
     type: 'Organic Fungicide',
     isGovtApproved: true,
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 2.3, // kg CO2 equivalent per application
+      waterUsage: 500, // liters per hectare
+      biodiversityImpact: 'Positive'
+    },
+    isOrganic: true,
+    organicCertification: ' certified organic by Indian Organic Certification Agency'
   },
   {
     id: 'prod_002',
@@ -174,6 +182,14 @@ export const mockProducts: StoreProduct[] = [
     imageHint: getImageHint('product_trichoderma'),
     type: 'Organic Fungicide',
     isGovtApproved: true,
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 1.8, // kg CO2 equivalent per application
+      waterUsage: 300, // liters per hectare
+      biodiversityImpact: 'Positive'
+    },
+    isOrganic: true,
+    organicCertification: ' certified organic by Indian Organic Certification Agency'
   },
   {
     id: 'prod_003',
@@ -186,6 +202,13 @@ export const mockProducts: StoreProduct[] = [
     type: 'Chemical Fungicide',
     isGovtApproved: true,
     toxicity: 'Medium',
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 8.5, // kg CO2 equivalent per application
+      waterUsage: 800, // liters per hectare
+      biodiversityImpact: 'Negative'
+    },
+    isOrganic: false
   },
   {
     id: 'prod_004',
@@ -198,6 +221,13 @@ export const mockProducts: StoreProduct[] = [
     type: 'Chemical Fungicide',
     isGovtApproved: true,
     toxicity: 'Low',
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 6.2, // kg CO2 equivalent per application
+      waterUsage: 600, // liters per hectare
+      biodiversityImpact: 'Neutral'
+    },
+    isOrganic: false
   },
   {
     id: 'prod_005',
@@ -209,6 +239,14 @@ export const mockProducts: StoreProduct[] = [
     imageHint: getImageHint('product_beauveria'),
     type: 'Organic Insecticide',
     isGovtApproved: true,
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 2.1, // kg CO2 equivalent per application
+      waterUsage: 400, // liters per hectare
+      biodiversityImpact: 'Positive'
+    },
+    isOrganic: true,
+    organicCertification: ' certified organic by Indian Organic Certification Agency'
   },
   {
     id: 'prod_006',
@@ -220,6 +258,14 @@ export const mockProducts: StoreProduct[] = [
     imageHint: getImageHint('product_seaweed_extract'),
     type: 'Bio-stimulant',
     isGovtApproved: true,
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 3.7, // kg CO2 equivalent per application
+      waterUsage: 350, // liters per hectare
+      biodiversityImpact: 'Positive'
+    },
+    isOrganic: true,
+    organicCertification: ' certified organic by Indian Organic Certification Agency'
   },
   {
     id: 'prod_007',
@@ -231,6 +277,14 @@ export const mockProducts: StoreProduct[] = [
     imageHint: getImageHint('product_verticillium'),
     type: 'Organic Insecticide',
     isGovtApproved: true,
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 1.9, // kg CO2 equivalent per application
+      waterUsage: 380, // liters per hectare
+      biodiversityImpact: 'Positive'
+    },
+    isOrganic: true,
+    organicCertification: ' certified organic by Indian Organic Certification Agency'
   }
 ];
 
@@ -407,4 +461,310 @@ export const mockConversations: Conversation[] = [
             { sender: 'bot', text: 'Yes, Early Blight affects both potatoes and tomatoes, and the treatment methods are very similar. Good crop rotation, removing infected debris, and using fungicides like mancozeb or chlorothalonil are effective. For organic options, copper-based sprays are recommended.' },
         ]
     }
+];
+
+// Knowledge Sharing Platform Mock Data
+export const mockKnowledgeProblems: KnowledgeProblem[] = [
+  {
+    id: 'prob_001',
+    title: 'Tomato plants showing yellowing leaves',
+    description: 'My tomato plants are showing yellowing leaves starting from the bottom. What could be the issue?',
+    crop: 'Tomato',
+    location: 'Hyderabad, Telangana',
+    region: 'South India',
+    postedAt: '2024-07-15T10:30:00Z',
+    postedBy: 'anonymous_farmer_001',
+    isAnonymous: true,
+    category: 'Nutrition',
+    upvotes: 12,
+    downvotes: 2,
+    status: 'Solved',
+    views: 156,
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 15.5, // kg CO2 equivalent
+      waterUsage: 2500, // liters per plant
+      biodiversityImpact: 'Neutral'
+    },
+    organicTreatmentAlternatives: ['Compost application', 'Seaweed-based fertilizer', 'Neem cake']
+  },
+  {
+    id: 'prob_002',
+    title: 'Pests eating holes in potato leaves',
+    description: 'I am noticing holes in my potato leaves and some small insects. What are they and how can I control them organically?',
+    crop: 'Potato',
+    location: 'Nashik, Maharashtra',
+    region: 'West India',
+    postedAt: '2024-07-20T14:15:00Z',
+    postedBy: 'anonymous_farmer_002',
+    isAnonymous: true,
+    category: 'Pest',
+    upvotes: 8,
+    downvotes: 1,
+    status: 'Open',
+    views: 89,
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 12.3, // kg CO2 equivalent
+      waterUsage: 3200, // liters per plant
+      biodiversityImpact: 'Positive'
+    },
+    organicTreatmentAlternatives: ['Neem oil spray', 'Beneficial insect introduction', 'Handpicking']
+  },
+  {
+    id: 'prob_003',
+    title: 'Maize crop affected by heavy rains',
+    description: 'Heavy rains have affected my maize crop. Some plants are showing signs of rot. What should I do?',
+    crop: 'Maize',
+    location: 'Karnal, Haryana',
+    region: 'North India',
+    postedAt: '2024-07-22T09:45:00Z',
+    postedBy: 'anonymous_farmer_003',
+    isAnonymous: true,
+    category: 'Weather',
+    upvotes: 15,
+    downvotes: 0,
+    status: 'In Progress',
+    views: 203,
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 18.7, // kg CO2 equivalent
+      waterUsage: 4500, // liters per plant
+      biodiversityImpact: 'Negative'
+    },
+    organicTreatmentAlternatives: ['Improve drainage', 'Crop rotation', 'Organic fungicides']
+  },
+];
+
+export const mockKnowledgeSolutions: KnowledgeSolution[] = [
+  {
+    id: 'sol_001',
+    problemId: 'prob_001',
+    title: 'Solution for tomato yellowing leaves',
+    description: 'This is likely a nitrogen deficiency. Apply a balanced fertilizer with higher nitrogen content. Also, check for proper drainage as waterlogged soil can cause similar symptoms.',
+    postedAt: '2024-07-16T11:20:00Z',
+    postedBy: 'experienced_farmer_001',
+    isAnonymous: false,
+    upvotes: 18,
+    downvotes: 1,
+    verifiedByExpert: true,
+    expertId: 'expert_001',
+    expertName: 'Dr. Ramesh Kumar',
+    expertVerifiedAt: '2024-07-17T09:30:00Z',
+    helpfulCount: 15,
+    notHelpfulCount: 2,
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 8.2, // kg CO2 equivalent
+      waterUsage: 1200, // liters per plant
+      biodiversityImpact: 'Neutral'
+    },
+    organicTreatmentAlternatives: ['Compost application', 'Seaweed-based fertilizer'],
+    isOrganic: false
+  },
+  {
+    id: 'sol_002',
+    problemId: 'prob_001',
+    title: 'Organic solution for tomato yellowing',
+    description: 'Try adding compost or well-rotted manure to the soil. You can also use a seaweed-based fertilizer which provides micronutrients. Water consistently to avoid stress.',
+    postedAt: '2024-07-16T14:45:00Z',
+    postedBy: 'organic_farmer_001',
+    isAnonymous: true,
+    upvotes: 12,
+    downvotes: 0,
+    verifiedByExpert: false,
+    helpfulCount: 9,
+    notHelpfulCount: 1,
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 2.1, // kg CO2 equivalent
+      waterUsage: 800, // liters per plant
+      biodiversityImpact: 'Positive'
+    },
+    organicTreatmentAlternatives: ['Compost application', 'Seaweed-based fertilizer', 'Neem cake'],
+    isOrganic: true
+  },
+  {
+    id: 'sol_003',
+    problemId: 'prob_002',
+    title: 'Control potato pests organically',
+    description: 'These are likely potato beetles. You can handpick them in the early morning. Neem oil spray or a mixture of soap and water can help. Introduce beneficial insects like ladybugs.',
+    postedAt: '2024-07-21T10:30:00Z',
+    postedBy: 'pest_control_expert_001',
+    isAnonymous: false,
+    upvotes: 9,
+    downvotes: 0,
+    verifiedByExpert: true,
+    expertId: 'expert_002',
+    expertName: 'Dr. Priya Sharma',
+    expertVerifiedAt: '2024-07-21T15:45:00Z',
+    helpfulCount: 7,
+    notHelpfulCount: 0,
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 1.8, // kg CO2 equivalent
+      waterUsage: 500, // liters per plant
+      biodiversityImpact: 'Positive'
+    },
+    organicTreatmentAlternatives: ['Neem oil spray', 'Beneficial insect introduction', 'Handpicking'],
+    isOrganic: true
+  },
+];
+
+export const mockBestPractices: BestPractice[] = [
+  {
+    id: 'bp_001',
+    title: 'Intercropping for pest control',
+    description: 'Planting marigold around tomato plants helps repel nematodes and other pests. This traditional practice has been validated by many farmers in South India.',
+    region: 'South India',
+    crop: 'Tomato',
+    category: 'Pest',
+    postedAt: '2024-06-10T08:00:00Z',
+    postedBy: 'traditional_farmer_001',
+    upvotes: 42,
+    downvotes: 2,
+    verifiedByExpert: true,
+    expertId: 'expert_003',
+    expertName: 'Dr. Suresh Reddy',
+    expertVerifiedAt: '2024-06-15T11:30:00Z',
+    successRate: 85,
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 3.5, // kg CO2 equivalent
+      waterUsage: 1800, // liters per plant
+      biodiversityImpact: 'Positive'
+    },
+    organicTreatmentAlternatives: ['Marigold intercropping', 'Neem-based pesticides'],
+    isOrganic: true,
+    waterConservationTechnique: 'Mulching'
+  },
+  {
+    id: 'bp_002',
+    title: 'Drip irrigation for water conservation',
+    description: 'Using drip irrigation in potato farming can save up to 40% water while maintaining yield. Install pipes with emitters near the root zone.',
+    region: 'West India',
+    crop: 'Potato',
+    category: 'Other',
+    postedAt: '2024-05-22T14:20:00Z',
+    postedBy: 'progressive_farmer_001',
+    upvotes: 38,
+    downvotes: 1,
+    verifiedByExpert: true,
+    expertId: 'expert_004',
+    expertName: 'Dr. Anil Patel',
+    expertVerifiedAt: '2024-05-28T09:15:00Z',
+    successRate: 92,
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 5.2, // kg CO2 equivalent
+      waterUsage: 1200, // liters per plant
+      biodiversityImpact: 'Neutral'
+    },
+    organicTreatmentAlternatives: ['Organic fertilizers with drip system'],
+    isOrganic: false,
+    waterConservationTechnique: 'Drip irrigation'
+  },
+  {
+    id: 'bp_003',
+    title: 'Soil preparation for maize',
+    description: 'Deep plowing followed by two harrowings helps create a fine tilth for maize. Add well-decomposed farmyard manure at 10-15 tons per hectare before sowing.',
+    region: 'North India',
+    crop: 'Maize',
+    category: 'Soil',
+    postedAt: '2024-04-18T11:45:00Z',
+    postedBy: 'seasoned_farmer_001',
+    upvotes: 56,
+    downvotes: 0,
+    verifiedByExpert: true,
+    expertId: 'expert_005',
+    expertName: 'Dr. Rajesh Singh',
+    expertVerifiedAt: '2024-04-22T16:30:00Z',
+    successRate: 88,
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 12.8, // kg CO2 equivalent
+      waterUsage: 3500, // liters per plant
+      biodiversityImpact: 'Neutral'
+    },
+    organicTreatmentAlternatives: ['Farmyard manure', 'Green manuring'],
+    isOrganic: true,
+    waterConservationTechnique: 'Contour farming'
+  },
+];
+
+export const mockSuccessStories: SuccessStory[] = [
+  {
+    id: 'ss_001',
+    title: 'Tripling tomato yield with organic methods',
+    description: 'By implementing integrated pest management and organic fertilization, I was able to triple my tomato yield while reducing costs.',
+    farmerName: 'Rajesh Kumar',
+    location: 'Bangalore, Karnataka',
+    region: 'South India',
+    crop: 'Tomato',
+    problem: 'Low yield and high pesticide costs',
+    solution: 'Switched to organic farming with neem-based pesticides and compost',
+    beforeYield: 8,
+    afterYield: 24,
+    yieldImprovement: 200,
+    costSavings: 45,
+    timePeriod: '6 months',
+    postedAt: '2024-07-01T12:00:00Z',
+    upvotes: 89,
+    downvotes: 2,
+    verifiedByExpert: true,
+    expertId: 'expert_006',
+    expertName: 'Dr. Meena Desai',
+    expertVerifiedAt: '2024-07-05T10:30:00Z',
+    images: [
+      getImage('success_story_1_before'),
+      getImage('success_story_1_after'),
+    ],
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 4.3, // kg CO2 equivalent
+      waterUsage: 1500, // liters per plant
+      biodiversityImpact: 'Positive'
+    },
+    organicTreatmentAlternatives: ['Neem-based pesticides', 'Compost', 'Beneficial insects'],
+    isOrganic: true,
+    waterConservationTechnique: 'Mulching',
+    biodiversityImpactDescription: 'Increased beneficial insect population by 40%'
+  },
+  {
+    id: 'ss_002',
+    title: 'Drip irrigation saves water and increases potato yield',
+    description: 'Installing drip irrigation system helped me save water and get better yields in my potato farm.',
+    farmerName: 'Anil Patel',
+    location: 'Ahmedabad, Gujarat',
+    region: 'West India',
+    crop: 'Potato',
+    problem: 'Water scarcity and inconsistent yields',
+    solution: 'Installed drip irrigation system with fertigation',
+    beforeYield: 15,
+    afterYield: 25,
+    yieldImprovement: 67,
+    costSavings: 30,
+    timePeriod: '1 year',
+    postedAt: '2024-06-15T09:30:00Z',
+    upvotes: 76,
+    downvotes: 1,
+    verifiedByExpert: true,
+    expertId: 'expert_007',
+    expertName: 'Dr. Vijay Shah',
+    expertVerifiedAt: '2024-06-20T14:45:00Z',
+    images: [
+      getImage('success_story_2_before'),
+      getImage('success_story_2_after'),
+    ],
+    // Environmental metrics
+    environmentalImpact: {
+      carbonFootprint: 6.7, // kg CO2 equivalent
+      waterUsage: 2200, // liters per plant
+      biodiversityImpact: 'Neutral'
+    },
+    organicTreatmentAlternatives: ['Organic fertilizers with drip system'],
+    isOrganic: false,
+    waterConservationTechnique: 'Drip irrigation',
+    biodiversityImpactDescription: 'No significant change in biodiversity'
+  },
 ];

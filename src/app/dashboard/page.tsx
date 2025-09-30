@@ -119,49 +119,59 @@ export default function DashboardPage() {
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>{t('High-Risk Alert: Tomato Late Blight')}</AlertTitle>
           <AlertDescription>
-            {t("High humidity forecasted. Your tomato crops are at immediate risk. Review preventive actions now.")}
+            <span>
+              {t("High humidity forecasted. Your tomato crops are at immediate risk. Review preventive actions now.")}
+            </span>
           </AlertDescription>
        </Alert>
        
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('Total Scans')}</CardTitle>
+            <div>
+              <CardTitle className="text-sm font-medium">{t('Total Scans')}</CardTitle>
+              <p className="text-xs text-muted-foreground">{t('+20.1% from last month')}</p>
+            </div>
             <FlaskConical className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{loading ? <Skeleton className="h-6 w-16" /> : totalScans.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">{t('+20.1% from last month')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('High-Risk Alerts')}</CardTitle>
+            <div>
+              <CardTitle className="text-sm font-medium">{t('High-Risk Alerts')}</CardTitle>
+              <p className="text-xs text-muted-foreground">{t('+12 since last week')}</p>
+            </div>
             <ShieldAlert className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{loading ? <Skeleton className="h-6 w-8" /> : highRiskAlerts}</div>
-            <p className="text-xs text-muted-foreground">{t('+12 since last week')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('Pending Reviews')}</CardTitle>
+            <div>
+              <CardTitle className="text-sm font-medium">{t('Pending Reviews')}</CardTitle>
+              <p className="text-xs text-muted-foreground">{t('2 new today')}</p>
+            </div>
             <ClipboardCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{loading ? <Skeleton className="h-6 w-8" /> : pendingReviews}</div>
-            <p className="text-xs text-muted-foreground">{t('2 new today')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('Weekly Detections')}</CardTitle>
+            <div>
+              <CardTitle className="text-sm font-medium">{t('Weekly Detections')}</CardTitle>
+              <p className="text-xs text-muted-foreground">{t('Total for this week')}</p>
+            </div>
             <BarChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{loading ? <Skeleton className="h-6 w-8" /> : weeklyDetections}</div>
-            <p className="text-xs text-muted-foreground">{t('Total for this week')}</p>
           </CardContent>
         </Card>
       </div>
@@ -170,11 +180,13 @@ export default function DashboardPage() {
         <CardHeader>
             <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2'>
                 <div>
-                    <CardTitle>{t('7-Day Forecast')}</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                      {t('7-Day Forecast')}
+                    </CardTitle>
                     <CardDescription>{t('Minimal weather forecast for the upcoming week.')}</CardDescription>
                 </div>
-                 <Button asChild size="sm" variant="outline">
-                    <Link href="/dashboard/forecast">{t('View Detailed Forecast')}</Link>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/dashboard/forecast">{t('View Detailed Forecast')}</Link>
                 </Button>
             </div>
         </CardHeader>
@@ -198,7 +210,9 @@ export default function DashboardPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         <Card className="lg:col-span-4">
           <CardHeader>
-            <CardTitle>{t('Detections This Week')}</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>{t('Detections This Week')}</CardTitle>
+            </div>
           </CardHeader>
           <CardContent className="pl-2">
             <div className="overflow-x-auto">
@@ -217,12 +231,14 @@ export default function DashboardPage() {
               <CardTitle>{t('Recent Analyses')}</CardTitle>
               <CardDescription>{t('Recent disease and pest analyses from your farm.')}</CardDescription>
             </div>
-            <Button asChild size="sm" className="ml-auto gap-1">
-              <Link href="/dashboard/history">
-                {t('View All')}
-                <ArrowUpRight className="h-4 w-4" />
-              </Link>
-            </Button>
+            <div className="flex gap-2 ml-auto">
+              <Button asChild size="sm" className="gap-1">
+                <Link href="/dashboard/history">
+                  {t('View All')}
+                  <ArrowUpRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="overflow-x-auto">
             {loading ? (

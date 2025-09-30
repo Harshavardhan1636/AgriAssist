@@ -11,17 +11,28 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function LoginPage() {
-    const [email, setEmail] = useState('demo@agriassist.com');
-    const [password, setPassword] = useState('demo123');
+export default function SignupPage() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    const { login } = useAuth();
+    const { signup } = useAuth();
     const router = useRouter();
 
-    const handleLogin = async () => {
+    const handleSignup = async () => {
         if (!email || !password) {
             setError('Please enter both email and password');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters');
             return;
         }
 
@@ -29,12 +40,12 @@ export default function LoginPage() {
         setError('');
 
         try {
-            const result = await login(email, password);
+            const result = await signup(email, password);
             
             if (result.success) {
                 router.push('/dashboard');
             } else {
-                setError(result.error || 'Login failed');
+                setError(result.error || 'Signup failed');
             }
         } catch (error) {
             setError('An unexpected error occurred');
@@ -45,7 +56,7 @@ export default function LoginPage() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        handleLogin();
+        handleSignup();
     };
 
     return (
@@ -56,7 +67,7 @@ export default function LoginPage() {
                         <Leaf className="h-8 w-8 text-primary" />
                         <CardTitle className="text-3xl">AgriAssist</CardTitle>
                     </div>
-                    <CardDescription>Enter your email below to login to your account</CardDescription>
+                    <CardDescription>Create a new account</CardDescription>
                 </CardHeader>
                 <form onSubmit={handleSubmit}>
                     <CardContent className="grid gap-4">
@@ -72,7 +83,7 @@ export default function LoginPage() {
                             <Input 
                                 id="email" 
                                 type="email" 
-                                placeholder="demo@agriassist.com" 
+                                placeholder="your.email@example.com" 
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 disabled={isLoading}
@@ -90,8 +101,16 @@ export default function LoginPage() {
                                 required
                             />
                         </div>
-                        <div className="text-center text-sm text-muted-foreground">
-                            Demo credentials: demo@agriassist.com / demo123
+                        <div className="grid gap-2">
+                            <Label htmlFor="confirmPassword">Confirm Password</Label>
+                            <Input 
+                                id="confirmPassword" 
+                                type="password" 
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                disabled={isLoading}
+                                required
+                            />
                         </div>
                     </CardContent>
                     <CardFooter className="flex flex-col gap-4">
@@ -99,16 +118,22 @@ export default function LoginPage() {
                             {isLoading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Signing in...
+                                    Creating account...
                                 </>
                             ) : (
-                                'Sign in'
+                                'Sign up'
                             )}
                         </Button>
                         <div className="text-center text-sm text-muted-foreground">
-                            Don't have an account?{' '}
-                            <Link href="/signup" className="text-primary hover:underline">
-                                Sign up
+                            Already have an account?{' '}
+                            <Link href="/login" className="text-primary hover:underline">
+                                Sign in
+                            </Link>
+                        </div>
+                        <div className="text-center text-sm text-muted-foreground">
+                            Or continue with{' '}
+                            <Link href="/login" className="text-primary hover:underline">
+                                demo account
                             </Link>
                         </div>
                     </CardFooter>

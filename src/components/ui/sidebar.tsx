@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -13,6 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
 
 type SidebarContextProps = {
   isMobile: boolean;
@@ -132,9 +132,13 @@ type SidebarMenuLinkProps = {
     label: string;
     icon: React.ElementType;
     isMobile?: boolean;
+    badge?: string;
 };
 
-export const SidebarMenuLink = ({ href, label, icon: Icon, isMobile = false }: SidebarMenuLinkProps) => {
+export const SidebarMenuLink = React.forwardRef<
+  HTMLAnchorElement,
+  SidebarMenuLinkProps
+>(({ href, label, icon: Icon, isMobile = false, badge }: SidebarMenuLinkProps, ref) => {
     const pathname = usePathname();
     const { isCollapsed } = useSidebar();
     const isActive = pathname === href;
@@ -146,25 +150,35 @@ export const SidebarMenuLink = ({ href, label, icon: Icon, isMobile = false }: S
       return (
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>
-            <Link href={href}>
+            <Link href={href} className="relative" ref={ref}>
               <Button
                 variant={isActive ? 'secondary' : 'ghost'}
                 size="icon"
                 className="h-12 w-12 rounded-lg"
               >
                 <Icon className="h-5 w-5" />
+                {badge && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                    {badge}
+                  </Badge>
+                )}
               </Button>
             </Link>
           </TooltipTrigger>
           <TooltipContent side="right" className="flex items-center gap-4">
             <p>{label}</p>
+            {badge && (
+              <Badge className="h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                {badge}
+              </Badge>
+            )}
           </TooltipContent>
         </Tooltip>
       );
     }
   
     return (
-      <Link href={href}>
+      <Link href={href} className="relative" ref={ref}>
         <Button
           variant={isActive ? 'secondary' : 'ghost'}
           size="default"
@@ -172,7 +186,13 @@ export const SidebarMenuLink = ({ href, label, icon: Icon, isMobile = false }: S
         >
           <Icon className="h-5 w-5" />
           <span>{label}</span>
+          {badge && (
+            <Badge className="ml-auto h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+              {badge}
+            </Badge>
+          )}
         </Button>
       </Link>
     );
-};
+});
+SidebarMenuLink.displayName = 'SidebarMenuLink';

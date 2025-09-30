@@ -82,6 +82,8 @@ const ForecastOutbreakRiskInputSchema = z.object({
   cropType: z.string().describe('Type of crop.'),
   soilType: z.string().describe('Type of soil.'),
   language: z.string().optional().describe('The language for the output, as a two-letter ISO 639-1 code (e.g., "en", "hi").'),
+  // Environmental considerations
+  biodiversityImpact: z.string().optional().describe('Biodiversity impact assessment for the farming practices.'),
 });
 export type ForecastOutbreakRiskInput = z.infer<typeof ForecastOutbreakRiskInputSchema>;
 
@@ -98,6 +100,7 @@ const ForecastOutbreakRiskOutputSchema = z.object({
   preventiveActions: z
     .array(z.string())
     .describe('A list of clear, actionable preventive actions to mitigate the outbreak risk based on the forecast.'),
+  biodiversityImpactAssessment: z.string().optional().describe('Assessment of the impact of preventive actions on local biodiversity.')
 });
 export type ForecastOutbreakRiskOutput = z.infer<typeof ForecastOutbreakRiskOutputSchema>;
 
@@ -121,11 +124,13 @@ const prompt = ai.definePrompt({
   - 14-Day Avg Weather: Temperature={{{weatherFeatures.temperature}}}°C, Humidity={{{weatherFeatures.humidity}}}%, Rainfall={{{weatherFeatures.rainfall}}}mm
   - Soil Type: {{{soilType}}}
   - Historical Detections (last 14 days): {{{historicalDetections}}}
+  - Biodiversity Impact: {{{biodiversityImpact}}}
 
   Your Task:
   1.  **Calculate a Risk Score:** Provide a risk score between 0 and 1, representing the probability of a significant outbreak in the next 7-14 days.
   2.  **Provide a Detailed Explanation:** Explain the "why" behind the score. Mention how the forecasted weather (humidity, temperature) and the specified '{{{soilType}}}' (e.g., clay soil retains moisture, increasing fungal risk) specifically favors or disfavors the growth and spread of the identified '{{{disease}}}' on '{{{cropType}}}'.
   3.  **Suggest Preventive Actions:** Provide a list of 3-4 clear, simple, and actionable steps the farmer can take *before* the outbreak gets worse, based on the forecast and soil type. Prioritize cultural and organic methods.
+  4.  **Assess Biodiversity Impact:** Evaluate how the preventive actions will affect local biodiversity, including beneficial insects, soil microorganisms, and wildlife.
 
   Example Preventive Actions:
   - "With rain expected in your clay soil, ensure good field drainage to avoid waterlogging, which helps spread blight."
@@ -133,6 +138,11 @@ const prompt = ai.definePrompt({
   - "Avoid overhead watering in the evenings to keep leaves dry overnight."
   - "Proactively spray with a Neem oil solution before the forecasted rain."
   - "Monitor fields daily, especially after the rain stops."
+
+  Example Biodiversity Impact Assessment:
+  - "Neem oil is organic and safe for beneficial insects when applied correctly."
+  - "Pruning lower leaves may temporarily reduce habitat for ground-dwelling beneficial insects."
+  - "Proper drainage will support soil microorganism health by preventing waterlogging."
 `,
 });
 

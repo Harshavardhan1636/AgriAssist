@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -11,12 +10,12 @@ import {
   SidebarMenuLink,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { Leaf, LayoutDashboard, History, FlaskConical, LifeBuoy, Settings, Users, ChevronLeft, ShoppingCart, Cloudy, MessageSquare } from 'lucide-react';
+import { Leaf, LayoutDashboard, History, FlaskConical, LifeBuoy, Users, ChevronLeft, Cloudy, MessageSquare, Sprout, ShoppingCart, Share2 } from 'lucide-react';
 import Link from 'next/link';
 import { useI18n } from '@/context/i18n-context';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
-
+import { useEffect, useState } from 'react';
 
 const SidebarToggle = () => {
     const { isCollapsed, setIsCollapsed } = useSidebar();
@@ -42,23 +41,37 @@ const SidebarToggle = () => {
     );
 }
 
-
 export default function AppSidebar({isMobile = false}: {isMobile?: boolean}) {
-    const { t } = useI18n();
+    const { t, locale } = useI18n();
     const { isCollapsed } = useSidebar();
-  
-    const menuItems = [
+    const [menuItems, setMenuItems] = useState([
       { href: '/dashboard', label: t('Dashboard'), icon: LayoutDashboard },
       { href: '/dashboard/analyze', label: t('New Analysis'), icon: FlaskConical },
       { href: '/dashboard/history', label: t('History'), icon: History },
       { href: '/dashboard/conversations', label: t('AI Conversations'), icon: MessageSquare },
       { href: '/dashboard/forecast', label: t('Forecast'), icon: Cloudy },
+      { href: '/dashboard/crop-planning', label: t('Crop Planning'), icon: Sprout },
       { href: '/dashboard/store', label: t('Store'), icon: ShoppingCart },
       { href: '/dashboard/community', label: t('Community Outbreak Alerts'), icon: Users },
+      { href: '/dashboard/knowledge-sharing', label: t('Knowledge Sharing'), icon: Share2 },
       { href: '/dashboard/review', label: t('Review Queue'), icon: LifeBuoy },
-    ];
-  
-    const settingsItem = { href: '/dashboard/settings', label: t('Settings'), icon: Settings };
+    ]);
+
+    // Update menu items when locale changes
+    useEffect(() => {
+      setMenuItems([
+        { href: '/dashboard', label: t('Dashboard'), icon: LayoutDashboard },
+        { href: '/dashboard/analyze', label: t('New Analysis'), icon: FlaskConical },
+        { href: '/dashboard/history', label: t('History'), icon: History },
+        { href: '/dashboard/conversations', label: t('AI Conversations'), icon: MessageSquare },
+        { href: '/dashboard/forecast', label: t('Forecast'), icon: Cloudy },
+        { href: '/dashboard/crop-planning', label: t('Crop Planning'), icon: Sprout },
+        { href: '/dashboard/store', label: t('Store'), icon: ShoppingCart },
+        { href: '/dashboard/community', label: t('Community Outbreak Alerts'), icon: Users },
+        { href: '/dashboard/knowledge-sharing', label: t('Knowledge Sharing'), icon: Share2 },
+        { href: '/dashboard/review', label: t('Review Queue'), icon: LifeBuoy },
+      ]);
+    }, [t, locale]);
 
     return (
     <Sidebar isMobile={isMobile}>
@@ -71,7 +84,7 @@ export default function AppSidebar({isMobile = false}: {isMobile?: boolean}) {
         <SidebarContent>
         <SidebarMenu>
             {menuItems.map((item) => (
-            <SidebarMenuItem key={item.label}>
+            <SidebarMenuItem key={item.href}>
                 <SidebarMenuLink 
                     href={item.href}
                     label={item.label}
@@ -83,16 +96,6 @@ export default function AppSidebar({isMobile = false}: {isMobile?: boolean}) {
         </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
-        <SidebarMenu>
-            <SidebarMenuItem>
-                <SidebarMenuLink 
-                    href={settingsItem.href}
-                    label={settingsItem.label}
-                    icon={settingsItem.icon}
-                    isMobile={isMobile}
-                />
-            </SidebarMenuItem>
-        </SidebarMenu>
         <SidebarToggle />
         </SidebarFooter>
     </Sidebar>

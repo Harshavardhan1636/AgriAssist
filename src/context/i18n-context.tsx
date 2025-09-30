@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -23,21 +22,54 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   // Effect to run only on the client
   useEffect(() => {
-    const browserLang = navigator.language.split('-')[0];
-    if (translations[browserLang]) {
-      setLocale(browserLang);
+    // Check for saved language preference
+    const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('preferredLanguage') : null;
+    const autoTranslateEnabled = typeof window !== 'undefined' ? localStorage.getItem('autoTranslateEnabled') === 'true' : true;
+    
+    if (savedLanguage && autoTranslateEnabled && translations[savedLanguage]) {
+      setLocale(savedLanguage);
+    } else {
+      // Fallback to browser language
+      const browserLang = navigator.language.split('-')[0];
+      if (translations[browserLang]) {
+        setLocale(browserLang);
+      }
     }
   }, []);
 
   const t = (key: string): string => {
+    // Handle empty or invalid keys
+    if (!key || typeof key !== 'string') {
+      return '';
+    }
+    
     // Fallback to English if the key is not found in the current locale
     const messages = translations[locale] || translations.en;
-    return messages[key] || key;
+    
+    // If the key doesn't exist in the current language, fallback to English
+    if (!messages[key]) {
+      console.warn(`Translation key "${key}" not found for locale "${locale}", falling back to English`);
+      return translations.en[key] || key;
+    }
+    
+    return messages[key];
   };
 
   const value = {
     locale,
-    setLocale,
+    setLocale: (newLocale: string) => {
+      // Validate that the locale exists
+      if (translations[newLocale]) {
+        setLocale(newLocale);
+        // Save the preference to localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('preferredLanguage', newLocale);
+          localStorage.setItem('autoTranslateEnabled', 'true');
+        }
+      } else {
+        console.warn(`Unsupported locale: ${newLocale}`);
+      }
+    },
     t,
   };
 

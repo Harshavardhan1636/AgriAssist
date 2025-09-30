@@ -1,126 +1,174 @@
-
 'use client';
 
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { useI18n } from "@/context/i18n-context"
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useI18n } from '@/context/i18n-context';
+import { useTheme } from 'next-themes';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { UserNav } from "@/components/user-nav";
-import { useTheme } from "next-themes";
-import { useAuth } from "@/context/auth-context";
-
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Palette, Languages } from 'lucide-react';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+import Image from 'next/image';
 
 export default function SettingsPage() {
   const { t, locale, setLocale } = useI18n();
   const { theme, setTheme } = useTheme();
-  const { logout } = useAuth();
+  const [notifications, setNotifications] = useState(true);
+  const [autoTranslate, setAutoTranslate] = useState(true); // Set to true by default
 
-  const languages = [
-    { code: 'en', name: 'English' },
-    { code: 'hi', name: 'हिंदी' },
-    { code: 'te', name: 'తెలుగు' },
-    { code: 'ta', name: 'தமிழ்' },
-    { code: 'ml', name: 'മലയാളം' },
-  ];
+  const userAvatar = PlaceHolderImages.find(img => img.id === 'user_avatar');
+
+  const handleLanguageChange = (newLocale: string) => {
+    setLocale(newLocale);
+    // Store the preference in localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('preferredLanguage', newLocale);
+      localStorage.setItem('autoTranslateEnabled', 'true');
+    }
+  };
+
+  // Load saved preferences
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedLanguage = localStorage.getItem('preferredLanguage');
+      const autoTranslateEnabled = localStorage.getItem('autoTranslateEnabled') === 'true';
+      
+      if (savedLanguage) {
+        setLocale(savedLanguage);
+      }
+      
+      setAutoTranslate(autoTranslateEnabled);
+    }
+  }, [setLocale]);
 
   return (
-    <div className="grid gap-6">
-       <div className="flex items-center gap-4">
-          <h1 className="text-3xl font-semibold">{t('Settings')}</h1>
+    <div className="grid gap-8">
+      <div className="flex items-center gap-4">
+        <h1 className="text-3xl font-semibold">{t('Settings')}</h1>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('My Profile')}</CardTitle>
-          <CardDescription>{t('Update your personal information.')}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-            <div className="flex items-center space-x-4">
-                <UserNav />
-                <div className="space-y-2 w-full max-w-sm">
-                    <Label htmlFor="name">{t('Name')}</Label>
-                    <Input id="name" defaultValue="Agronomist" />
-                </div>
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="email">{t('Email')}</Label>
-                <Input id="email" type="email" defaultValue="agro@agriassist.com" disabled />
-            </div>
-        </CardContent>
-        <CardFooter className="border-t px-6 py-4">
-          <Button>{t('Save')}</Button>
-        </CardFooter>
-      </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('Appearance')}</CardTitle>
-          <CardDescription>{t('Customize the look and feel of the application.')}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Appearance Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Palette className="h-5 w-5" />
+              {t('Appearance')}
+            </CardTitle>
+            <CardDescription>{t('Customize the look and feel of the application.')}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
-                <div>
-                    <Label htmlFor="dark-mode" className="font-medium">{t('Dark Mode')}</Label>
-                    <p className="text-sm text-muted-foreground">{t('Toggle between light and dark themes.')}</p>
-                </div>
-                <Switch 
-                  id="dark-mode" 
-                  checked={theme === 'dark'}
-                  onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
-                />
+              <div>
+                <h3 className="font-medium">{t('Theme')}</h3>
+                <p className="text-sm text-muted-foreground">{t('Select the theme for the application.')}</p>
+              </div>
+              <Select value={theme} onValueChange={setTheme}>
+                <SelectTrigger className="w-[120px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light">{t('Light')}</SelectItem>
+                  <SelectItem value="dark">{t('Dark')}</SelectItem>
+                  <SelectItem value="system">{t('System')}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="space-y-2">
-                <Label htmlFor="language">{t('Language')}</Label>
-                 <Select value={locale} onValueChange={setLocale}>
-                    <SelectTrigger className="w-full sm:w-[280px]">
-                        <SelectValue placeholder={t('Select a language')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {languages.map((lang) => (
-                          <SelectItem key={lang.code} value={lang.code}>
-                            {lang.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                 <p className="text-sm text-muted-foreground">{t('Choose your preferred language for the interface.')}</p>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-medium">{t('Notifications')}</h3>
+                <p className="text-sm text-muted-foreground">{t('Enable or disable notifications.')}</p>
+              </div>
+              <Switch
+                checked={notifications}
+                onCheckedChange={setNotifications}
+              />
             </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('Account')}</CardTitle>
-          <CardDescription>{t('Manage your account settings.')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <Button variant="outline" onClick={logout}>{t('Log out')}</Button>
-        </CardContent>
-         <CardFooter className="border-t px-6 py-4">
-            <div className="flex items-center justify-between w-full">
-                <div>
-                    <p className="font-medium">{t('Delete Account')}</p>
-                    <p className="text-sm text-muted-foreground">{t('Permanently delete your account and all associated data.')}</p>
-                </div>
-                <Button variant="destructive">{t('Delete Account')}</Button>
+        {/* Language Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Languages className="h-5 w-5" />
+              {t('Language & Region')}
+            </CardTitle>
+            <CardDescription>{t('Configure language and regional settings.')}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-medium">{t('Language')}</h3>
+                <p className="text-sm text-muted-foreground">{t('Select your preferred language.')}</p>
+              </div>
+              <Select value={locale} onValueChange={handleLanguageChange}>
+                <SelectTrigger className="w-[120px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="hi">हिंदी</SelectItem>
+                  <SelectItem value="te">తెలుగు</SelectItem>
+                  <SelectItem value="ta">தமிழ்</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-        </CardFooter>
-      </Card>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-medium">{t('Auto-translate')}</h3>
+                <p className="text-sm text-muted-foreground">{t('Automatically translate content.')}</p>
+              </div>
+              <Switch
+                checked={autoTranslate}
+                onCheckedChange={(checked) => {
+                  setAutoTranslate(checked);
+                  if (typeof window !== 'undefined') {
+                    localStorage.setItem('autoTranslateEnabled', checked.toString());
+                  }
+                }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Account Information */}
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>{t('Account Information')}</CardTitle>
+            <CardDescription>{t('Manage your account details and preferences.')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-4">
+              <div className="relative h-16 w-16">
+                <Image
+                  src={userAvatar?.imageUrl || ''}
+                  alt="User Avatar"
+                  fill
+                  className="rounded-full object-cover"
+                  data-ai-hint={userAvatar?.imageHint}
+                />
+              </div>
+              <div>
+                <h3 className="font-medium">Agronomist</h3>
+                <p className="text-sm text-muted-foreground">agro@agriassist.com</p>
+                <Button variant="link" className="p-0 h-auto text-sm">
+                  {t('Change Password')}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
-  )
+  );
 }

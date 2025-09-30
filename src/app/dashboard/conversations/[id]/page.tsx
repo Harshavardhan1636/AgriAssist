@@ -7,15 +7,18 @@ import type { ChatMessage } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Bot, User, Send, ArrowLeft, Paperclip, X, Mic, Square } from 'lucide-react';
+import { Bot, User, Send, ArrowLeft, Paperclip, X, Mic, Square, Volume2, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import { speakText, stopSpeech } from '@/lib/tts-utils';
+import { useAuth } from '@/context/auth-context';
 
 export default function ConversationDetailPage() {
-    const { t } = useI18n();
+    const { t, locale } = useI18n();
     const params = useParams();
     const router = useRouter();
     const { toast } = useToast();
+    const { isDemoUser } = useAuth(); // Get demo user status
     
     const id = params.id as string;
     
@@ -24,6 +27,8 @@ export default function ConversationDetailPage() {
     const [isAsking, setIsAsking] = useState(false);
     const [conversation, setConversation] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [autoSpeak, setAutoSpeak] = useState(false);
+    const [isDemoData, setIsDemoData] = useState(false);
     
     // Voice recording states
     const [isRecording, setIsRecording] = useState(false);
@@ -38,7 +43,7 @@ export default function ConversationDetailPage() {
             recognitionRef.current = new SpeechRecognition();
             recognitionRef.current.continuous = false;
             recognitionRef.current.interimResults = false;
-            recognitionRef.current.lang = 'en-US'; // Default language
+            recognitionRef.current.lang = locale || 'en-US';
             
             recognitionRef.current.onresult = (event: any) => {
                 const transcript = event.results[0][0].transcript;
@@ -61,57 +66,110 @@ export default function ConversationDetailPage() {
             };
         }
         
-        // Load conversation from localStorage
-        try {
-            const conversationsKey = 'agriassist_ai_conversations';
-            const storedConversations = JSON.parse(localStorage.getItem(conversationsKey) || '[]');
-            const foundConversation = storedConversations.find((c: any) => c.id === id);
-            
-            if (foundConversation) {
-                setConversation(foundConversation);
-                setChatHistory(foundConversation.messages || []);
-            } else {
-                console.error("Conversation not found in localStorage");
-            }
-        } catch (error) {
-            console.error("Error loading conversation:", error);
-        } finally {
-            setIsLoading(false);
-        }
+        // Load conversation based on user type
+        loadConversation();
         
         // Cleanup function
         return () => {
             if (recognitionRef.current) {
                 recognitionRef.current.stop();
             }
+            // Stop any ongoing speech when component unmounts
+            stopSpeech();
         };
-    }, [id, t, toast]);
+    }, [id, t, toast, locale, isDemoUser]);
 
-    // Update conversation in localStorage whenever chatHistory changes
-    useEffect(() => {
-        if (id && chatHistory.length > 0 && conversation) {
-            try {
-                const conversationsKey = 'agriassist_ai_conversations';
-                const existingConversations = JSON.parse(localStorage.getItem(conversationsKey) || '[]');
-                
-                // Update the specific conversation
-                const updatedConversations = existingConversations.map((c: any) => {
-                    if (c.id === id) {
-                        return {
-                            ...c,
-                            messages: chatHistory,
-                            lastUpdated: new Date().toISOString()
-                        };
+    const loadConversation = async () => {
+        setIsLoading(true);
+        try {
+            if (isDemoUser) {
+                // Load conversation from localStorage for demo users
+                try {
+                    const conversationsKey = 'agriassist_ai_conversations';
+                    const storedConversations = JSON.parse(localStorage.getItem(conversationsKey) || '[]');
+                    const foundConversation = storedConversations.find((c: any) => c.id === id);
+                    
+                    if (foundConversation) {
+                        setConversation(foundConversation);
+                        setChatHistory(foundConversation.messages || []);
+                        setIsDemoData(true);
+                    } else {
+                        console.error("Conversation not found in localStorage");
                     }
-                    return c;
-                });
-                
-                localStorage.setItem(conversationsKey, JSON.stringify(updatedConversations));
-            } catch (error) {
-                console.warn('Failed to update conversation in localStorage:', error);
+                } catch (error) {
+                    console.error("Error loading conversation from localStorage:", error);
+                }
+            } else {
+                // For real users, we would fetch from API
+                // This is a placeholder for real implementation
+                try {
+                    const conversationsKey = 'agriassist_ai_conversations';
+                    const storedConversations = JSON.parse(localStorage.getItem(conversationsKey) || '[]');
+                    const foundConversation = storedConversations.find((c: any) => c.id === id);
+                    
+                    if (foundConversation) {
+                        setConversation(foundConversation);
+                        setChatHistory(foundConversation.messages || []);
+                        setIsDemoData(false);
+                    } else {
+                        console.error("Conversation not found");
+                    }
+                } catch (error) {
+                    console.error("Error loading conversation:", error);
+                }
+            }
+        } catch (error) {
+            console.error("Error loading conversation:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Auto-speak new AI responses when autoSpeak is enabled
+    useEffect(() => {
+        if (autoSpeak && chatHistory.length > 0) {
+            const lastMessage = chatHistory[chatHistory.length - 1];
+            if (lastMessage.sender === 'bot') {
+                // Small delay to ensure the UI is updated
+                setTimeout(() => {
+                    speakText(lastMessage.text, locale);
+                }, 500);
             }
         }
-    }, [chatHistory, id, conversation]);
+    }, [chatHistory, autoSpeak, locale]);
+
+    // Update conversation based on user type whenever chatHistory changes
+    useEffect(() => {
+        if (id && chatHistory.length > 0 && conversation) {
+            if (isDemoUser) {
+                // For demo users, update localStorage
+                try {
+                    const conversationsKey = 'agriassist_ai_conversations';
+                    const existingConversations = JSON.parse(localStorage.getItem(conversationsKey) || '[]');
+                    
+                    // Update the specific conversation
+                    const updatedConversations = existingConversations.map((c: any) => {
+                        if (c.id === id) {
+                            return {
+                                ...c,
+                                messages: chatHistory,
+                                lastUpdated: new Date().toISOString()
+                            };
+                        }
+                        return c;
+                    });
+                    
+                    localStorage.setItem(conversationsKey, JSON.stringify(updatedConversations));
+                } catch (error) {
+                    console.warn('Failed to update conversation in localStorage:', error);
+                }
+            } else {
+                // For real users, we would make an API call to update the database
+                // This is a placeholder for real implementation
+                console.log("Would update conversation in database for real user");
+            }
+        }
+    }, [chatHistory, id, conversation, isDemoUser]);
 
     // Start voice recording
     const startRecording = () => {
@@ -159,6 +217,44 @@ export default function ConversationDetailPage() {
         }, 1000);
     };
 
+    const deleteConversation = () => {
+        if (isDemoUser) {
+            // For demo users, delete from localStorage
+            try {
+                const conversationsKey = 'agriassist_ai_conversations';
+                const existingConversations = JSON.parse(localStorage.getItem(conversationsKey) || '[]');
+                
+                // Filter out the current conversation
+                const updatedConversations = existingConversations.filter((c: any) => c.id !== id);
+                
+                localStorage.setItem(conversationsKey, JSON.stringify(updatedConversations));
+                
+                // Navigate back to conversations list
+                router.push('/dashboard/conversations');
+                
+                toast({
+                    title: t('Conversation Deleted'),
+                    description: t('The conversation has been successfully deleted.')
+                });
+            } catch (error) {
+                console.error("Error deleting conversation from localStorage:", error);
+                toast({
+                    variant: 'destructive',
+                    title: t('Deletion Failed'),
+                    description: t('Failed to delete the conversation. Please try again.')
+                });
+            }
+        } else {
+            // For real users, we would make an API call to delete from database
+            // This is a placeholder for real implementation
+            toast({
+                title: t('Demo Mode'),
+                description: t('In a real implementation, this conversation would be deleted from the database.')
+            });
+            router.push('/dashboard/conversations');
+        }
+    };
+
     if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center h-full">
@@ -200,11 +296,39 @@ export default function ConversationDetailPage() {
                     </Link>
                  </Button>
                  <h1 className="text-3xl font-semibold">{t(conversation.title || 'AI Conversation')}</h1>
+                 <Button size="icon" variant="destructive" onClick={deleteConversation}>
+                    <Trash2 className="h-5 w-5" />
+                 </Button>
             </div>
              <Card className="flex flex-col h-[70vh]">
                 <CardHeader>
-                    <CardTitle>{t('AI Assistant')}</CardTitle>
-                    <CardDescription>{t('Continue your conversation with the AI assistant.')}</CardDescription>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <CardTitle>{t('AI Assistant')}</CardTitle>
+                            <CardDescription>
+                                {t('Continue your conversation with the AI assistant.')}
+                                {isDemoData && (
+                                    <span className="block mt-2 text-sm text-yellow-600 bg-yellow-50 p-2 rounded">
+                                        {t('Demo Mode: Using sample data. Sign in to use real data.')}
+                                    </span>
+                                )}
+                            </CardDescription>
+                        </div>
+                        <div className="relative group">
+                            <Button 
+                                size="sm" 
+                                variant={autoSpeak ? "default" : "outline"}
+                                onClick={() => setAutoSpeak(!autoSpeak)}
+                                className="flex items-center gap-2"
+                            >
+                                <Volume2 className="h-4 w-4" />
+                                {t('Auto')}
+                            </Button>
+                            <div className="absolute right-0 mt-1 w-32 p-2 bg-black text-white text-xs rounded-md shadow-lg z-10 hidden group-hover:block">
+                                {autoSpeak ? t('Auto Speak On') : t('Auto Speak Off')}
+                            </div>
+                        </div>
+                    </div>
                 </CardHeader>
                 <CardContent className="flex-grow overflow-y-auto space-y-4">
                     {chatHistory.length === 0 && (
@@ -224,6 +348,16 @@ export default function ConversationDetailPage() {
                                                 {line.replace(/\*\*(.*?)\*\*/g, '$1')}
                                             </p>
                                         ))}
+                                        <div className="flex justify-end mt-2">
+                                            <Button 
+                                                size="sm" 
+                                                variant="ghost" 
+                                                className="h-6 w-6 p-0"
+                                                onClick={() => speakText(msg.text, locale)}
+                                            >
+                                                <Volume2 className="h-3 w-3" />
+                                            </Button>
+                                        </div>
                                     </div>
                                 ) : (
                                     <p className="text-sm">{t(msg.text as any)}</p>

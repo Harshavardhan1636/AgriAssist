@@ -1,4 +1,3 @@
-
 import {
   Avatar,
   AvatarFallback,
@@ -48,13 +47,13 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <Link href="/dashboard/settings">
+          <Link href="/dashboard/account">
             <DropdownMenuItem>
               <User className="mr-2" />
               <span>{t('Profile')}</span>
             </DropdownMenuItem>
           </Link>
-          <Link href="/dashboard/settings">
+          <Link href="/dashboard/account">
             <DropdownMenuItem>
               <Settings className="mr-2" />
               <span>{t('Settings')}</span>

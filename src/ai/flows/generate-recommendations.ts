@@ -74,7 +74,10 @@ const GenerateRecommendationsInputSchema = z.object({
   cropType: z.string().describe('The type of crop affected.'),
   language: z.string().optional().describe('The language for the output, as a two-letter ISO 639-1 code (e.g., "en", "hi").'),
   forecastSummary: z.string().describe("A summary of the upcoming weather forecast (e.g., 'High humidity and rain expected')."),
-  soilType: z.string().describe("The soil type of the farm (e.g., 'Loam', 'Clay').")
+  soilType: z.string().describe("The soil type of the farm (e.g., 'Loam', 'Clay')."),
+  // Environmental considerations
+  waterConservationNeeds: z.string().optional().describe("Specific water conservation needs based on crop type and local conditions."),
+  biodiversityConsiderations: z.string().optional().describe("Biodiversity impact considerations for the farming practices.")
 });
 export type GenerateRecommendationsInput = z.infer<typeof GenerateRecommendationsInputSchema>;
 
@@ -110,6 +113,8 @@ const prompt = ai.definePrompt({
   - Crop: {{{cropType}}}
   - Soil Type: {{{soilType}}}
   - Weather Forecast: {{{forecastSummary}}}
+  - Water Conservation Needs: {{{waterConservationNeeds}}}
+  - Biodiversity Considerations: {{{biodiversityConsiderations}}}
 
   TASK:
   Generate a list of clear, step-by-step recommendations. For each recommendation, explicitly mention HOW it relates to the provided soil and weather data.
@@ -119,7 +124,9 @@ const prompt = ai.definePrompt({
   2.  **Responsible Chemical Use:** Only if the severity is 'High', you may suggest a common, government-approved pesticide as a *later* step. Emphasize safety precautions.
   3.  **Contextualize with Data:** Explain *why* a step is important in the context of the forecast or soil. For example: "Because rain is forecasted and you have clay soil, it's vital to check field drainage to prevent waterlogging, which helps blight spread." or "With high humidity expected, prune lower leaves to improve airflow."
   4.  **Include Preventive Actions:** Add recommendations for future prevention.
-  5.  **Simplicity & Clarity:** Write in simple language. Provide 3-5 actionable steps.
+  5.  **Water Conservation:** Provide specific water conservation techniques based on the crop type and local conditions.
+  6.  **Biodiversity Protection:** Suggest practices that support biodiversity and avoid harm to beneficial insects and wildlife.
+  7.  **Simplicity & Clarity:** Write in simple language. Provide 3-5 actionable steps.
 
   Format the output as a JSON object with a "recommendations" array, where each item is an object with "step", "title", "description" (including the 'why' connected to data), and "type".
   `,

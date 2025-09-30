@@ -32,6 +32,14 @@ export const RecommendProductsOutputSchema = z.object({
     type: z.enum(['Organic Fungicide', 'Chemical Fungicide', 'Organic Insecticide', 'Bio-stimulant']).describe("The category of the product."),
     isGovtApproved: z.boolean().describe("Whether the product is approved by the government."),
     toxicity: z.enum(['Low', 'Medium', 'High']).optional().describe("The toxicity level, if applicable."),
+    // Environmental metrics
+    environmentalImpact: z.object({
+      carbonFootprint: z.number().optional().describe("Carbon footprint in kg CO2 equivalent per application."),
+      waterUsage: z.number().optional().describe("Water usage in liters per hectare."),
+      biodiversityImpact: z.enum(['Positive', 'Neutral', 'Negative']).optional().describe("Impact on biodiversity."),
+    }).optional().describe("Environmental impact metrics for the product."),
+    isOrganic: z.boolean().optional().describe("Whether the product is organic."),
+    organicCertification: z.string().optional().describe("Organic certification details."),
   })).describe('A list of recommended products, prioritizing organic and safe options.'),
 });
 export type RecommendProductsOutput = z.infer<typeof RecommendProductsOutputSchema>;
@@ -54,12 +62,14 @@ const prompt = ai.definePrompt({
   3.  All suggested products must be ones commonly approved for use in India.
   4.  Provide 3 to 4 product recommendations.
   5.  Generate a unique ID and a placeholder picsum.photos URL for each product image.
+  6.  Include environmental impact metrics for each product (carbon footprint, water usage, biodiversity impact).
+  7.  Clearly indicate if a product is organic and include certification details if applicable.
 
   Disease Context:
   - Disease: {{{disease}}}
   - Crop: {{{cropType}}}
 
-  Generate a list of suitable products. For each product, provide all the fields specified in the output schema, including a simple description, type, and government approval status.
+  Generate a list of suitable products. For each product, provide all the fields specified in the output schema, including a simple description, type, government approval status, and environmental impact metrics. Prioritize organic options and clearly indicate their environmental benefits.
   `,
 });
 

@@ -653,6 +653,58 @@ export async function analyzeImage(
     let weatherFeatures = { temperature: 28, humidity: 82, rainfall: 8 }; // Default fallback
     let forecastSummary = 'Weather data not available';
     
+    // Determine water conservation needs based on crop type
+    const getWaterConservationNeeds = (crop: string, soil: string, weather: any) => {
+      const needs = [];
+      
+      if (crop.toLowerCase().includes('rice')) {
+        needs.push('Implement alternate wetting and drying (AWD) technique');
+        needs.push('Use laser land leveling for efficient water distribution');
+      } else if (crop.toLowerCase().includes('wheat') || crop.toLowerCase().includes('maize')) {
+        needs.push('Use drip irrigation or sprinkler systems');
+        needs.push('Apply mulching to retain soil moisture');
+      } else if (crop.toLowerCase().includes('tomato') || crop.toLowerCase().includes('potato')) {
+        needs.push('Use drip irrigation with moisture sensors');
+        needs.push('Implement rainwater harvesting');
+      }
+      
+      if (soil === 'Sandy') {
+        needs.push('Increase organic matter to improve water retention');
+      } else if (soil === 'Clay') {
+        needs.push('Improve drainage to prevent waterlogging');
+      }
+      
+      if (weather.rainfall > 1500) {
+        needs.push('Install proper drainage systems');
+      } else if (weather.rainfall < 500) {
+        needs.push('Implement water-efficient irrigation methods');
+      }
+      
+      return needs.join(', ');
+    };
+    
+    // Determine biodiversity considerations
+    const getBiodiversityConsiderations = (crop: string, soil: string) => {
+      const considerations = [];
+      
+      considerations.push('Encourage beneficial insects by planting companion crops');
+      considerations.push('Avoid broad-spectrum pesticides that harm pollinators');
+      
+      if (crop.toLowerCase().includes('rice')) {
+        considerations.push('Maintain buffer zones around water bodies');
+        considerations.push('Support aquatic biodiversity in irrigation systems');
+      } else {
+        considerations.push('Create habitat corridors for wildlife');
+        considerations.push('Plant native species as windbreaks');
+      }
+      
+      if (soil === 'Loam' || soil === 'Organic') {
+        considerations.push('Support soil microorganism diversity through organic practices');
+      }
+      
+      return considerations.join(', ');
+    };
+    
     if (location) {
       try {
         logInfo("Fetching real-time weather and soil data", location);
@@ -698,6 +750,9 @@ export async function analyzeImage(
       }
     }
     
+    const waterConservationNeeds = getWaterConservationNeeds(cropType, soilType, weatherFeatures);
+    const biodiversityConsiderations = getBiodiversityConsiderations(cropType, soilType);
+
     // Parallel processing of severity, explanation, and forecast
     logInfo("Starting parallel processing of severity, explanation, and forecast");
     const [severityResult, explanationResult, forecastResult] = await Promise.allSettled([
@@ -789,6 +844,7 @@ export async function analyzeImage(
             cropType: cropType, // Use the crop type from form data
             soilType, // Real-time soil data
             language: locale,
+            biodiversityImpact: biodiversityConsiderations
           };
           
           // Call forecastOutbreakRisk directly, as it now has its own retry logic
@@ -798,7 +854,7 @@ export async function analyzeImage(
           return result;
         } catch (e) { 
           logError("Risk forecast failed", e); 
-          return { riskScore: 0, explanation: 'Not available', preventiveActions: [] }; 
+          return { riskScore: 0, explanation: 'Not available', preventiveActions: [], biodiversityImpactAssessment: 'Not available' }; 
         }
       })(),
     ]);
@@ -834,6 +890,8 @@ export async function analyzeImage(
         language: locale,
         forecastSummary: forecastSummary.substring(0, 100) + '...', // Truncate for logging
         soilType,
+        waterConservationNeeds,
+        biodiversityConsiderations
       });
       
       recommendations = await generateRecommendationsWithRetry({
@@ -843,6 +901,8 @@ export async function analyzeImage(
         language: locale,
         forecastSummary,
         soilType,
+        waterConservationNeeds,
+        biodiversityConsiderations
       });
       
       console.log('[DEBUG] Recommendations generated successfully');
