@@ -1,15 +1,15 @@
-
 'use client';
 
-import { useState, useRef, ChangeEvent, FormEvent } from 'react';
+import { useState, useRef, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Bot, User, Send, ArrowLeft, Paperclip, X, Loader2 } from 'lucide-react';
+import { Bot, User, Send, ArrowLeft, Paperclip, X, Loader2, Mic, Square } from 'lucide-react';
 import { useI18n } from '@/context/i18n-context';
-import { askFollowUpQuestion, AskFollowUpQuestionOutput, analyzeImage } from '@/app/dashboard/analyze/actions';
+import { askFollowUpQuestion, analyzeImage } from '@/app/dashboard/analyze/fixed-actions';
 import type { ChatMessage } from '@/lib/types';
+import type { AskFollowUpQuestionOutput } from '@/ai/flows/ask-follow-up-question';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
@@ -33,8 +33,125 @@ export default function NewConversationPage() {
     const [isAsking, setIsAsking] = useState(false);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [conversationId, setConversationId] = useState<string>(''); // Track conversation ID
+    
+    // Voice recording states
+    const [isRecording, setIsRecording] = useState(false);
+    const recognitionRef = useRef<any>(null);
+    const [isSpeechSupported, setIsSpeechSupported] = useState(false);
     
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Initialize a new conversation when the component mounts
+    useEffect(() => {
+        // Check if speech recognition is supported
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            setIsSpeechSupported(true);
+            recognitionRef.current = new SpeechRecognition();
+            recognitionRef.current.continuous = false;
+            recognitionRef.current.interimResults = false;
+            recognitionRef.current.lang = locale || 'en-US';
+            
+            recognitionRef.current.onresult = (event: any) => {
+                const transcript = event.results[0][0].transcript;
+                setQuestion(transcript);
+                setIsRecording(false);
+            };
+            
+            recognitionRef.current.onerror = (event: any) => {
+                console.error('Speech recognition error', event.error);
+                setIsRecording(false);
+                toast({
+                    variant: 'destructive',
+                    title: t('Speech Recognition Error'),
+                    description: t('There was an error with speech recognition. Please try again.')
+                });
+            };
+            
+            recognitionRef.current.onend = () => {
+                setIsRecording(false);
+            };
+        }
+        
+        const newId = `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        setConversationId(newId);
+        
+        // Cleanup function
+        return () => {
+            if (recognitionRef.current) {
+                recognitionRef.current.stop();
+            }
+        };
+    }, [locale, t, toast]);
+
+    // Start voice recording
+    const startRecording = () => {
+        if (recognitionRef.current && isSpeechSupported) {
+            try {
+                recognitionRef.current.start();
+                setIsRecording(true);
+            } catch (err) {
+                console.error("Error starting speech recognition:", err);
+                toast({
+                    variant: 'destructive',
+                    title: t('Microphone Access Error'),
+                    description: t('Failed to access microphone. Please check your browser settings.')
+                });
+            }
+        }
+    };
+
+    // Stop voice recording
+    const stopRecording = () => {
+        if (recognitionRef.current && isRecording) {
+            recognitionRef.current.stop();
+            setIsRecording(false);
+        }
+    };
+
+    // Store conversation in localStorage whenever chatHistory changes
+    useEffect(() => {
+        if (conversationId && chatHistory.length > 0) {
+            try {
+                const conversationsKey = 'agriassist_ai_conversations';
+                const existingConversations = JSON.parse(localStorage.getItem(conversationsKey) || '[]');
+                
+                // Find existing conversation or create new one
+                let conversation = existingConversations.find((c: any) => c.id === conversationId);
+                if (!conversation) {
+                    conversation = {
+                        id: conversationId,
+                        title: 'New Chat',
+                        timestamp: new Date().toISOString(),
+                        messages: []
+                    };
+                }
+                
+                // Update conversation with current chat history
+                conversation.messages = chatHistory;
+                conversation.lastUpdated = new Date().toISOString();
+                
+                // Update title based on first message if it's still the default
+                if (conversation.title === 'New Chat' && chatHistory.length > 0) {
+                    const firstUserMessage = chatHistory.find(msg => msg.sender === 'user');
+                    if (firstUserMessage) {
+                        conversation.title = firstUserMessage.text.substring(0, 50) + (firstUserMessage.text.length > 50 ? '...' : '');
+                    }
+                }
+                
+                // Update or add conversation to storage
+                const updatedConversations = existingConversations.filter((c: any) => c.id !== conversationId);
+                updatedConversations.unshift(conversation);
+                
+                // Limit to 50 conversations
+                const limitedConversations = updatedConversations.slice(0, 50);
+                localStorage.setItem(conversationsKey, JSON.stringify(limitedConversations));
+            } catch (error) {
+                console.warn('Failed to save conversation to localStorage:', error);
+            }
+        }
+    }, [chatHistory, conversationId]);
 
     const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -48,6 +165,28 @@ export default function NewConversationPage() {
         setImagePreview(null);
         if(fileInputRef.current) fileInputRef.current.value = '';
     }
+
+    // Function to format analysis results in a structured way
+    const formatAnalysisResults = (data: any) => {
+        const disease = data.classification?.predictions?.[0]?.label || 'Unknown';
+        const confidence = Math.round((data.classification?.predictions?.[0]?.confidence || 0) * 100);
+        const severity = data.severity?.severityBand || 'Unknown';
+        
+        let formattedResponse = `**Disease Detected:** ${disease}\n`;
+        formattedResponse += `**Confidence:** ${confidence}%\n`;
+        formattedResponse += `**Severity:** ${severity}\n\n`;
+        
+        if (data.recommendations?.recommendations?.length > 0) {
+            formattedResponse += '**Recommendations:**\n';
+            data.recommendations.recommendations.forEach((rec: any, index: number) => {
+                formattedResponse += `\n**${index + 1}. ${rec.title}**\n${rec.description}\n`;
+            });
+        } else {
+            formattedResponse += '**Recommendations:**\nNo specific recommendations available.';
+        }
+        
+        return formattedResponse;
+    };
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -77,8 +216,11 @@ export default function NewConversationPage() {
                  const newAiMessage: ChatMessage = { sender: 'bot', text: response.error };
                  setChatHistory(prev => [...prev, newAiMessage]);
             } else if (response.data) {
-                // Instead of displaying results here, redirect to the new unified case history page
-                router.push(`/dashboard/history/${response.data.conversationId}`);
+                // For AI conversations, we should display the analysis results directly in the chat
+                // Format the analysis results as a structured bot message
+                const formattedResults = formatAnalysisResults(response.data);
+                const newAiMessage: ChatMessage = { sender: 'bot', text: formattedResults };
+                setChatHistory(prev => [...prev, newAiMessage]);
             }
             return;
         }
@@ -130,7 +272,17 @@ export default function NewConversationPage() {
                         <div key={index} className={`flex items-start gap-3 ${msg.sender === 'user' ? 'justify-end' : ''}`}>
                             {msg.sender === 'bot' && <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted"><Bot className="h-5 w-5" /></div>}
                             <div className={`rounded-lg px-4 py-2 max-w-[80%] ${msg.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                                <p className="text-sm">{t(msg.text as any)}</p>
+                                {msg.sender === 'bot' ? (
+                                    <div className="text-sm whitespace-pre-wrap">
+                                        {msg.text.split('\n').map((line, i) => (
+                                            <p key={i} className={line.startsWith('**') ? 'font-bold mt-2' : line.startsWith('*') ? 'ml-4' : ''}>
+                                                {line.replace(/\*\*(.*?)\*\*/g, '$1')}
+                                            </p>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-sm">{t(msg.text as any)}</p>
+                                )}
                             </div>
                             {msg.sender === 'user' && <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted"><User className="h-5 w-5" /></div>}
                         </div>
@@ -166,10 +318,20 @@ export default function NewConversationPage() {
                                     accept="image/*"
                                     onChange={handleFileChange}
                                 />
+                                {isSpeechSupported ? (
+                                    <Button 
+                                        type="button" 
+                                        size="icon" 
+                                        variant={isRecording ? "destructive" : "outline"}
+                                        onClick={isRecording ? stopRecording : startRecording}
+                                    >
+                                        {isRecording ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                                    </Button>
+                                ) : null}
                                 <Input 
                                     value={question}
                                     onChange={(e) => setQuestion(e.target.value)}
-                                    placeholder={t('Ask a question or describe your image...')}
+                                    placeholder={isSpeechSupported ? t('Ask a question or describe your image...') : t('Ask a question or describe your image...')}
                                     disabled={isAsking || isLoading}
                                 />
                                 <Button type="submit" size="icon" disabled={isAsking || isLoading || (!question.trim() && !imagePreview)}>

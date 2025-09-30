@@ -1,21 +1,20 @@
-
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { FullAnalysisResponse, ChatMessage as ChatMessageType } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import Image from 'next/image';
 import { useI18n } from '@/context/i18n-context';
-import { Bot, User, Send, CheckCircle, AlertTriangle, Wind, Sprout } from 'lucide-react';
+import { Bot, User, Send, CheckCircle, AlertTriangle, Wind, Sprout, Image as ImageIcon, FileText, Mic, Square } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { askFollowUpQuestion } from './actions';
-import type { AskFollowUpQuestionOutput } from './actions';
+import { askFollowUpQuestion } from './fixed-actions';
+import type { AskFollowUpQuestionOutput } from '@/ai/flows/ask-follow-up-question';
 import { RadialChart } from '@/components/ui/radial-chart';
 import { Badge } from '@/components/ui/badge';
 import { mockConversations } from '@/lib/mock-data';
-
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 interface AnalysisResultsProps {
   result: FullAnalysisResponse;
@@ -35,31 +34,117 @@ const RecommendationIcon = ({type}: {type: string}) => {
     }
 }
 
+// Function to get a reference image based on the disease name
+const getReferenceImage = (diseaseName: string) => {
+  // Normalize the disease name for matching
+  const normalizedDisease = diseaseName.toLowerCase().replace(/\s+/g, '_');
+  
+  // Try to find a matching placeholder image
+  const matchingImage = PlaceHolderImages.find(img => 
+    img.id.includes(normalizedDisease) || 
+    img.description.toLowerCase().includes(normalizedDisease)
+  );
+  
+  // If no specific match, try to find a general disease image
+  if (!matchingImage) {
+    const generalDiseaseImage = PlaceHolderImages.find(img => 
+      img.id.includes('disease') || 
+      img.description.toLowerCase().includes('disease') ||
+      img.id.includes('blight') ||
+      img.description.toLowerCase().includes('blight')
+    );
+    return generalDiseaseImage || PlaceHolderImages[1]; // Fallback to second image
+  }
+  
+  return matchingImage;
+};
 
 export default function AnalysisResults({ result }: AnalysisResultsProps) {
-  const { classification, severity, explanation, forecast, recommendations, locale, conversationId } = result;
-  const topPrediction = classification.predictions[0];
+  const { classification, severity, explanation, forecast, recommendations, locale, conversationId, originalImage } = result;
+  const topPrediction = classification?.predictions?.[0] || { label: 'Unknown', confidence: 0 };
   const { t } = useI18n();
+
+  // Check if this is a text-based analysis (no original image or placeholder image)
+  const isTextBasedAnalysis = !originalImage || originalImage.includes('placeholder') || originalImage.includes('picsum');
+  
+  // Get reference image for text-based analysis
+  const referenceImage = isTextBasedAnalysis ? getReferenceImage(topPrediction.label) : null;
 
   const [question, setQuestion] = useState('');
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [isAsking, setIsAsking] = useState(false);
+  
+  // Voice recording states
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const [isSpeechSupported, setIsSpeechSupported] = useState(false);
 
   useEffect(() => {
+    // Check if speech recognition is supported
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      setIsSpeechSupported(true);
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = locale || 'en-US';
+      
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setQuestion(transcript);
+        setIsRecording(false);
+      };
+      
+      recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error', event.error);
+        setIsRecording(false);
+      };
+      
+      recognitionRef.current.onend = () => {
+        setIsRecording(false);
+      };
+    }
+    
     // When viewing a past analysis, load its chat history from mock data.
     // In a real app, this would be part of the initial data fetch for the page.
     const existingConversation = mockConversations.find(c => c.id === conversationId);
     if (existingConversation) {
       setChatHistory(existingConversation.messages);
     }
-  }, [conversationId]);
+    
+    // Cleanup function
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, [conversationId, locale]);
 
+  // Start voice recording
+  const startRecording = () => {
+    if (recognitionRef.current && isSpeechSupported) {
+      try {
+        recognitionRef.current.start();
+        setIsRecording(true);
+      } catch (err) {
+        console.error("Error starting speech recognition:", err);
+      }
+    }
+  };
+
+  // Stop voice recording
+  const stopRecording = () => {
+    if (recognitionRef.current && isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+    }
+  };
 
   const analysisContext = JSON.stringify({
     disease: topPrediction.label,
     confidence: topPrediction.confidence,
     severity: severity,
-    risk: forecast.riskScore,
+    risk: forecast?.riskScore,
   });
 
   const handleFollowUpSubmit = async (e: React.FormEvent) => {
@@ -80,7 +165,6 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
       bot: response.answer,
     });
 
-
     const newAiMessage: ChatMessage = { sender: 'bot', text: response.answer };
     setChatHistory(prev => [...prev, newAiMessage]);
     setIsAsking(false);
@@ -92,7 +176,7 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
         <CardHeader>
           <CardTitle>{t('Analysis Complete')}</CardTitle>
           <CardDescription>
-             {t('AI analysis suggests the most likely disease is')} <strong>{t(topPrediction.label as any)}</strong> {t('with')} {Math.round(topPrediction.confidence * 100)}% {t('confidence')}.
+             {t('AI analysis suggests the most likely disease is')} <strong>{t(topPrediction.label as any)}</strong> {t('with')} {Math.round((topPrediction.confidence || 0) * 100)}% {t('confidence')}.
           </CardDescription>
         </CardHeader>
       </Card>
@@ -148,17 +232,28 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
               </div>
             </CardContent>
             <CardFooter>
-                 <form onSubmit={handleFollowUpSubmit} className="flex w-full items-center gap-2">
-                    <Input 
-                      value={question}
-                      onChange={(e) => setQuestion(e.target.value)}
-                      placeholder={t('Ask a question...')}
-                      disabled={isAsking}
-                    />
-                    <Button type="submit" size="icon" disabled={isAsking}>
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </form>
+              <form onSubmit={handleFollowUpSubmit} className="flex w-full items-center gap-2">
+                {isSpeechSupported ? (
+                  <Button 
+                    type="button" 
+                    size="icon" 
+                    variant={isRecording ? "destructive" : "outline"}
+                    onClick={isRecording ? stopRecording : startRecording}
+                    disabled={isAsking}
+                  >
+                    {isRecording ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                  </Button>
+                ) : null}
+                <Input 
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  placeholder={isSpeechSupported ? t('Ask a question or use voice input...') : t('Ask a question...')}
+                  disabled={isAsking}
+                />
+                <Button type="submit" size="icon" disabled={isAsking || !question.trim()}>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </form>
             </CardFooter>
           </Card>
         </div>
@@ -170,20 +265,57 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center">
               <RadialChart 
-                value={severity.severityPercentage}
-                mainText={`${Math.round(severity.severityPercentage)}%`}
-                subText={t(severity.severityBand as 'Low' | 'Medium' | 'High')}
+                value={severity?.severityPercentage || 0}
+                mainText={`${Math.round(severity?.severityPercentage || 0)}%`}
+                subText={t((severity?.severityBand || 'Unknown') as 'Low' | 'Medium' | 'High' | 'Unknown')}
               />
             </CardContent>
           </Card>
           
            <Card>
             <CardHeader>
-              <CardTitle>{t('Explainable AI (Grad-CAM)')}</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                {isTextBasedAnalysis ? <FileText className="h-5 w-5" /> : <ImageIcon className="h-5 w-5" />}
+                {isTextBasedAnalysis ? t('Reference Image') : t('Explainable AI (Grad-CAM)')}
+              </CardTitle>
             </CardHeader>
             <CardContent>
-                <Image src={explanation.gradCAMOverlay} alt="Grad-CAM explanation" width={400} height={400} className="rounded-lg border object-cover aspect-square w-full" />
-                <p className="text-xs text-muted-foreground mt-2">{t('The highlighted areas show what the AI focused on to make its diagnosis.')}</p>
+              {isTextBasedAnalysis ? (
+                <>
+                  {referenceImage ? (
+                    <>
+                      <div className="relative aspect-square w-full overflow-hidden rounded-lg border">
+                        <Image 
+                          src={referenceImage.imageUrl} 
+                          alt={referenceImage.description} 
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {t('Reference image showing what')} <strong>{t(topPrediction.label as any)}</strong> {t('looks like on a plant leaf.')}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {t('No reference image available for')} <strong>{t(topPrediction.label as any)}</strong>.
+                    </p>
+                  )}
+                  <div className="mt-4 p-3 bg-muted rounded-lg">
+                    <h4 className="font-medium text-sm mb-1">{t('Text-Based Analysis')}</h4>
+                    <p className="text-xs text-muted-foreground">
+                      {t('This analysis was based on your text description. The reference image above shows what this disease typically looks like.')}
+                    </p>
+                  </div>
+                </>
+              ) : explanation?.gradCAMOverlay ? (
+                <>
+                  <Image src={explanation.gradCAMOverlay} alt="Grad-CAM explanation" width={400} height={400} className="rounded-lg border object-cover aspect-square w-full" />
+                  <p className="text-xs text-muted-foreground mt-2">{t('The highlighted areas show what the AI focused on to make its diagnosis.')}</p>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">{t('Grad-CAM visualization is not available for this analysis.')}</p>
+              )}
             </CardContent>
           </Card>
 
@@ -193,30 +325,25 @@ export default function AnalysisResults({ result }: AnalysisResultsProps) {
             </CardHeader>
             <CardContent>
               <RadialChart 
-                value={forecast.riskScore * 100}
-                mainText={`${Math.round(forecast.riskScore * 100)}%`}
+                value={(forecast?.riskScore || 0) * 100}
+                mainText={`${Math.round((forecast?.riskScore || 0) * 100)}%`}
                 subText={t('Risk Score')}
               />
               <Accordion type="single" collapsible className="w-full mt-4">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger>{t('Why this score?')}</AccordionTrigger>
+                <AccordionItem value="forecast-details">
+                  <AccordionTrigger>{t('View Forecast Details')}</AccordionTrigger>
                   <AccordionContent>
-                    <p className="text-sm">{t(forecast.explanation as any)}</p>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-2">
-                  <AccordionTrigger>{t('Preventive Actions')}</AccordionTrigger>
-                  <AccordionContent>
-                    <ul className="space-y-2 text-sm">
-                      {forecast?.preventiveActions?.length > 0 ? forecast.preventiveActions.map((action, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <Wind className="h-4 w-4 mt-0.5 text-blue-500 flex-shrink-0" />
-                          <span>{t(action as any)}</span>
-                        </li>
-                      )) : (
-                        <li>{t('No preventive actions available.')}</li>
-                      )}
-                    </ul>
+                    <p className="text-sm text-muted-foreground">{forecast?.explanation || t('Forecast details not available.')}</p>
+                    {forecast?.preventiveActions && forecast.preventiveActions.length > 0 && (
+                      <div className="mt-2">
+                        <h4 className="font-medium">{t('Preventive Actions')}</h4>
+                        <ul className="list-disc pl-5 text-sm text-muted-foreground">
+                          {forecast.preventiveActions.map((action, index) => (
+                            <li key={index}>{action}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>

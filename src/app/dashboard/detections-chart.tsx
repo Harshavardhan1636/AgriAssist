@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -9,16 +8,7 @@ import {
 } from '@/components/ui/chart';
 import { Bar, BarChart as RechartsBarChart, XAxis, YAxis } from 'recharts';
 
-const chartData = [
-  { day: 'Mon', detections: 5 },
-  { day: 'Tue', detections: 8 },
-  { day: 'Wed', detections: 12 },
-  { day: 'Thu', detections: 7 },
-  { day: 'Fri', detections: 15 },
-  { day: 'Sat', detections: 11 },
-  { day: 'Sun', detections: 9 },
-];
-
+// We'll pass the chart data as a prop now instead of using static data
 const chartConfig = {
   detections: {
     label: 'Detections',
@@ -26,7 +16,7 @@ const chartConfig = {
   },
 };
 
-const DetectionsChart = React.memo(function DetectionsChart() {
+const DetectionsChart = React.memo(function DetectionsChart({ chartData }: { chartData: { day: string; detections: number }[] }) {
   return (
     <ChartContainer config={chartConfig} className="h-[300px] w-full">
       <RechartsBarChart data={chartData} accessibilityLayer>

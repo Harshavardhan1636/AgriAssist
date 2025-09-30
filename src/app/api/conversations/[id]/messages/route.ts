@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { askFollowUpQuestion as askFollowUpQuestionFlow } from '@/ai/flows/ask-follow-up-question';
-import { mockConversations } from '@/lib/mock-data';
+import { getFirestore, doc, getDoc, updateDoc, arrayUnion, serverTimestamp } from 'firebase/firestore';
+import { app } from '@/lib/firebase';
 
 const messageSchema = z.object({
   question: z.string().min(1, 'Question cannot be empty'),
@@ -9,22 +10,55 @@ const messageSchema = z.object({
   language: z.string().default('en'),
 });
 
+async function getUserIdFromToken(request: NextRequest): Promise<string> {
+  // Mock implementation - in a real app, you would verify the JWT token
+  // and extract the user ID from it
+  return 'demo-user-id';
+}
+
+async function getConversationFromFirestore(conversationId: string, userId: string) {
+  const db = getFirestore(app);
+  const conversationRef = doc(db, 'conversations', conversationId);
+  const conversationSnap = await getDoc(conversationRef);
+  
+  if (!conversationSnap.exists()) {
+    return null;
+  }
+  
+  const conversation = conversationSnap.data();
+  
+  // Verify ownership
+  if (conversation.userId !== userId) {
+    throw new Error('Unauthorized access to conversation');
+  }
+  
+  return { id: conversationSnap.id, ...conversation } as any;
+}
+
+async function updateConversationInFirestore(conversationId: string, updates: any) {
+  const db = getFirestore(app);
+  const conversationRef = doc(db, 'conversations', conversationId);
+  
+  await updateDoc(conversationRef, {
+    ...updates,
+    lastMessageAt: serverTimestamp()
+  });
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    // TODO: Extract user ID from JWT token
-    // const userId = await getUserIdFromToken(request);
-    const userId = 'demo-user-id'; // Mock user ID
+    const userId = await getUserIdFromToken(request);
     const conversationId = params.id;
 
     const body = await request.json();
     const validatedData = messageSchema.parse(body);
     const { question, analysisContext, language } = validatedData;
 
-    // TODO: Fetch conversation from Firestore to verify ownership and get context
-    const conversation = mockConversations.find(c => c.id === conversationId);
+    // Fetch conversation from Firestore to verify ownership and get context
+    const conversation: any = await getConversationFromFirestore(conversationId, userId);
     if (!conversation) {
       return NextResponse.json(
         { success: false, error: 'Conversation not found' },
@@ -42,7 +76,7 @@ export async function POST(
       language
     });
 
-    // TODO: Save messages to Firestore
+    // Save messages to Firestore
     const userMessage = {
       sender: 'user' as const,
       text: question,
@@ -55,13 +89,10 @@ export async function POST(
       timestamp: new Date().toISOString()
     };
 
-    // TODO: Update conversation in Firestore
-    /*
+    // Update conversation in Firestore
     await updateConversationInFirestore(conversationId, {
-      messages: [...conversation.messages, userMessage, botMessage],
-      lastMessageAt: new Date()
+      messages: arrayUnion(userMessage, botMessage)
     });
-    */
 
     return NextResponse.json({
       success: true,
@@ -96,11 +127,11 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // TODO: Extract user ID from JWT token and verify ownership
+    const userId = await getUserIdFromToken(request);
     const conversationId = params.id;
 
-    // TODO: Fetch conversation messages from Firestore
-    const conversation = mockConversations.find(c => c.id === conversationId);
+    // Fetch conversation messages from Firestore
+    const conversation: any = await getConversationFromFirestore(conversationId, userId);
     if (!conversation) {
       return NextResponse.json(
         { success: false, error: 'Conversation not found' },
@@ -111,7 +142,7 @@ export async function GET(
     return NextResponse.json({
       success: true,
       data: {
-        messages: conversation.messages
+        messages: conversation.messages || []
       }
     });
 
@@ -123,37 +154,3 @@ export async function GET(
     );
   }
 }
-
-// TODO: Implement Firestore operations
-/*
-import { getFirestore, doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
-
-async function updateConversationInFirestore(conversationId: string, updates: any) {
-  const db = getFirestore();
-  const conversationRef = doc(db, 'conversations', conversationId);
-  
-  await updateDoc(conversationRef, {
-    ...updates,
-    lastMessageAt: new Date()
-  });
-}
-
-async function getConversationFromFirestore(conversationId: string, userId: string) {
-  const db = getFirestore();
-  const conversationRef = doc(db, 'conversations', conversationId);
-  const conversationSnap = await getDoc(conversationRef);
-  
-  if (!conversationSnap.exists()) {
-    return null;
-  }
-  
-  const conversation = conversationSnap.data();
-  
-  // Verify ownership
-  if (conversation.userId !== userId) {
-    throw new Error('Unauthorized access to conversation');
-  }
-  
-  return { id: conversationSnap.id, ...conversation };
-}
-*/

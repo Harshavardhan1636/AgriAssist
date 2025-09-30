@@ -183,3 +183,185 @@ Troubleshooting
 Status
 - This README prepares the full environment and command surface
 - Next step: add scripts under ml/ (train_classifier.py, grad_cam_infer.py, train_severity_regression.py). These will be created to be runnable as-is and consume datasets/ paths you already maintain.
+
+# AgriAssist Machine Learning Models
+
+This directory contains all the machine learning models and tools for the AgriAssist agricultural disease detection system.
+
+## 📁 Directory Structure
+
+```
+ml/
+├── exports/                    # Exported models for inference
+│   ├── classifier/             # PlantVillage classifier (general crops)
+│   ├── classifier_paddy/       # Paddy classifier (rice-specific)
+│   └── severity_regression/    # Disease severity assessment
+├── scripts/                    # Testing and evaluation scripts
+│   ├── test_models.py          # Main testing interface
+│   ├── batch_test.py           # Batch processing of multiple images
+│   └── ...                     # Additional testing tools
+├── utils/                      # Utility scripts and helpers
+│   ├── validate_models.py      # Model validation tools
+│   └── ...                     # Additional utilities
+├── docs/                       # Documentation and guides
+│   ├── README.md               # Main documentation
+│   ├── TESTING.md              # Testing guide
+│   └── ...                     # Additional documentation
+├── results/                    # Test results and evaluations
+│   ├── *.csv                   # Batch test results
+│   └── ...                     # Evaluation reports
+├── test_images/                # Sample test images
+├── infer_server.py             # FastAPI inference server
+├── train_pipeline.py           # Model training pipeline
+└── requirements.txt            # Python dependencies
+```
+
+## 🚀 Quick Start
+
+1. **Test the models**:
+   ```bash
+   cd scripts
+   python test_models.py ../test_images/test_leaf.jpg
+   ```
+
+2. **Start the inference server**:
+   ```bash
+   python infer_server.py
+   ```
+
+3. **Run batch tests**:
+   ```bash
+   cd scripts
+   python batch_test.py ../test_images/ -o ../results/batch_results.csv
+   ```
+
+## 📚 Documentation
+
+For detailed instructions, see the documentation in the [docs](docs/) directory:
+- [Testing Guide](docs/TESTING.md)
+- [Quick Start](docs/QUICK_START.md)
+- [Complete Testing Summary](docs/FINAL_SUMMARY.md)
+
+## 🛠️ Requirements
+
+Install the required dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+Key dependencies:
+- PyTorch (with CUDA support)
+- TorchVision
+- PIL/Pillow
+- NumPy
+- FastAPI
+- pytorch-grad-cam (for Grad-CAM visualizations)
+
+## ✅ Models Overview
+
+| Model | Purpose | Status |
+|-------|---------|--------|
+| PlantVillage Classifier | General plant disease identification | ✅ Ready |
+| Paddy Classifier | Rice-specific disease identification | ✅ Ready |
+| Severity Prediction | Disease extent estimation | ✅ Ready |
+| Grad-CAM Visualization | Model explainability | ✅ Ready |
+
+## 🎯 Next Steps
+
+1. Test with real plant disease images from your datasets
+2. Evaluate model accuracy with ground truth data
+3. Analyze Grad-CAM visualizations for model interpretability
+4. Deploy the FastAPI server for production use
+
+For any questions about using these tools, refer to the documentation files or run:
+```bash
+python scripts/test_models.py --help
+python scripts/batch_test.py --help
+```
+
+# AgriAssist ML Models - Testing and Evaluation
+
+This directory contains all the tools and documentation needed to test and evaluate your trained agricultural AI models.
+
+## 📋 Models Overview
+
+| Model | Purpose | Status |
+|-------|---------|--------|
+| PlantVillage Classifier | General plant disease identification | ✅ Ready |
+| Paddy Classifier | Rice-specific disease identification | ✅ Ready |
+| Severity Prediction | Disease extent estimation | ✅ Ready |
+| Grad-CAM Visualization | Model explainability | ✅ Ready |
+
+## 🚀 Quick Start
+
+1. **Validate your models**:
+   ```bash
+   python validate_models.py
+   ```
+
+2. **Test with a sample image**:
+   ```bash
+   python test_models.py test_leaf.jpg
+   ```
+
+3. **Generate Grad-CAM visualizations**:
+   ```bash
+   python test_models.py test_leaf.jpg --models gradcam --gradcam-model plantvillage
+   ```
+
+## 📁 Directory Structure
+
+```
+ml/
+├── runs/
+│   ├── classifier/              # PlantVillage model
+│   ├── classifier_paddy/        # Paddy model  
+│   └── severity_regression/     # Severity model
+├── test_models.py              # Main testing interface
+├── validate_models.py          # Model validation
+├── batch_test.py               # Batch processing
+└── ...                         # Additional tools and documentation
+```
+
+## 🛠️ Testing Tools
+
+### Main Testing Script
+```bash
+python test_models.py image.jpg [--models model1 model2] [--gradcam-model plantvillage|paddy]
+```
+
+### Batch Testing
+```bash
+python batch_test.py image_directory -o results.csv
+```
+
+### Model Validation
+```bash
+python validate_models.py
+```
+
+## 📚 Documentation
+
+- [TESTING.md](TESTING.md) - Comprehensive testing guide
+- [QUICK_START.md](QUICK_START.md) - Quick start instructions
+- [SUMMARY_REPORT.md](SUMMARY_REPORT.md) - Testing results summary
+- [FINAL_SUMMARY.md](FINAL_SUMMARY.md) - Complete overview
+
+## ✅ Verified Functionality
+
+All models have been successfully tested and verified:
+
+- **Classification**: Both PlantVillage and Paddy classifiers working correctly
+- **Severity Prediction**: Percentage-based disease severity estimation
+- **Grad-CAM**: Heatmap visualization showing model decision-making
+- **Batch Processing**: Multiple image processing capabilities
+
+## 🎯 Next Steps
+
+1. Test with real plant disease images
+2. Evaluate model accuracy with ground truth data
+3. Analyze Grad-CAM visualizations for model interpretability
+4. Run batch tests on larger datasets
+5. Integrate with the FastAPI inference server
+
+For detailed instructions, see [TESTING.md](TESTING.md)

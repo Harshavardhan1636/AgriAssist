@@ -2,7 +2,7 @@ import os
 import io
 import json
 import base64
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Union, TypedDict
 
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -50,10 +50,16 @@ VAL_TF = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
-classifiers: Dict[str, Dict[str, Any]] = {}
+# Define type for classifier dictionary
+# The structure is {"model": ScriptModule, "labels": Dict[int, str]}
+class ModelDict(TypedDict):
+    model: torch.jit.ScriptModule
+    labels: Dict[int, str]
+
+classifiers: Dict[str, ModelDict] = {}
 
 
-def load_torchscript_classifier(export_dir: Path) -> Optional[torch.jit.ScriptModule]:
+def load_torchscript_classifier(export_dir: Path) -> Optional[ModelDict]:
     model_path = export_dir / 'model.ts.pt'
     labels_path = export_dir / 'labels.json'
     if not model_path.exists() or not labels_path.exists():
@@ -88,7 +94,13 @@ def read_image_to_pil(data: bytes) -> Image.Image:
 
 
 def tensor_from_image(pil: Image.Image) -> torch.Tensor:
-    return VAL_TF(pil).unsqueeze(0)
+    tensor = VAL_TF(pil)
+    # Fix: Ensure we're calling unsqueeze on a tensor, not an image
+    if isinstance(tensor, torch.Tensor):
+        return tensor.unsqueeze(0)
+    else:
+        # If it's not already a tensor, convert it
+        return torch.tensor(tensor).unsqueeze(0)
 
 
 def softmax_logits(logits: torch.Tensor) -> np.ndarray:
@@ -118,11 +130,13 @@ async def classify(
     pil = read_image_to_pil(data)
     x = tensor_from_image(pil)
 
-    model = classifiers[model_key]['model']
-    labels = classifiers[model_key]['labels']
+    # Fix: Properly access the model from the dictionary
+    model_dict = classifiers[model_key]
+    model_obj = model_dict['model']
+    labels = model_dict['labels']
 
     with torch.no_grad():
-        logits = model(x)
+        logits = model_obj(x)
     probs = softmax_logits(logits)
 
     # top-k
@@ -185,17 +199,24 @@ def gradcam_from_ckpt(ckpt_path: Path, pil: Image.Image, target_label: Optional[
     if target_layer is None:
         raise HTTPException(status_code=500, detail="Could not find conv layer for Grad-CAM")
 
-    cam = GradCAM(model=model, target_layers=[target_layer], use_cuda=torch.cuda.is_available())
-    grayscale = cam(input_tensor=x, targets=None)[0]
+    # Fix: Remove use_cuda parameter which is no longer supported
+    if HAS_GRADCAM:
+        from pytorch_grad_cam import GradCAM
+        from pytorch_grad_cam.utils.image import show_cam_on_image
+        cam = GradCAM(model=model, target_layers=[target_layer])
+        grayscale = cam(input_tensor=x)[0]
 
-    disp = pil.resize((IMG_SIZE, IMG_SIZE))
-    disp_np = np.array(disp).astype(np.float32) / 255.0
-    cam_image = show_cam_on_image(disp_np, grayscale, use_rgb=True, image_weight=(1.0 - 0.45))
-    out_img = Image.fromarray(cam_image)
-    buf = io.BytesIO()
-    out_img.save(buf, format='PNG')
-    data = base64.b64encode(buf.getvalue()).decode('utf-8')
-    return f"data:image/png;base64,{data}"
+        disp = pil.resize((IMG_SIZE, IMG_SIZE))
+        disp_np = np.array(disp).astype(np.float32) / 255.0
+        cam_image = show_cam_on_image(disp_np, grayscale, use_rgb=True, image_weight=0.55)
+        out_img = Image.fromarray(cam_image)
+        buf = io.BytesIO()
+        out_img.save(buf, format='PNG')
+        data = base64.b64encode(buf.getvalue()).decode('utf-8')
+        return f"data:image/png;base64,{data}"
+    else:
+        # Return a default image or raise an exception if Grad-CAM is not available
+        raise HTTPException(status_code=500, detail="Grad-CAM not available on server (pytorch-grad-cam not installed)")
 
 
 class GradCAMResponse(BaseModel):

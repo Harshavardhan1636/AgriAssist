@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -26,10 +25,13 @@ import {
   AlertTriangle,
   Cloudy,
   Thermometer,
-  Droplets
+  Droplets,
+  Upload,
+  FileText,
+  Mic
 } from "lucide-react";
 
-import { mockHistory, mockForecast } from "@/lib/mock-data";
+import { mockForecast } from "@/lib/mock-data";
 import { formatDistanceToNow, format, addDays } from "date-fns";
 import { useI18n } from "@/context/i18n-context";
 import dynamic from 'next/dynamic';
@@ -38,34 +40,82 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-
+import { useEffect, useState } from "react";
 
 const DetectionsChart = dynamic(() => import('./detections-chart'), { 
     ssr: false,
     loading: () => <Skeleton className="h-[300px] w-full" />
 });
 
-
-const chartData = [
-  { day: "Mon", detections: 5 },
-  { day: "Tue", detections: 8 },
-  { day: "Wed", detections: 12 },
-  { day: "Thu", detections: 7 },
-  { day: "Fri", detections: 15 },
-  { day: "Sat", detections: 11 },
-  { day: "Sun", detections: 9 },
-];
-
 export default function DashboardPage() {
-  const recentAnalyses = mockHistory.slice(0, 5);
   const { t } = useI18n();
   const today = new Date();
   const minimalForecast = mockForecast.slice(0, 7);
+  
+  const [analysisHistory, setAnalysisHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [chartData, setChartData] = useState([
+    { day: "Sun", detections: 0 },
+    { day: "Mon", detections: 0 },
+    { day: "Tue", detections: 0 },
+    { day: "Wed", detections: 0 },
+    { day: "Thu", detections: 0 },
+    { day: "Fri", detections: 0 },
+    { day: "Sat", detections: 0 },
+  ]);
+
+  useEffect(() => {
+    // Load real data from localStorage
+    try {
+      const historyKey = 'agriassist_analysis_history';
+      const storedHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+      setAnalysisHistory(storedHistory);
+      
+      // Calculate weekly detections data based on real data
+      const detectionsByDay = Array(7).fill(0);
+      const todayIndex = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
+      
+      storedHistory.forEach((analysis: any) => {
+        const analysisDate = new Date(analysis.timestamp);
+        const analysisDayIndex = analysisDate.getDay();
+        const daysAgo = (todayIndex - analysisDayIndex + 7) % 7;
+        
+        // Only count analyses from the current week
+        if (daysAgo < 7) {
+          detectionsByDay[analysisDayIndex] += 1;
+        }
+      });
+      
+      // Update chart data with real values
+      const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      const updatedChartData = days.map((day, index) => ({
+        day: day.substring(0, 3), // First 3 letters of day name
+        detections: detectionsByDay[index]
+      }));
+      
+      setChartData(updatedChartData);
+    } catch (error) {
+      console.error("Error loading analysis history:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Calculate statistics from real data
+  const totalScans = analysisHistory.length;
+  const highRiskAlerts = analysisHistory.filter((analysis: any) => 
+    analysis.severity === 'High' || (analysis.preview?.riskScore || 0) > 70
+  ).length;
+  const pendingReviews = analysisHistory.filter((analysis: any) => 
+    analysis.status === 'Pending Review'
+  ).length;
+  const weeklyDetections = chartData.reduce((sum, day) => sum + day.detections, 0);
+  const recentAnalyses = analysisHistory.slice(0, 5);
 
   return (
     <div className="flex flex-col gap-6 min-w-0">
 
-       <Alert variant="destructive" className="animate-blink-alert">
+       <Alert className="animate-blink-alert border-0">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>{t('High-Risk Alert: Tomato Late Blight')}</AlertTitle>
           <AlertDescription>
@@ -80,7 +130,7 @@ export default function DashboardPage() {
             <FlaskConical className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,254</div>
+            <div className="text-2xl font-bold">{loading ? <Skeleton className="h-6 w-16" /> : totalScans.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">{t('+20.1% from last month')}</p>
           </CardContent>
         </Card>
@@ -90,7 +140,7 @@ export default function DashboardPage() {
             <ShieldAlert className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">32</div>
+            <div className="text-2xl font-bold">{loading ? <Skeleton className="h-6 w-8" /> : highRiskAlerts}</div>
             <p className="text-xs text-muted-foreground">{t('+12 since last week')}</p>
           </CardContent>
         </Card>
@@ -100,7 +150,7 @@ export default function DashboardPage() {
             <ClipboardCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockHistory.filter(h => h.status === 'Pending Review').length}</div>
+            <div className="text-2xl font-bold">{loading ? <Skeleton className="h-6 w-8" /> : pendingReviews}</div>
             <p className="text-xs text-muted-foreground">{t('2 new today')}</p>
           </CardContent>
         </Card>
@@ -110,7 +160,7 @@ export default function DashboardPage() {
             <BarChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{chartData.reduce((acc, cur) => acc + cur.detections, 0)}</div>
+            <div className="text-2xl font-bold">{loading ? <Skeleton className="h-6 w-8" /> : weeklyDetections}</div>
             <p className="text-xs text-muted-foreground">{t('Total for this week')}</p>
           </CardContent>
         </Card>
@@ -152,7 +202,11 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="pl-2">
             <div className="overflow-x-auto">
-              <DetectionsChart />
+              {loading ? (
+                <Skeleton className="h-[300px] w-full" />
+              ) : (
+                <DetectionsChart chartData={chartData} />
+              )}
             </div>
           </CardContent>
         </Card>
@@ -171,41 +225,57 @@ export default function DashboardPage() {
             </Button>
           </CardHeader>
           <CardContent className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('Crop')}</TableHead>
-                  <TableHead>{t('Diagnosis')}</TableHead>
-                  <TableHead className="text-right">{t('Time')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentAnalyses.map((analysis) => (
-                  <TableRow key={analysis.id}>
-                    <TableCell>
-                      <div className="font-medium">{t(analysis.crop as any)}</div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={analysis.predictions[0].label === 'Healthy' ? "secondary" : "destructive"} className="text-xs" >
-                        {t(analysis.predictions[0].label as any)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right text-muted-foreground text-xs">
-                      {formatDistanceToNow(new Date(analysis.timestamp), {
-                        addSuffix: true,
-                      })}
-                    </TableCell>
-                  </TableRow>
+            {loading ? (
+              <div className="space-y-4">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-6 w-16 rounded-full" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('Crop')}</TableHead>
+                    <TableHead>{t('Diagnosis')}</TableHead>
+                    <TableHead className="text-right">{t('Time')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentAnalyses.length > 0 ? (
+                    recentAnalyses.map((analysis) => (
+                      <TableRow key={analysis.id}>
+                        <TableCell>
+                          <div className="font-medium">{analysis.crop || 'Unknown'}</div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={(analysis.disease && analysis.disease !== 'Healthy') ? "destructive" : "secondary"} className="text-xs" >
+                            {analysis.disease || 'Unknown'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right text-muted-foreground text-xs">
+                          {analysis.timestamp ? formatDistanceToNow(new Date(analysis.timestamp), {
+                            addSuffix: true,
+                          }) : 'N/A'}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={3} className="text-center py-4 text-muted-foreground">
+                        {t('No analysis history found.')}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
       </div>
     </div>
   );
 }
-
-    
-
-    

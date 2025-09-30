@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -16,6 +15,7 @@ import { useCart } from '@/context/cart-context';
 import { Badge } from './ui/badge';
 import CartSheet from './cart-sheet';
 import Link from 'next/link';
+import { useAnalysis } from '@/context/analysis-context';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -25,6 +25,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
   const { t, setLocale, locale } = useI18n();
   const { cart } = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const { requestNewAnalysis } = useAnalysis();
 
   const cartItemCount = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
 
@@ -35,6 +36,15 @@ export default function Header({ onMenuClick }: HeaderProps) {
     { code: 'ta', name: 'தமிழ்' },
     { code: 'ml', name: 'മലയാളം' },
   ];
+
+  const handleNewAnalysis = () => {
+    // First navigate to the analyze page
+    window.location.href = '/dashboard/analyze';
+    // Then request a new analysis (this will be handled by the analysis view)
+    setTimeout(() => {
+      requestNewAnalysis();
+    }, 100);
+  };
 
   return (
     <>
@@ -49,11 +59,9 @@ export default function Header({ onMenuClick }: HeaderProps) {
       </Button>
       
       <div className="flex w-full flex-1 items-center justify-end gap-2 md:gap-4">
-        <Button asChild className="gap-1">
-            <Link href="/dashboard/analyze">
-                <PlusCircle className="h-4 w-4"/>
-                <span className="hidden sm:inline">{t('New Analysis')}</span>
-            </Link>
+        <Button className="gap-1" onClick={handleNewAnalysis}>
+            <PlusCircle className="h-4 w-4"/>
+            <span className="hidden sm:inline">{t('New Analysis')}</span>
         </Button>
 
         <DropdownMenu>

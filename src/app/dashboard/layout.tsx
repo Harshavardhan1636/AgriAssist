@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -14,6 +13,7 @@ import { communityOutbreaks } from '@/lib/mock-data';
 import { AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { AnalysisProvider } from '@/context/analysis-context';
 
 function DashboardLayoutContent({
   children,
@@ -33,12 +33,12 @@ function DashboardLayoutContent({
         setTimeout(() => {
             toast({
               title: `⚠️ ${t('Community Alert')}`,
-              description: `${t('High-risk outbreak detected')}: ${t(latestAlert.disease as any)} ${t('in')} ${latestAlert.location}. Click to view details.`,
+              description: `${t('High-risk outbreak detected')}: ${t(latestAlert.disease as any)} ${t('in')} ${latestAlert.location}. ${t('Immediate action recommended.')}`,
               variant: 'destructive',
               duration: 15000,
               action: (
                 <Link href="/dashboard/community">
-                  <Button variant="outline" size="sm">{t('View Details')}</Button>
+                  <Button variant="default" size="sm" className="bg-white text-red-600 hover:bg-gray-100 hover:text-red-700">{t('View Details')}</Button>
                 </Link>
               ),
             });
@@ -86,9 +86,11 @@ export default function DashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <ClientOnly>
-        <DashboardLayoutContent>{children}</DashboardLayoutContent>
-      </ClientOnly>
+      <AnalysisProvider>
+        <ClientOnly>
+          <DashboardLayoutContent>{children}</DashboardLayoutContent>
+        </ClientOnly>
+      </AnalysisProvider>
     </SidebarProvider>
   )
 }

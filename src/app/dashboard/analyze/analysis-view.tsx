@@ -1,18 +1,27 @@
-
 'use client';
 
-import { useState, useRef, ChangeEvent, FormEvent } from 'react';
+import { useState, useRef, ChangeEvent, FormEvent, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Upload, X, Loader2, AlertCircle, Image as ImageIcon, FileText, Mic, Square } from 'lucide-react';
+import { Upload, X, Loader2, AlertCircle, Image as ImageIcon, FileText, Mic, Square, MapPin, Plus } from 'lucide-react';
 import Image from 'next/image';
 import type { FullAnalysisResponse } from '@/lib/types';
 import AnalysisResults from './analysis-results';
 import { useI18n } from '@/context/i18n-context';
-import { analyzeImage } from './actions';
+import { analyzeImage } from './fixed-actions';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useAnalysis } from '@/context/analysis-context';
+import { v4 as uuidv4 } from 'uuid';
 
 function fileToDataUri(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -33,12 +42,106 @@ export default function AnalysisView() {
   const [textQuery, setTextQuery] = useState('');
   const [audioDataUri, setAudioDataUri] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [location, setLocation] = useState<{ lat: string; lng: string } | null>(null);
+  const [useLocation, setUseLocation] = useState(true);
+  const [selectedCrop, setSelectedCrop] = useState<string>(''); // New crop selection state
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  
+  const { isNewAnalysisRequested, resetNewAnalysisRequest } = useAnalysis();
 
   const { t, locale } = useI18n();
+  
+  // Effect to handle new analysis request from header
+  useEffect(() => {
+    if (isNewAnalysisRequested) {
+      startNewAnalysis();
+      resetNewAnalysisRequest();
+    }
+  }, [isNewAnalysisRequested, resetNewAnalysisRequest]);
+
+  // Function to start a new analysis
+  const startNewAnalysis = () => {
+    // Clear all current analysis data
+    setResult(null);
+    setPreview(null);
+    setTextQuery('');
+    setAudioDataUri(null);
+    setError(null);
+    setSelectedCrop('');
+    setLocation(null);
+    setUseLocation(true);
+    
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    
+    // Reset recording state if needed
+    if (isRecording) {
+      stopRecording();
+    }
+    
+    // Reset to image tab
+    setActiveTab('image');
+    
+    console.log('[INFO] Started new analysis');
+  };
+
+  // Function to store analysis in localStorage
+  const storeAnalysisInHistory = (analysisData: FullAnalysisResponse) => {
+    try {
+      const historyKey = 'agriassist_analysis_history';
+      const existingHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+      
+      // Generate a unique ID for the analysis
+      const analysisId = uuidv4();
+      
+      // Extract top prediction
+      const topPrediction = analysisData.classification?.predictions?.[0] || { label: 'Unknown', confidence: 0 };
+      
+      // Add the new analysis to the beginning of the history array
+      const newHistoryItem = {
+        id: analysisId,
+        timestamp: new Date().toISOString(),
+        disease: topPrediction.label,
+        confidence: topPrediction.confidence,
+        severity: analysisData.severity?.severityBand || 'Unknown',
+        location: location,
+        crop: selectedCrop,
+        // Store the complete analysis data for detailed view
+        fullData: {
+          classification: analysisData.classification,
+          severity: analysisData.severity,
+          explanation: analysisData.explanation,
+          forecast: analysisData.forecast,
+          recommendations: analysisData.recommendations,
+          originalImage: analysisData.originalImage,
+          locale: analysisData.locale,
+          conversationId: analysisData.conversationId,
+          // Add the text-based analysis flag
+          isTextBasedAnalysis: (analysisData as any).isTextBasedAnalysis || false
+        },
+        // Store a simplified version of the results for the history list
+        preview: {
+          disease: topPrediction.label,
+          confidence: Math.round(topPrediction.confidence * 100),
+          severity: analysisData.severity?.severityBand || 'Unknown',
+          riskScore: Math.round((analysisData.forecast?.riskScore || 0) * 100) || 0,
+        }
+      };
+      
+      // Limit history to 50 items
+      const updatedHistory = [newHistoryItem, ...existingHistory].slice(0, 50);
+      localStorage.setItem(historyKey, JSON.stringify(updatedHistory));
+      
+      console.log('[INFO] Analysis saved to localStorage history');
+    } catch (storageError) {
+      console.warn('[WARN] Failed to save analysis to localStorage:', storageError);
+    }
+  };
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -65,6 +168,31 @@ export default function AnalysisView() {
     setAudioDataUri(null);
     if (isRecording) {
       stopRecording();
+    }
+  };
+
+  const handleLocationChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const [lat, lng] = e.target.value.split(',').map(coord => coord.trim());
+    if (lat && lng) {
+      setLocation({ lat, lng });
+    }
+  };
+
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            lat: position.coords.latitude.toString(),
+            lng: position.coords.longitude.toString()
+          });
+        },
+        (error) => {
+          setError(`Location error: ${error.message}`);
+        }
+      );
+    } else {
+      setError("Geolocation is not supported by this browser.");
     }
   };
 
@@ -125,6 +253,16 @@ export default function AnalysisView() {
       hasInput = true;
     } 
 
+    // Add location data if enabled and available
+    if (useLocation && location) {
+      formData.append('location', JSON.stringify(location));
+    }
+    
+    // Add crop selection if available
+    if (selectedCrop) {
+      formData.append('cropType', selectedCrop);
+    }
+
     if (!hasInput) {
         setError("Please provide an input before starting the analysis.");
         setIsPending(false);
@@ -137,6 +275,11 @@ export default function AnalysisView() {
         setError(t(response.error as any) || response.error);
       } else if (response.data) {
         setResult(response.data);
+        
+        // Store complete analysis in localStorage for history
+        if (typeof window !== 'undefined' && response.data) {
+          storeAnalysisInHistory(response.data);
+        }
       } else {
         setError("An unexpected error occurred: received no data and no error.");
       }
@@ -160,7 +303,11 @@ export default function AnalysisView() {
   }
 
   if (result) {
-    return <AnalysisResults result={result} />;
+    return (
+      <div className="space-y-4">
+        <AnalysisResults result={result} />
+      </div>
+    );
   }
   
   return (
@@ -179,6 +326,29 @@ export default function AnalysisView() {
                         <CardDescription>{t('Upload an image of a plant leaf to get an AI-powered health analysis and risk assessment.')}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
+                        {/* Crop Selection */}
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium leading-none">
+                            {t('Select Crop Type (Optional)')}
+                          </label>
+                          <Select value={selectedCrop} onValueChange={setSelectedCrop}>
+                            <SelectTrigger>
+                              <SelectValue placeholder={t("Select a crop type")} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="tomato">{t('Tomato')}</SelectItem>
+                              <SelectItem value="rice">{t('Rice')}</SelectItem>
+                              <SelectItem value="wheat">{t('Wheat')}</SelectItem>
+                              <SelectItem value="maize">{t('Maize/Corn')}</SelectItem>
+                              <SelectItem value="potato">{t('Potato')}</SelectItem>
+                              <SelectItem value="other">{t('Other')}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-muted-foreground">
+                            {t('Selecting a crop type can help improve prediction accuracy.')}
+                          </p>
+                        </div>
+                        
                         <div className="space-y-2">
                             {preview ? (
                             <div className="relative group w-full max-w-lg mx-auto">
@@ -227,6 +397,51 @@ export default function AnalysisView() {
                             </div>
                             )}
                         </div>
+                        
+                        {/* Location Input */}
+                        <div className="space-y-4">
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              id="use-location"
+                              checked={useLocation}
+                              onChange={(e) => setUseLocation(e.target.checked)}
+                            />
+                            <label htmlFor="use-location" className="text-sm font-medium leading-none">
+                              {t('Use my current location for real-time weather and soil data')}
+                            </label>
+                          </div>
+                          
+                          {useLocation && (
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Button 
+                                  type="button" 
+                                  variant="outline" 
+                                  size="sm" 
+                                  onClick={getCurrentLocation}
+                                >
+                                  <MapPin className="h-4 w-4 mr-2" />
+                                  {t('Get Current Location')}
+                                </Button>
+                                <span className="text-sm text-muted-foreground">
+                                  {location ? `${location.lat}, ${location.lng}` : t('Location not set')}
+                                </span>
+                              </div>
+                              
+                              <div className="text-sm text-muted-foreground">
+                                <p>{t('Or enter coordinates manually:')}</p>
+                                <Input
+                                  type="text"
+                                  placeholder="17.3850, 78.4867"
+                                  onChange={handleLocationChange}
+                                  className="mt-1"
+                                />
+                                <p className="mt-1">{t('Format: latitude, longitude')}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                     </CardContent>
                 </Card>
             </TabsContent>
@@ -237,12 +452,80 @@ export default function AnalysisView() {
                         <CardDescription>{t("Describe the symptoms you're seeing in your own words.")}</CardDescription>
                     </CardHeader>
                     <CardContent>
+                        {/* Crop Selection */}
+                        <div className="space-y-2 mb-4">
+                          <label className="text-sm font-medium leading-none">
+                            {t('Select Crop Type (Optional)')}
+                          </label>
+                          <Select value={selectedCrop} onValueChange={setSelectedCrop}>
+                            <SelectTrigger>
+                              <SelectValue placeholder={t("Select a crop type")} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="tomato">{t('Tomato')}</SelectItem>
+                              <SelectItem value="rice">{t('Rice')}</SelectItem>
+                              <SelectItem value="wheat">{t('Wheat')}</SelectItem>
+                              <SelectItem value="maize">{t('Maize/Corn')}</SelectItem>
+                              <SelectItem value="potato">{t('Potato')}</SelectItem>
+                              <SelectItem value="other">{t('Other')}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-muted-foreground">
+                            {t('Selecting a crop type can help improve prediction accuracy.')}
+                          </p>
+                        </div>
+                        
                         <Textarea 
                             value={textQuery}
                             onChange={(e) => setTextQuery(e.target.value)}
                             placeholder={t("e.g., 'My tomato leaves have yellow spots and brown edges.'")}
                             className="min-h-[200px]"
                         />
+                        
+                        {/* Location Input */}
+                        <div className="mt-4 space-y-4">
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              id="use-location-text"
+                              checked={useLocation}
+                              onChange={(e) => setUseLocation(e.target.checked)}
+                            />
+                            <label htmlFor="use-location-text" className="text-sm font-medium leading-none">
+                              {t('Use my current location for real-time weather and soil data')}
+                            </label>
+                          </div>
+                          
+                          {useLocation && (
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Button 
+                                  type="button" 
+                                  variant="outline" 
+                                  size="sm" 
+                                  onClick={getCurrentLocation}
+                                >
+                                  <MapPin className="h-4 w-4 mr-2" />
+                                  {t('Get Current Location')}
+                                </Button>
+                                <span className="text-sm text-muted-foreground">
+                                  {location ? `${location.lat}, ${location.lng}` : t('Location not set')}
+                                </span>
+                              </div>
+                              
+                              <div className="text-sm text-muted-foreground">
+                                <p>{t('Or enter coordinates manually:')}</p>
+                                <Input
+                                  type="text"
+                                  placeholder="17.3850, 78.4867"
+                                  onChange={handleLocationChange}
+                                  className="mt-1"
+                                />
+                                <p className="mt-1">{t('Format: latitude, longitude')}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                     </CardContent>
                 </Card>
             </TabsContent>
@@ -270,6 +553,74 @@ export default function AnalysisView() {
                                 <audio src={audioDataUri} controls className="w-full" />
                             </div>
                         )}
+                        
+                        {/* Crop Selection */}
+                        <div className="space-y-2 w-full">
+                          <label className="text-sm font-medium leading-none">
+                            {t('Select Crop Type (Optional)')}
+                          </label>
+                          <Select value={selectedCrop} onValueChange={setSelectedCrop}>
+                            <SelectTrigger>
+                              <SelectValue placeholder={t("Select a crop type")} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="tomato">{t('Tomato')}</SelectItem>
+                              <SelectItem value="rice">{t('Rice')}</SelectItem>
+                              <SelectItem value="wheat">{t('Wheat')}</SelectItem>
+                              <SelectItem value="maize">{t('Maize/Corn')}</SelectItem>
+                              <SelectItem value="potato">{t('Potato')}</SelectItem>
+                              <SelectItem value="other">{t('Other')}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-muted-foreground">
+                            {t('Selecting a crop type can help improve prediction accuracy.')}
+                          </p>
+                        </div>
+                        
+                        {/* Location Input */}
+                        <div className="w-full mt-4 space-y-4">
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              id="use-location-audio"
+                              checked={useLocation}
+                              onChange={(e) => setUseLocation(e.target.checked)}
+                            />
+                            <label htmlFor="use-location-audio" className="text-sm font-medium leading-none">
+                              {t('Use my current location for real-time weather and soil data')}
+                            </label>
+                          </div>
+                          
+                          {useLocation && (
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Button 
+                                  type="button" 
+                                  variant="outline" 
+                                  size="sm" 
+                                  onClick={getCurrentLocation}
+                                >
+                                  <MapPin className="h-4 w-4 mr-2" />
+                                  {t('Get Current Location')}
+                                </Button>
+                                <span className="text-sm text-muted-foreground">
+                                  {location ? `${location.lat}, ${location.lng}` : t('Location not set')}
+                                </span>
+                              </div>
+                              
+                              <div className="text-sm text-muted-foreground">
+                                <p>{t('Or enter coordinates manually:')}</p>
+                                <Input
+                                  type="text"
+                                  placeholder="17.3850, 78.4867"
+                                  onChange={handleLocationChange}
+                                  className="mt-1"
+                                />
+                                <p className="mt-1">{t('Format: latitude, longitude')}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                     </CardContent>
                 </Card>
             </TabsContent>

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { mockForecast } from '@/lib/mock-data';
 
 export async function GET(request: NextRequest) {
   try {
@@ -7,60 +6,7 @@ export async function GET(request: NextRequest) {
     const location = searchParams.get('location');
     const lat = searchParams.get('lat');
     const lng = searchParams.get('lng');
-    const days = parseInt(searchParams.get('days') || '7');
-
-    if (!location && (!lat || !lng)) {
-      return NextResponse.json(
-        { success: false, error: 'Location or coordinates are required' },
-        { status: 400 }
-      );
-    }
-
-    // TODO: Replace with actual weather API call
-    // For now, return mock data
-    const weatherData = {
-      location: location || `${lat}, ${lng}`,
-      forecast: mockForecast.slice(0, days),
-      current: {
-        temperature: 28,
-        humidity: 75,
-        windSpeed: 12,
-        condition: 'Partly Cloudy',
-        pressure: 1013,
-        visibility: 10
-      },
-      alerts: [
-        {
-          type: 'High Humidity',
-          severity: 'Medium',
-          message: 'High humidity levels may increase disease risk for tomato crops',
-          validUntil: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-        }
-      ]
-    };
-
-    return NextResponse.json({
-      success: true,
-      data: weatherData
-    });
-
-  } catch (error) {
-    console.error('Error fetching weather data:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch weather data' },
-      { status: 500 }
-    );
-  }
-}
-
-// TODO: Implement with real weather API
-/*
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const lat = searchParams.get('lat');
-    const lng = searchParams.get('lng');
-    const days = parseInt(searchParams.get('days') || '7');
+    const days = parseInt(searchParams.get('days') || '14'); // Default to 14 days
 
     if (!lat || !lng) {
       return NextResponse.json(
@@ -69,14 +15,26 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Call OpenWeatherMap API
+    // Get API key from environment variables
     const apiKey = process.env.OPENWEATHER_API_KEY;
-    const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${apiKey}&units=metric`;
-    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lng}&appid=${apiKey}&units=metric&cnt=${days * 8}`; // 8 forecasts per day (3-hour intervals)
+    if (!apiKey) {
+      return NextResponse.json(
+        { success: false, error: 'Weather API key not configured' },
+        { status: 500 }
+      );
+    }
+
+    // Call OpenWeather Agro API for current weather
+    const currentWeatherUrl = `https://api.agromonitoring.com/agro/1.0/weather?lat=${lat}&lon=${lng}&appid=${apiKey}`;
+    
+    // Call OpenWeather Agro API for 14-day forecast
+    // Note: Agro API provides 5-day forecast with 3-hour intervals
+    // For 14 days, we'll need to combine with historical data or use a different approach
+    const forecastWeatherUrl = `https://api.agromonitoring.com/agro/1.0/weather/forecast?lat=${lat}&lon=${lng}&appid=${apiKey}`;
 
     const [currentResponse, forecastResponse] = await Promise.all([
       fetch(currentWeatherUrl),
-      fetch(forecastUrl)
+      fetch(forecastWeatherUrl)
     ]);
 
     if (!currentResponse.ok || !forecastResponse.ok) {
@@ -86,19 +44,19 @@ export async function GET(request: NextRequest) {
     const currentData = await currentResponse.json();
     const forecastData = await forecastResponse.json();
 
-    // Process and format the data
+    // Process and format the data for 14 days
     const processedData = {
-      location: `${currentData.name}, ${currentData.sys.country}`,
+      location: location || `${lat}, ${lng}`,
       current: {
-        temperature: Math.round(currentData.main.temp),
+        temperature: Math.round(currentData.main.temp - 273.15), // Convert from Kelvin to Celsius
         humidity: currentData.main.humidity,
         windSpeed: Math.round(currentData.wind.speed * 3.6), // Convert m/s to km/h
         condition: currentData.weather[0].main,
         pressure: currentData.main.pressure,
-        visibility: currentData.visibility / 1000 // Convert to km
+        visibility: 10 // Agro API doesn't provide visibility, using default
       },
-      forecast: processForecastData(forecastData.list, days),
-      alerts: generateAgriculturalAlerts(currentData, forecastData.list)
+      forecast: processForecastDataFor14Days(forecastData, days),
+      alerts: generateAgriculturalAlerts(currentData, forecastData)
     };
 
     return NextResponse.json({
@@ -115,30 +73,86 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function processForecastData(forecastList: any[], days: number) {
+function processForecastDataFor14Days(forecastList: any[], days: number) {
   // Group forecasts by day and calculate daily averages
   const dailyForecasts = [];
   
-  for (let i = 0; i < days; i++) {
-    const dayStart = i * 8;
-    const dayEnd = Math.min((i + 1) * 8, forecastList.length);
-    const dayForecasts = forecastList.slice(dayStart, dayEnd);
+  // Group forecast data by day
+  const groupedByDay: any = {};
+  const today = new Date();
+  
+  forecastList.forEach((forecast: any) => {
+    const date = new Date(forecast.dt * 1000);
+    const dateKey = date.toISOString().split('T')[0];
+    
+    if (!groupedByDay[dateKey]) {
+      groupedByDay[dateKey] = [];
+    }
+    groupedByDay[dateKey].push(forecast);
+  });
+  
+  // Process each day's data
+  const dateKeys = Object.keys(groupedByDay);
+  for (let i = 0; i < Math.min(days, dateKeys.length); i++) {
+    const dateKey = dateKeys[i];
+    const dayForecasts = groupedByDay[dateKey];
     
     if (dayForecasts.length === 0) break;
     
-    const avgTemp = dayForecasts.reduce((sum, f) => sum + f.main.temp, 0) / dayForecasts.length;
-    const avgHumidity = dayForecasts.reduce((sum, f) => sum + f.main.humidity, 0) / dayForecasts.length;
-    const totalRain = dayForecasts.reduce((sum, f) => sum + (f.rain?.['3h'] || 0), 0);
+    // Calculate averages
+    const avgTemp = dayForecasts.reduce((sum: number, f: any) => sum + (f.main.temp - 273.15), 0) / dayForecasts.length;
+    const avgHumidity = dayForecasts.reduce((sum: number, f: any) => sum + f.main.humidity, 0) / dayForecasts.length;
+    
+    // Find min/max temperatures
+    const temps = dayForecasts.map((f: any) => f.main.temp - 273.15);
+    const minTemp = Math.min(...temps);
+    const maxTemp = Math.max(...temps);
+    
+    // Calculate total precipitation
+    let totalRain = 0;
+    dayForecasts.forEach((f: any) => {
+      if (f.rain && f.rain['3h']) {
+        totalRain += f.rain['3h'];
+      }
+    });
+    
+    // Use midday forecast for condition
+    const middayIndex = Math.floor(dayForecasts.length / 2);
+    const condition = dayForecasts[middayIndex]?.weather[0]?.main || dayForecasts[0]?.weather[0]?.main || 'Clear';
     
     dailyForecasts.push({
-      condition: dayForecasts[4]?.weather[0]?.main || dayForecasts[0].weather[0].main, // Use midday forecast
+      condition: condition,
       temp: {
-        max: Math.round(Math.max(...dayForecasts.map(f => f.main.temp_max))),
-        min: Math.round(Math.min(...dayForecasts.map(f => f.main.temp_min)))
+        max: Math.round(maxTemp),
+        min: Math.round(minTemp)
       },
       humidity: Math.round(avgHumidity),
       rainChance: Math.min(100, Math.round(totalRain * 10)) // Rough conversion to percentage
     });
+  }
+  
+  // If we need more days than available in forecast, extend with average data
+  if (dailyForecasts.length < days) {
+    const avgMaxTemp = dailyForecasts.reduce((sum, day) => sum + day.temp.max, 0) / dailyForecasts.length;
+    const avgMinTemp = dailyForecasts.reduce((sum, day) => sum + day.temp.min, 0) / dailyForecasts.length;
+    const avgHumidity = dailyForecasts.reduce((sum, day) => sum + day.humidity, 0) / dailyForecasts.length;
+    const avgRainChance = dailyForecasts.reduce((sum, day) => sum + day.rainChance, 0) / dailyForecasts.length;
+    const commonCondition = dailyForecasts[0]?.condition || 'Clear';
+    
+    for (let i = dailyForecasts.length; i < days; i++) {
+      const futureDate = new Date(today);
+      futureDate.setDate(futureDate.getDate() + i);
+      
+      dailyForecasts.push({
+        condition: commonCondition,
+        temp: {
+          max: Math.round(avgMaxTemp),
+          min: Math.round(avgMinTemp)
+        },
+        humidity: Math.round(avgHumidity),
+        rainChance: Math.round(avgRainChance)
+      });
+    }
   }
   
   return dailyForecasts;
@@ -158,7 +172,8 @@ function generateAgriculturalAlerts(current: any, forecast: any[]) {
   }
   
   // Temperature alerts
-  if (current.main.temp > 35) {
+  const tempCelsius = current.main.temp - 273.15;
+  if (tempCelsius > 35) {
     alerts.push({
       type: 'Heat Stress',
       severity: 'High',
@@ -168,7 +183,7 @@ function generateAgriculturalAlerts(current: any, forecast: any[]) {
   }
   
   // Check for upcoming rain
-  const upcomingRain = forecast.slice(0, 8).some(f => f.rain && f.rain['3h'] > 0);
+  const upcomingRain = forecast.slice(0, 8).some((f: any) => f.rain && f.rain['3h'] > 0);
   if (upcomingRain) {
     alerts.push({
       type: 'Rain Expected',
@@ -180,4 +195,3 @@ function generateAgriculturalAlerts(current: any, forecast: any[]) {
   
   return alerts;
 }
-*/

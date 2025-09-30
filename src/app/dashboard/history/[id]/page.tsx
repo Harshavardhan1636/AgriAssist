@@ -1,51 +1,15 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, notFound } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useI18n } from '@/context/i18n-context';
-import { mockHistory, mockConversations } from '@/lib/mock-data';
-import type { FullAnalysisResponse, Conversation, AnalysisResult } from '@/lib/types';
+import type { FullAnalysisResponse } from '@/lib/types';
 import AnalysisResults from '@/app/dashboard/analyze/analysis-results';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
-
-// This is a helper function to assemble the full response object
-// that the AnalysisResults component expects. In a real app, you'd fetch this complete object from the DB.
-const assembleFullAnalysisResponse = (analysis: AnalysisResult): FullAnalysisResponse | null => {
-    if (!analysis) return null;
-
-    // This is a simplified reconstruction.
-    return {
-        classification: { predictions: analysis.predictions },
-        severity: {
-            severityPercentage: analysis.severity.percentage,
-            severityBand: analysis.severity.band,
-            confidence: analysis.predictions[0].confidence, // Use top prediction confidence
-        },
-        explanation: { gradCAMOverlay: analysis.gradCamImage },
-        forecast: {
-            riskScore: analysis.risk.score,
-            explanation: analysis.risk.explanation,
-            // Mocking these as they are not in the brief history object. A real backend would provide them.
-            preventiveActions: ['Monitor crop daily', 'Ensure good drainage', 'Improve air circulation'], 
-        },
-        recommendations: {
-            // Mocking recommendations. A real backend would provide these based on the analysis.
-            recommendations: [
-                { step: 1, title: 'Monitor and Remove Infected Leaves', description: 'Regularly check plants and remove any leaves showing signs of the disease to reduce spread.', type: 'Organic/Cultural' },
-                { step: 2, title: 'Apply Organic Fungicide', description: 'Use a copper-based or neem oil fungicide as a preventive measure, especially before rain is forecasted.', type: 'Organic/Cultural' },
-            ]
-        },
-        originalImage: analysis.image,
-        locale: 'en', // This should come from i18n context or be stored with the analysis
-        conversationId: analysis.conversationId
-    };
-}
-
 
 export default function CaseDetailPage() {
     const { t } = useI18n();
@@ -54,18 +18,42 @@ export default function CaseDetailPage() {
     
     const [fullResponse, setFullResponse] = useState<FullAnalysisResponse | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [analysis, setAnalysis] = useState<any>(null);
 
     useEffect(() => {
-        // In a real app, you'd fetch the full analysis and conversation from your backend using the ID.
-        // Here, we find the data from our mock files.
-        const foundAnalysis = mockHistory.find(h => h.id === id || h.conversationId === id);
-        
-        if (foundAnalysis) {
-            const assembledResponse = assembleFullAnalysisResponse(foundAnalysis);
-            setFullResponse(assembledResponse);
-        } else {
-             // In a real app, this would trigger a 404.
-            console.error("Analysis not found");
+        // First, try to find the analysis in localStorage
+        try {
+            const historyKey = 'agriassist_analysis_history';
+            const history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+            const foundAnalysis = history.find((h: any) => h.id === id);
+            
+            if (foundAnalysis) {
+                setAnalysis(foundAnalysis);
+                // Use the complete stored data for the AnalysisResults component
+                if (foundAnalysis.fullData) {
+                    setFullResponse(foundAnalysis.fullData);
+                } else {
+                    // Fallback for older data format
+                    const assembledResponse = assembleFullAnalysisResponse(foundAnalysis);
+                    setFullResponse(assembledResponse);
+                }
+            } else {
+                console.error("Analysis not found in localStorage");
+                // Try to find in sessionStorage as fallback
+                const sessionHistory = JSON.parse(sessionStorage.getItem(historyKey) || '[]');
+                const sessionAnalysis = sessionHistory.find((h: any) => h.id === id);
+                if (sessionAnalysis) {
+                    setAnalysis(sessionAnalysis);
+                    if (sessionAnalysis.fullData) {
+                        setFullResponse(sessionAnalysis.fullData);
+                    } else {
+                        const assembledResponse = assembleFullAnalysisResponse(sessionAnalysis);
+                        setFullResponse(assembledResponse);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Error loading analysis:", error);
         }
         setIsLoading(false);
     }, [id]);
@@ -92,21 +80,26 @@ export default function CaseDetailPage() {
         );
     }
     
-    if (!fullResponse) {
-        // Use Next.js notFound() in a real app to render the 404 page
-        // notFound(); 
+    if (!fullResponse || !analysis) {
         return (
             <div className="flex flex-col items-center justify-center h-full text-center">
                  <Card>
                     <CardHeader>
-                        <CardTitle>{t('Case not found')}</CardTitle>
+                        <CardTitle>{t('Analysis not found')}</CardTitle>
+                        <p className="text-muted-foreground mt-2">
+                            {t('The requested analysis could not be found. It may have been deleted or the link is invalid.')}
+                        </p>
+                        <Button asChild className="mt-4">
+                            <Link href="/dashboard/history">
+                                <ArrowLeft className="mr-2 h-4 w-4" />
+                                {t('Back to History')}
+                            </Link>
+                        </Button>
                     </CardHeader>
                 </Card>
             </div>
         );
     }
-    
-    const analysis = mockHistory.find(h => h.id === id || h.conversationId === id);
 
     return (
         <div className="space-y-6">
@@ -116,10 +109,75 @@ export default function CaseDetailPage() {
                         <ArrowLeft />
                     </Link>
                  </Button>
-                 <h1 className="text-2xl lg:text-3xl font-semibold">{t('Case Details for')} {analysis?.crop} - {t(analysis?.predictions[0].label as any)}</h1>
+                 <h1 className="text-2xl lg:text-3xl font-semibold">
+                    {t('Case Details for')} {analysis?.disease || 'Unknown Disease'}
+                 </h1>
             </div>
             
             <AnalysisResults result={fullResponse} />
         </div>
     );
+}
+
+// This is a helper function to assemble the full response object
+// that the AnalysisResults component expects.
+const assembleFullAnalysisResponse = (analysis: any): FullAnalysisResponse | null => {
+    if (!analysis) return null;
+
+    // If we have full data stored, use it directly
+    if (analysis.fullData) {
+        return analysis.fullData;
+    }
+
+    // Fallback to assembling from individual fields for older data format
+    return {
+        classification: { 
+            predictions: [
+                { label: analysis.disease || 'Unknown Disease', confidence: analysis.confidence || 0 },
+                // Add some mock predictions if needed for UI
+            ] 
+        },
+        severity: {
+            severityPercentage: analysis.preview?.severityPercentage || 0,
+            severityBand: analysis.severity || 'Unknown',
+            confidence: analysis.confidence || 0,
+        },
+        explanation: { gradCAMOverlay: analysis.fullData?.explanation?.gradCAMOverlay || '' },
+        forecast: {
+            riskScore: (analysis.preview?.riskScore || 0) / 100,
+            explanation: 'Risk assessment based on environmental factors and disease patterns.',
+            preventiveActions: [
+                'Monitor plants regularly for early signs of disease',
+                'Maintain proper spacing between plants for air circulation',
+                'Apply appropriate fungicides as recommended'
+            ],
+        },
+        recommendations: {
+            recommendations: [
+                { 
+                    step: 1, 
+                    title: 'Immediate Action', 
+                    description: 'Remove and destroy infected plant parts to prevent spread.', 
+                    type: 'Preventive' 
+                },
+                { 
+                    step: 2, 
+                    title: 'Treatment', 
+                    description: 'Apply appropriate fungicides as recommended for this disease.', 
+                    type: 'Chemical' 
+                },
+                { 
+                    step: 3, 
+                    title: 'Prevention', 
+                    description: 'Implement crop rotation and use disease-resistant varieties.', 
+                    type: 'Organic/Cultural' 
+                }
+            ]
+        },
+        originalImage: analysis.fullData?.originalImage || '',
+        locale: analysis.fullData?.locale || 'en',
+        conversationId: analysis.fullData?.conversationId || analysis.id || 'unknown',
+        // Add the text-based analysis flag if it exists
+        isTextBasedAnalysis: analysis.fullData?.isTextBasedAnalysis || false
+    };
 }

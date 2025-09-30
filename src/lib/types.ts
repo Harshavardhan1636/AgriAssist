@@ -5,7 +5,7 @@ import type {
   ExplainClassificationWithGradCAMOutput,
   ForecastOutbreakRiskOutput,
   GenerateRecommendationsOutput,
-} from '@/app/dashboard/analyze/actions';
+} from '@/app/dashboard/analyze/fixed-actions';
 
 
 export type Prediction = {
@@ -79,6 +79,8 @@ export type FullAnalysisResponse = {
   originalImage: string;
   locale: string;
   conversationId: string;
+  // Add property to indicate if this is a text-based analysis
+  isTextBasedAnalysis?: boolean;
 };
 
 

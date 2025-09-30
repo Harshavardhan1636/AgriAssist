@@ -19,7 +19,16 @@ class ApiClient {
   private token: string | null = null;
 
   constructor(baseUrl: string = '') {
-    this.baseUrl = baseUrl;
+    // Ensure we have a valid base URL
+    if (baseUrl) {
+      this.baseUrl = baseUrl;
+    } else if (typeof window !== 'undefined') {
+      // In browser environment, use window.location.origin
+      this.baseUrl = window.location.origin;
+    } else {
+      // In server environment, use localhost as fallback
+      this.baseUrl = 'http://localhost:9002';
+    }
     
     // Initialize token from localStorage if available
     if (typeof window !== 'undefined') {
@@ -33,10 +42,46 @@ class ApiClient {
 
   private async request<T>(
     endpoint: string, 
-    options: RequestInit = {}
+    options: RequestInit & { params?: Record<string, any> } = {}
   ): Promise<{ success: boolean; data?: T; error?: string }> {
-    const url = `${this.baseUrl}/api${endpoint}`;
+    // Handle endpoints that already contain query parameters
+    let url: string;
     
+    if (endpoint.startsWith('/')) {
+      // Check if endpoint already has query parameters
+      if (endpoint.includes('?')) {
+        const [path, queryParams] = endpoint.split('?');
+        url = `${this.baseUrl}/api${path}?${queryParams}`;
+      } else {
+        url = `${this.baseUrl}/api${endpoint}`;
+      }
+    } else {
+      // Handle full URLs or relative paths
+      if (endpoint.startsWith('http')) {
+        url = endpoint;
+      } else {
+        url = `${this.baseUrl}/${endpoint}`;
+      }
+    }
+    
+    // Handle query parameters in options
+    if (options && (options as any).params) {
+      const params = (options as any).params;
+      const searchParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          searchParams.append(key, value.toString());
+        }
+      });
+      
+      if (searchParams.toString()) {
+        url += (url.includes('?') ? '&' : '?') + searchParams.toString();
+      }
+      
+      // Remove params from options to avoid passing them to fetch
+      delete (options as any).params;
+    }
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
@@ -333,13 +378,6 @@ class ApiClient {
     lng?: string;
     days?: number;
   }) {
-    const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined) {
-        searchParams.append(key, value.toString());
-      }
-    });
-
     return this.request<{
       location: string;
       forecast: WeatherForecast[];
@@ -357,7 +395,32 @@ class ApiClient {
         message: string;
         validUntil: string;
       }>;
-    }>(`/farm-data/weather?${searchParams}`);
+    }>('/farm-data/weather', {
+      params
+    });
+  }
+
+  async getSoilData(params: {
+    lat: string;
+    lng: string;
+  }) {
+    return this.request<{
+      type: 'Loam' | 'Clay' | 'Sandy' | 'Silty';
+      moisture: number;
+      ph: number;
+      nutrients: {
+        nitrogen: 'Low' | 'Medium' | 'High';
+        phosphorus: 'Low' | 'Medium' | 'High';
+        potassium: 'Low' | 'Medium' | 'High';
+      };
+      timestamp: string;
+      location: {
+        lat: number;
+        lng: number;
+      };
+    }>('/farm-data/soil', {
+      params
+    });
   }
 }
 

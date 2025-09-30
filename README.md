@@ -1,18 +1,23 @@
-
-# AgriAssist: AI-Powered Crop Health Analysis
+# AgriAssist 3.0: AI-Powered Crop Health Analysis
 
 AgriAssist is a web application designed to act as a "Digital Health Twin" for a farm. It uses AI to analyze images of crops, diagnose diseases, assess severity, and forecast outbreak risks. This tool is intended to help farmers and agronomists make informed decisions to protect their crops.
 
-## Key Features
+## Current Status
+
+AgriAssist 3.0 represents a significant evolution from previous versions, with a focus on practical implementation and user experience. The application is currently in the prototype stage with a fully functional frontend and simulated backend services.
+
+## Key Features (Implemented)
 
 - **Multimodal & Multilingual Analysis:** Upload an image, record a voice note, or type a description in your local language to get a comprehensive health analysis.
 - **Disease Classification & Severity Assessment:** The AI model identifies potential diseases, provides confidence scores, and estimates the extent of damage.
 - **Explainable AI (XAI):** Uses Grad-CAM heatmaps to visualize which parts of the image the AI focused on for its diagnosis, building farmer trust.
-- **Risk Forecasting:** Provides a 7-day outbreak risk score based on various data points to enable preventive action.
-- **Community Outbreak Alerts:** Features a live, interactive map showing reported disease outbreaks in the region, helping farmers stay informed about local threats.
+- **Risk Forecasting:** Provides a 14-day outbreak risk score based on various data points to enable preventive action.
 - **Ethical & Smart Marketplace:** An integrated store recommends safe, government-approved, and organic-first products based on the specific crop diagnosis. Includes a map to find local retailers.
 - **Persistent AI Conversations:** Every analysis creates a dedicated chat session. Farmers can ask follow-up questions and refer back to the conversation days later, creating an ongoing relationship with their AI assistant.
 - **Analysis History & Review Queue:** Browse all past analyses and flag low-confidence predictions for expert review by an agronomist, creating a continuous learning loop.
+- **Voice Input Support:** Hands-free symptom description using Web Speech API for accessibility.
+- **Crop-Specific Models:** Different AI models for different crops (paddy for rice, plantvillage for others).
+- **Real Dashboard Analytics:** Dynamic charts and metrics using actual user data.
 
 ## Tech Stack
 
@@ -21,8 +26,85 @@ This project is built on the following technologies:
 - **Frontend:** [Next.js](https://nextjs.org/) (with App Router), [React](https://react.dev/), [TypeScript](https://www.typescriptlang.org/)
 - **UI:** [shadcn/ui](https://ui.shadcn.com/), [Tailwind CSS](https://tailwindcss.com/)
 - **Generative AI:** [Google's Gemini models](https://deepmind.google/technologies/gemini/) accessed via [Genkit](https://firebase.google.com/docs/genkit).
+- **Computer Vision:** Custom PyTorch models (MobileNetV2/EfficientNet) for plant disease classification and Grad-CAM explainability.
 - **Charting & Mapping:** [Recharts](https://recharts.org/), [Leaflet](https://leafletjs.com/), [React Leaflet](https://react-leaflet.js.org/)
 - **Hosting:** Prepared for [Firebase App Hosting](https://firebase.google.com/docs/app-hosting).
+
+## Current Implementation Status
+
+### Core Features
+✅ **Complete:** Image-based disease detection with Grad-CAM visualization
+✅ **Complete:** Text-based diagnosis with reference image matching
+✅ **Complete:** Voice input functionality using Web Speech API
+✅ **Complete:** Crop-specific model selection
+✅ **Complete:** Comprehensive result presentation with all AI insights
+✅ **Complete:** Analysis history with complete data persistence
+✅ **Complete:** Separate AI conversation system
+✅ **Complete:** Dashboard with real analytics
+
+### In Progress
+🔄 **Multi-language Enhancement:** Expanding localization support for all UI elements and AI-generated content
+🔄 **Crop Planning Feature:** New module for seasonal planting recommendations and crop rotation planning
+🔄 **Enhanced Data Persistence:** Migration from localStorage to robust backend storage
+
+## Future Roadmap
+
+### Phase 1: Stabilization & Enhancement (Next 2-3 months)
+- Complete multi-language implementation with dynamic language switching
+- Optimize AI model performance and accuracy
+- Enhance error handling and user feedback systems
+- Improve mobile responsiveness and accessibility
+
+### Phase 2: Feature Expansion (3-6 months)
+- Launch crop planning module with seasonal recommendations
+- Add advanced data visualization and export functionality
+- Implement user account system for data synchronization
+- Integrate with external APIs for enhanced weather/soil data
+
+### Phase 3: Innovation & Differentiation (6-12 months)
+- Develop digital twin functionality for farms
+- Build community knowledge network for farmer-to-farmer sharing
+- Add precision agriculture features with IoT sensor integration
+- Implement sustainability advisor for organic farming practices
+
+## AI Recommendations for Hackathon Standout
+
+To differentiate AgriAssist in the competitive agri-tech landscape, we're implementing these innovative features:
+
+### 1. Digital Twin for Farms
+Create a virtual replica of each farmer's farm that:
+- Updates in real-time with sensor data (planned integration)
+- Predicts outcomes of different farming decisions
+- Simulates the impact of weather events
+- Provides what-if scenarios for crop management
+
+### 2. Community Knowledge Network
+Build a farmer-to-farmer knowledge sharing platform:
+- Anonymous problem sharing for community solutions
+- Expert verification of community-shared solutions
+- Regional best practices database
+- Success story showcase with measurable outcomes
+
+### 3. Precision Agriculture Integration
+Advanced features for tech-savvy farmers:
+- Drone image analysis for large fields
+- Variable rate application recommendations
+- Soil health monitoring with IoT sensors
+- Automated irrigation scheduling based on AI predictions
+
+### 4. Sustainable Farming Advisor
+Focus on environmentally conscious recommendations:
+- Organic treatment alternatives prioritization
+- Carbon footprint tracking for farming practices
+- Water conservation techniques specific to crop types
+- Biodiversity impact assessment for farming decisions
+
+### 5. Climate Resilience Planning
+Prepare farmers for climate change challenges:
+- Drought-resistant crop recommendations
+- Flood impact mitigation strategies
+- Heat stress management for crops
+- Adaptive farming techniques for changing weather patterns
 
 ## Backend Architecture Blueprint
 
@@ -119,7 +201,6 @@ This final phase makes the Digital Twin a truly autonomous and self-improving as
   - **Backend**: Build a predictive modeling engine that uses the Digital Twin's data as a baseline to simulate variables like nutrient uptake, pest spread, and water consumption.
   - **Frontend**: Design an interactive UI `(/dashboard/sandbox)` where a farmer can input variables and see a side-by-side comparison of the projected outcomes.
 
-
 ## Getting Started
 
 ### Prerequisites
@@ -145,3 +226,18 @@ This final phase makes the Digital Twin a truly autonomous and self-improving as
    ```
 
 Open [http://localhost:9002](http://localhost:9002) with your browser to see the result.
+
+## Documentation
+
+For comprehensive documentation including technical details, API specifications, and implementation guides, please refer to:
+- [AGRIASSIST_DOCUMENTATION.md](AGRIASSIST_DOCUMENTATION.md) - Complete project documentation
+- [AGRO_API_INTEGRATION.md](AGRO_API_INTEGRATION.md) - Agricultural API integration guide
+- [DEPLOYMENT-STATUS.md](DEPLOYMENT-STATUS.md) - Deployment and current status tracking
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

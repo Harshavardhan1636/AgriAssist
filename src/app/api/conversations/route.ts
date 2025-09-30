@@ -1,47 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { mockConversations } from '@/lib/mock-data';
+import { getFirestore, collection, query, where, orderBy, limit as firestoreLimit, startAfter, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { app } from '@/lib/firebase';
 
-export async function GET(request: NextRequest) {
-  try {
-    // TODO: Extract user ID from JWT token
-    // const userId = await getUserIdFromToken(request);
-    const userId = 'demo-user-id'; // Mock user ID
-
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
-    const offset = (page - 1) * limit;
-
-    // TODO: Replace with Firestore query
-    // For now, return mock data
-    const userConversations = mockConversations.slice(offset, offset + limit);
-    const total = mockConversations.length;
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        conversations: userConversations,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit)
-        }
-      }
-    });
-
-  } catch (error) {
-    console.error('Error fetching conversations:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch conversations' },
-      { status: 500 }
-    );
-  }
+async function getUserIdFromToken(request: NextRequest): Promise<string> {
+  // Mock implementation - in a real app, you would verify the JWT token
+  // and extract the user ID from it
+  return 'demo-user-id';
 }
-
-// TODO: Implement with Firestore
-/*
-import { getFirestore, collection, query, where, orderBy, limit as firestoreLimit, startAfter, getDocs } from 'firebase/firestore';
 
 export async function GET(request: NextRequest) {
   try {
@@ -50,7 +16,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
 
-    const db = getFirestore();
+    const db = getFirestore(app);
     const conversationsRef = collection(db, 'conversations');
     
     let q = query(
@@ -105,4 +71,42 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-*/
+
+export async function POST(request: NextRequest) {
+  try {
+    const userId = await getUserIdFromToken(request);
+    const body = await request.json();
+    
+    const { title, analysisContext } = body;
+
+    const db = getFirestore(app);
+    const conversationsRef = collection(db, 'conversations');
+    
+    // Create new conversation
+    const newConversation = {
+      userId,
+      title,
+      analysisContext,
+      messages: [],
+      createdAt: serverTimestamp(),
+      lastMessageAt: serverTimestamp(),
+    };
+    
+    const docRef = await addDoc(conversationsRef, newConversation);
+    
+    return NextResponse.json({
+      success: true,
+      data: {
+        id: docRef.id,
+        ...newConversation
+      }
+    }, { status: 201 });
+
+  } catch (error) {
+    console.error('Error creating conversation:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to create conversation' },
+      { status: 500 }
+    );
+  }
+}

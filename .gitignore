@@ -47,6 +47,9 @@ firestore-debug.log
 # datasets folder
 /datasets/
 
+# lib folder
+/lib/
+
 # Python virtual environments
 .venv/
 __pycache__/
@@ -64,3 +67,23 @@ ml/runs/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# System files
+Thumbs.db
+
+# IDE files
+*.swp
+*.swo
+
+# Log files
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Icon?
+[Tt]humbs.db

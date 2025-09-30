@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -18,7 +17,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { mockHistory } from "@/lib/mock-data";
 import { format } from "date-fns";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
@@ -36,17 +34,28 @@ import Link from "next/link";
 export default function HistoryPage() {
   const [search, setSearch] = useState("");
   const [cropFilter, setCropFilter] = useState("all");
+  const [history, setHistory] = useState<any[]>([]);
   const { t } = useI18n();
 
-  const filteredHistory = mockHistory.filter((analysis) => {
+  useEffect(() => {
+    // Load history from localStorage
+    try {
+      const historyKey = 'agriassist_analysis_history';
+      const storedHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+      setHistory(storedHistory);
+    } catch (error) {
+      console.error("Error loading history from localStorage:", error);
+      setHistory([]);
+    }
+  }, []);
+
+  const filteredHistory = history.filter((analysis) => {
     const searchLower = search.toLowerCase();
     const matchesSearch =
       search === "" ||
-      analysis.crop.toLowerCase().includes(searchLower) ||
-      analysis.predictions.some((p) =>
-        t(p.label as any).toLowerCase().includes(searchLower)
-      );
-    const matchesCrop = cropFilter === "all" || analysis.crop === cropFilter;
+      (analysis.disease && analysis.disease.toLowerCase().includes(searchLower)) ||
+      (analysis.crop && analysis.crop.toLowerCase().includes(searchLower));
+    const matchesCrop = cropFilter === "all" || (analysis.crop && analysis.crop === cropFilter);
 
     return matchesSearch && matchesCrop;
   });
@@ -74,6 +83,8 @@ export default function HistoryPage() {
               <SelectItem value="Tomato">{t('Tomato')}</SelectItem>
               <SelectItem value="Potato">{t('Potato')}</SelectItem>
               <SelectItem value="Maize">{t('Maize')}</SelectItem>
+              <SelectItem value="Rice">{t('Rice')}</SelectItem>
+              <SelectItem value="Wheat">{t('Wheat')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -83,14 +94,10 @@ export default function HistoryPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="hidden w-[100px] sm:table-cell">
-                  {t('Image')}
-                </TableHead>
-                <TableHead>{t('Crop')}</TableHead>
-                <TableHead>{t('Top Diagnosis')}</TableHead>
+                <TableHead>{t('Disease')}</TableHead>
+                <TableHead>{t('Confidence')}</TableHead>
                 <TableHead>{t('Severity')}</TableHead>
                 <TableHead>{t('Risk')}</TableHead>
-                <TableHead>{t('Status')}</TableHead>
                 <TableHead>{t('Date')}</TableHead>
                 <TableHead>
                   <span className="sr-only">{t('Actions')}</span>
@@ -98,45 +105,40 @@ export default function HistoryPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredHistory.map((analysis) => (
-                <TableRow key={analysis.id}>
-                  <TableCell className="hidden sm:table-cell">
-                    <Image
-                      alt="Crop image"
-                      className="aspect-square rounded-md object-cover"
-                      height="64"
-                      src={analysis.image}
-                      width="64"
-                      data-ai-hint={analysis.imageHint}
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium">{t(analysis.crop as any)}</TableCell>
-                  <TableCell>{t(analysis.predictions[0].label as any)}</TableCell>
-                  <TableCell>
-                    <Badge variant={analysis.severity.band === 'High' ? 'destructive' : 'secondary'}>
-                      {t(analysis.severity.band as 'Low' | 'Medium' | 'High')} ({analysis.severity.percentage}%)
-                    </Badge>
-                  </TableCell>
-                   <TableCell>
-                    <Badge variant={analysis.risk.score > 0.7 ? 'destructive' : 'outline'}>
-                      {Math.round(analysis.risk.score * 100)}%
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={analysis.status === 'Pending Review' ? 'secondary' : 'outline'}>
-                      {t(analysis.status as 'Completed' | 'Pending Review')}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {format(new Date(analysis.timestamp), "PPP")}
-                  </TableCell>
-                  <TableCell>
-                    <Button asChild size="sm" variant="outline">
+              {filteredHistory.length > 0 ? (
+                filteredHistory.map((analysis) => (
+                  <TableRow key={analysis.id}>
+                    <TableCell className="font-medium">{analysis.disease || 'Unknown'}</TableCell>
+                    <TableCell>
+                      {analysis.confidence ? `${Math.round(analysis.confidence * 100)}%` : 'N/A'}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={analysis.severity === 'High' ? 'destructive' : 'secondary'}>
+                        {analysis.severity || 'Unknown'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={(analysis.preview?.riskScore || 0) > 70 ? 'destructive' : 'outline'}>
+                        {analysis.preview?.riskScore || 0}%
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {analysis.timestamp ? format(new Date(analysis.timestamp), "PPP") : 'N/A'}
+                    </TableCell>
+                    <TableCell>
+                      <Button asChild size="sm" variant="outline">
                         <Link href={`/dashboard/history/${analysis.id}`}>{t('View')}</Link>
-                    </Button>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    {t('No analysis history found. Complete an analysis to see results here.')}
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </div>
