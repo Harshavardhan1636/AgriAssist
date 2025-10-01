@@ -1,7 +1,7 @@
 // Firebase configuration and initialization
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { initializeApp, FirebaseApp } from 'firebase/app';
+import { getFirestore, Firestore } from 'firebase/firestore';
+import { getAuth, Auth } from 'firebase/auth';
 
 // Firebase configuration - in a real app, these would come from environment variables
 const firebaseConfig = {
@@ -13,14 +13,40 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
-export const app = initializeApp(firebaseConfig);
+// Function to validate Firebase config
+function validateFirebaseConfig(config: any): boolean {
+  return Object.values(config).every(value => value !== undefined && value !== null && value !== '');
+}
 
-// Initialize Firestore
-export const db = getFirestore(app);
+// Check if we're in a development environment
+const isDevelopment = process.env.NODE_ENV === 'development';
 
-// Initialize Firebase Authentication
-export const auth = getAuth(app);
+// Initialize Firebase services
+let app: FirebaseApp | null = null;
+let db: Firestore | null = null;
+let auth: Auth | null = null;
+
+if (validateFirebaseConfig(firebaseConfig) || isDevelopment) {
+  try {
+    // Initialize Firebase
+    app = initializeApp(firebaseConfig);
+    
+    // Initialize Firestore
+    db = getFirestore(app);
+    
+    // Initialize Firebase Authentication
+    auth = getAuth(app);
+  } catch (error) {
+    console.error('Firebase initialization error:', error);
+    // In development, we can provide mock implementations
+    if (isDevelopment) {
+      console.warn('Using mock Firebase services in development');
+    }
+  }
+} else {
+  console.warn('Firebase config is invalid. Skipping Firebase initialization.');
+}
 
 // Export for backward compatibility
+export { app, db, auth };
 export default app;

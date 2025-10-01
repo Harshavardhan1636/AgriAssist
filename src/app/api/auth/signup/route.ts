@@ -16,6 +16,14 @@ export async function POST(request: NextRequest) {
     const validatedData = signupSchema.parse(body);
     const { email, password } = validatedData;
 
+    // Check if Firebase auth is available
+    if (!auth) {
+      return NextResponse.json(
+        { success: false, error: 'Firebase authentication not available. Please check your configuration.' },
+        { status: 500 }
+      );
+    }
+
     // Real user signup with Firebase
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);

@@ -43,6 +43,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isDemoUser, setIsDemoUser] = useState(true); // Default to demo mode
 
   useEffect(() => {
+    // Check if Firebase auth is available
+    if (!auth) {
+      console.warn('Firebase auth not initialized. Running in demo mode only.');
+      // Set up demo mode only
+      const storedToken = localStorage.getItem('authToken');
+      const storedUser = localStorage.getItem('authUser');
+      
+      if (storedToken && storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          setToken(storedToken);
+          setUser(parsedUser);
+          setIsAuthenticated(true);
+          setIsDemoUser(parsedUser.isDemoUser === true);
+        } catch (error) {
+          console.error('Error parsing stored user data:', error);
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('authUser');
+        }
+      } else {
+        // Default to demo mode
+        setUser(null);
+        setToken(null);
+        setIsAuthenticated(false);
+        setIsDemoUser(true);
+      }
+      setIsLoading(false);
+      return;
+    }
+
     // Listen for auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
@@ -122,6 +152,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: true };
       }
 
+      // Check if Firebase auth is available
+      if (!auth) {
+        return { success: false, error: 'Firebase authentication not available. Please check your configuration.' };
+      }
+
       // Real user authentication with Firebase
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
@@ -147,6 +182,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signup = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    // Check if Firebase auth is available
+    if (!auth) {
+      return { success: false, error: 'Firebase authentication not available. Please check your configuration.' };
+    }
+
     try {
       // Real user signup with Firebase
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -179,8 +219,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem('authToken');
         localStorage.removeItem('authUser');
       } else {
-        // Real user logout with Firebase
-        await signOut(auth);
+        // Check if Firebase auth is available
+        if (auth) {
+          // Real user logout with Firebase
+          await signOut(auth);
+        } else {
+          // Just clear local storage if Firebase is not available
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('authUser');
+        }
       }
     } catch (error) {
       console.error('Logout error:', error);

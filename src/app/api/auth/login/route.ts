@@ -40,6 +40,14 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Check if Firebase auth is available
+    if (!auth) {
+      return NextResponse.json(
+        { success: false, error: 'Firebase authentication not available. Please check your configuration.' },
+        { status: 500 }
+      );
+    }
+
     // Real user authentication with Firebase
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
