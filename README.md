@@ -205,3 +205,48 @@ This final phase makes the Digital Twin a truly autonomous and self-improving as
 
 - [Node.js](https://nodejs.org/) (v20 or later)
 - An environment variable `GEMINI_API_KEY` with a valid API key for the Gemini models.
+
+### Running the Development Server
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Create a `.env` file** in the root directory and add your API key:
+   ```
+   GEMINI_API_KEY=your_api_key_here
+   NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_firebase_project_id
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+   NEXT_PUBLIC_FIREBASE_APP_ID=your_firebase_app_id
+   ```
+
+3. **Run the app:**
+   ```bash
+   npm run dev
+   ```
+
+Open [http://localhost:9002](http://localhost:9002) with your browser to see the result.
+
+### User Accounts
+
+- **Demo Account:** Use email `demo@agriassist.com` and password `demo123` to try all features
+- **Real Account:** Sign up with your email and password to create a real account
+
+## Documentation
+
+For comprehensive documentation including technical details, API specifications, and implementation guides, please refer to:
+- [AGRIASSIST_DOCUMENTATION.md](AGRIASSIST_DOCUMENTATION.md) - Complete project documentation
+- [AGRO_API_INTEGRATION.md](AGRO_API_INTEGRATION.md) - Agricultural API integration guide
+- [DEPLOYMENT-STATUS.md](DEPLOYMENT-STATUS.md) - Deployment and current status tracking
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
