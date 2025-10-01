@@ -23,7 +23,15 @@ export function SpeakButton({ text, className, size = 'sm', variant = 'outline',
   // Handle speech state changes
   useEffect(() => {
     const interval = setInterval(() => {
-      if (isSpeakingState && !isSpeaking()) {
+      try {
+        if (isSpeakingState && !isSpeaking()) {
+          setIsSpeakingState(false);
+          setIsPausedState(false);
+          setCurrentText('');
+        }
+      } catch (error) {
+        console.error('Error checking speech state:', error);
+        // Reset state on error
         setIsSpeakingState(false);
         setIsPausedState(false);
         setCurrentText('');
@@ -34,35 +42,47 @@ export function SpeakButton({ text, className, size = 'sm', variant = 'outline',
   }, [isSpeakingState]);
 
   const handleSpeak = () => {
-    if (isSpeakingState && currentText === text) {
-      if (isPausedState) {
-        resumeSpeech();
-        setIsPausedState(false);
+    try {
+      if (isSpeakingState && currentText === text) {
+        if (isPausedState) {
+          resumeSpeech();
+          setIsPausedState(false);
+        } else {
+          pauseSpeech();
+          setIsPausedState(true);
+        }
+      } else if (isSpeakingState) {
+        stopSpeech();
+        setTimeout(() => {
+          speakText(text, locale);
+          setIsSpeakingState(true);
+          setIsPausedState(false);
+          setCurrentText(text);
+        }, 100);
       } else {
-        pauseSpeech();
-        setIsPausedState(true);
-      }
-    } else if (isSpeakingState) {
-      stopSpeech();
-      setTimeout(() => {
         speakText(text, locale);
         setIsSpeakingState(true);
         setIsPausedState(false);
         setCurrentText(text);
-      }, 100);
-    } else {
-      speakText(text, locale);
-      setIsSpeakingState(true);
+      }
+    } catch (error) {
+      console.error('Error handling speech:', error);
+      // Reset state on error
+      setIsSpeakingState(false);
       setIsPausedState(false);
-      setCurrentText(text);
+      setCurrentText('');
     }
   };
 
   const handleStop = () => {
-    stopSpeech();
-    setIsSpeakingState(false);
-    setIsPausedState(false);
-    setCurrentText('');
+    try {
+      stopSpeech();
+      setIsSpeakingState(false);
+      setIsPausedState(false);
+      setCurrentText('');
+    } catch (error) {
+      console.error('Error stopping speech:', error);
+    }
   };
 
   // If text is empty, don't show the button

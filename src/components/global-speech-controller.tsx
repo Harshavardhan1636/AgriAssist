@@ -13,13 +13,21 @@ export function GlobalSpeechController() {
   // Update speaking state
   useEffect(() => {
     const interval = setInterval(() => {
-      const speaking = isSpeaking();
-      const paused = isPaused();
-      
-      setIsSpeakingState(speaking);
-      setIsPausedState(paused);
-      
-      if (!speaking) {
+      try {
+        const speaking = isSpeaking();
+        const paused = isPaused();
+        
+        setIsSpeakingState(speaking);
+        setIsPausedState(paused);
+        
+        if (!speaking) {
+          setCurrentText('');
+        }
+      } catch (error) {
+        console.error('Error updating speech state:', error);
+        // Reset state on error
+        setIsSpeakingState(false);
+        setIsPausedState(false);
         setCurrentText('');
       }
     }, 1000);
@@ -28,18 +36,26 @@ export function GlobalSpeechController() {
   }, []);
 
   const handlePauseResume = () => {
-    if (isPausedState) {
-      resumeSpeech();
-    } else {
-      pauseSpeech();
+    try {
+      if (isPausedState) {
+        resumeSpeech();
+      } else {
+        pauseSpeech();
+      }
+    } catch (error) {
+      console.error('Error pausing/resuming speech:', error);
     }
   };
 
   const handleStop = () => {
-    stopSpeech();
-    setIsSpeakingState(false);
-    setIsPausedState(false);
-    setCurrentText('');
+    try {
+      stopSpeech();
+      setIsSpeakingState(false);
+      setIsPausedState(false);
+      setCurrentText('');
+    } catch (error) {
+      console.error('Error stopping speech:', error);
+    }
   };
 
   if (!isSpeakingState) {

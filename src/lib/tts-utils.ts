@@ -106,7 +106,7 @@ export const speakText = (text: string, languageCode: string = 'en'): void => {
     };
     
     utterance.onerror = (event) => {
-      console.error('Speech error:', event);
+      console.error('Speech error:', event.error || event);
       // Try again with default voice if there was an error
       if (utterance.voice) {
         console.log('Retrying with default voice for language:', langCode);
@@ -119,7 +119,7 @@ export const speakText = (text: string, languageCode: string = 'en'): void => {
           retryUtterance.volume = 1.0;
           retryUtterance.onend = () => console.log('Retry speech ended successfully');
           retryUtterance.onerror = (retryEvent) => {
-            console.error('Retry speech error:', retryEvent);
+            console.error('Retry speech error:', retryEvent.error || retryEvent);
             // Final fallback - try without specifying voice
             try {
               window.speechSynthesis.cancel();
@@ -128,7 +128,7 @@ export const speakText = (text: string, languageCode: string = 'en'): void => {
               finalUtterance.rate = 0.9;
               finalUtterance.onend = () => console.log('Final fallback speech ended');
               finalUtterance.onerror = (finalEvent) => {
-                console.error('Final fallback speech error:', finalEvent);
+                console.error('Final fallback speech error:', finalEvent.error || finalEvent);
                 // Ultimate fallback - try with no language specification
                 try {
                   window.speechSynthesis.cancel();
@@ -136,7 +136,7 @@ export const speakText = (text: string, languageCode: string = 'en'): void => {
                   ultimateUtterance.rate = 0.9;
                   ultimateUtterance.onend = () => console.log('Ultimate fallback speech ended');
                   ultimateUtterance.onerror = (ultimateEvent) => {
-                    console.error('Ultimate fallback speech error:', ultimateEvent);
+                    console.error('Ultimate fallback speech error:', ultimateEvent.error || ultimateEvent);
                   };
                   window.speechSynthesis.speak(ultimateUtterance);
                 } catch (ultimateError) {
@@ -159,7 +159,7 @@ export const speakText = (text: string, languageCode: string = 'en'): void => {
             fallbackUtterance.rate = 0.9;
             fallbackUtterance.onend = () => console.log('Fallback speech ended');
             fallbackUtterance.onerror = (fallbackEvent) => {
-              console.error('Fallback speech error:', fallbackEvent);
+              console.error('Fallback speech error:', fallbackEvent.error || fallbackEvent);
             };
             window.speechSynthesis.speak(fallbackUtterance);
           } catch (fallbackError) {
@@ -175,7 +175,7 @@ export const speakText = (text: string, languageCode: string = 'en'): void => {
           fallbackUtterance.rate = 0.9;
           fallbackUtterance.onend = () => console.log('Minimal fallback speech ended');
           fallbackUtterance.onerror = (fallbackEvent) => {
-            console.error('Minimal fallback speech error:', fallbackEvent);
+            console.error('Minimal fallback speech error:', fallbackEvent.error || fallbackEvent);
             // Ultimate fallback - try with no language specification
             try {
               window.speechSynthesis.cancel();
@@ -183,7 +183,7 @@ export const speakText = (text: string, languageCode: string = 'en'): void => {
               ultimateUtterance.rate = 0.9;
               ultimateUtterance.onend = () => console.log('Ultimate fallback speech ended');
               ultimateUtterance.onerror = (ultimateEvent) => {
-                console.error('Ultimate fallback speech error:', ultimateEvent);
+                console.error('Ultimate fallback speech error:', ultimateEvent.error || ultimateEvent);
               };
               window.speechSynthesis.speak(ultimateUtterance);
             } catch (ultimateError) {
@@ -209,7 +209,7 @@ export const speakText = (text: string, languageCode: string = 'en'): void => {
       fallbackUtterance.rate = 0.9;
       fallbackUtterance.onend = () => console.log('Final fallback speech ended');
       fallbackUtterance.onerror = (fallbackEvent) => {
-        console.error('Final fallback speech error:', fallbackEvent);
+        console.error('Final fallback speech error:', fallbackEvent.error || fallbackEvent);
       };
       window.speechSynthesis.speak(fallbackUtterance);
     } catch (fallbackError) {
