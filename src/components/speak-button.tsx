@@ -18,32 +18,30 @@ export function SpeakButton({ text, className, size = 'sm', variant = 'outline',
   const { locale } = useI18n();
   const [isSpeakingState, setIsSpeakingState] = useState(false);
   const [isPausedState, setIsPausedState] = useState(false);
-  const [currentText, setCurrentText] = useState('');
 
   // Handle speech state changes
   useEffect(() => {
     const interval = setInterval(() => {
       try {
-        if (isSpeakingState && !isSpeaking()) {
-          setIsSpeakingState(false);
-          setIsPausedState(false);
-          setCurrentText('');
-        }
+        const speaking = isSpeaking();
+        const paused = isPaused();
+        
+        setIsSpeakingState(speaking);
+        setIsPausedState(paused);
       } catch (error) {
         console.error('Error checking speech state:', error);
         // Reset state on error
         setIsSpeakingState(false);
         setIsPausedState(false);
-        setCurrentText('');
       }
-    }, 1000);
+    }, 500); // Check more frequently
 
     return () => clearInterval(interval);
-  }, [isSpeakingState]);
+  }, []);
 
   const handleSpeak = () => {
     try {
-      if (isSpeakingState && currentText === text) {
+      if (isSpeakingState) {
         if (isPausedState) {
           resumeSpeech();
           setIsPausedState(false);
@@ -51,26 +49,16 @@ export function SpeakButton({ text, className, size = 'sm', variant = 'outline',
           pauseSpeech();
           setIsPausedState(true);
         }
-      } else if (isSpeakingState) {
-        stopSpeech();
-        setTimeout(() => {
-          speakText(text, locale);
-          setIsSpeakingState(true);
-          setIsPausedState(false);
-          setCurrentText(text);
-        }, 100);
       } else {
         speakText(text, locale);
         setIsSpeakingState(true);
         setIsPausedState(false);
-        setCurrentText(text);
       }
     } catch (error) {
       console.error('Error handling speech:', error);
       // Reset state on error
       setIsSpeakingState(false);
       setIsPausedState(false);
-      setCurrentText('');
     }
   };
 
@@ -79,7 +67,6 @@ export function SpeakButton({ text, className, size = 'sm', variant = 'outline',
       stopSpeech();
       setIsSpeakingState(false);
       setIsPausedState(false);
-      setCurrentText('');
     } catch (error) {
       console.error('Error stopping speech:', error);
     }

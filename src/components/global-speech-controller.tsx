@@ -8,7 +8,6 @@ import { isSpeaking, isPaused, pauseSpeech, resumeSpeech, stopSpeech } from '@/l
 export function GlobalSpeechController() {
   const [isSpeakingState, setIsSpeakingState] = useState(false);
   const [isPausedState, setIsPausedState] = useState(false);
-  const [currentText, setCurrentText] = useState('');
 
   // Update speaking state
   useEffect(() => {
@@ -19,18 +18,13 @@ export function GlobalSpeechController() {
         
         setIsSpeakingState(speaking);
         setIsPausedState(paused);
-        
-        if (!speaking) {
-          setCurrentText('');
-        }
       } catch (error) {
         console.error('Error updating speech state:', error);
         // Reset state on error
         setIsSpeakingState(false);
         setIsPausedState(false);
-        setCurrentText('');
       }
-    }, 1000);
+    }, 500); // Check more frequently
 
     return () => clearInterval(interval);
   }, []);
@@ -52,7 +46,6 @@ export function GlobalSpeechController() {
       stopSpeech();
       setIsSpeakingState(false);
       setIsPausedState(false);
-      setCurrentText('');
     } catch (error) {
       console.error('Error stopping speech:', error);
     }
@@ -72,9 +65,6 @@ export function GlobalSpeechController() {
       >
         {isPausedState ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
       </Button>
-      <span className="text-sm max-w-xs truncate">
-        {currentText.substring(0, 30)}...
-      </span>
       <Button 
         size="sm" 
         variant="ghost" 

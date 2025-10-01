@@ -12,6 +12,10 @@ const LANGUAGE_MAP: Record<string, string> = {
   'ml': 'ml-IN'
 };
 
+// Keep track of current utterance to prevent interruptions
+let currentUtterance: SpeechSynthesisUtterance | null = null;
+let isSpeakingFlag = false;
+
 // Check if speech synthesis is supported
 export const isSpeechSynthesisSupported = (): boolean => {
   try {
@@ -63,10 +67,12 @@ export const speakText = (text: string, languageCode: string = 'en'): void => {
       return;
     }
 
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
+    // Cancel any ongoing speech before starting new one
+    stopSpeech();
 
     const utterance = new SpeechSynthesisUtterance(text);
+    currentUtterance = utterance;
+    isSpeakingFlag = true;
     
     // Set language
     const langCode = LANGUAGE_MAP[languageCode] || 'en-US';
@@ -103,97 +109,114 @@ export const speakText = (text: string, languageCode: string = 'en'): void => {
     
     utterance.onend = () => {
       console.log('Speech ended successfully');
+      currentUtterance = null;
+      isSpeakingFlag = false;
     };
     
     utterance.onerror = (event) => {
-      console.error('Speech error:', event.error || event);
-      // Try again with default voice if there was an error
+      console.error('Speech error:', event.error || 'Unknown error');
+      currentUtterance = null;
+      isSpeakingFlag = false;
+      
+      // Only attempt retries for specific error types, not for "interrupted"
+      if (event.error === 'interrupted') {
+        console.log('Speech was interrupted, not retrying');
+        return;
+      }
+      
+      // Try again with default voice if there was an error (but not interruption)
       if (utterance.voice) {
         console.log('Retrying with default voice for language:', langCode);
-        try {
-          window.speechSynthesis.cancel();
-          const retryUtterance = new SpeechSynthesisUtterance(text);
-          retryUtterance.lang = langCode;
-          retryUtterance.rate = 0.9;
-          retryUtterance.pitch = 1.0;
-          retryUtterance.volume = 1.0;
-          retryUtterance.onend = () => console.log('Retry speech ended successfully');
-          retryUtterance.onerror = (retryEvent) => {
-            console.error('Retry speech error:', retryEvent.error || retryEvent);
-            // Final fallback - try without specifying voice
-            try {
-              window.speechSynthesis.cancel();
-              const finalUtterance = new SpeechSynthesisUtterance(text);
-              finalUtterance.lang = langCode;
-              finalUtterance.rate = 0.9;
-              finalUtterance.onend = () => console.log('Final fallback speech ended');
-              finalUtterance.onerror = (finalEvent) => {
-                console.error('Final fallback speech error:', finalEvent.error || finalEvent);
-                // Ultimate fallback - try with no language specification
-                try {
-                  window.speechSynthesis.cancel();
-                  const ultimateUtterance = new SpeechSynthesisUtterance(text);
-                  ultimateUtterance.rate = 0.9;
-                  ultimateUtterance.onend = () => console.log('Ultimate fallback speech ended');
-                  ultimateUtterance.onerror = (ultimateEvent) => {
-                    console.error('Ultimate fallback speech error:', ultimateEvent.error || ultimateEvent);
-                  };
-                  window.speechSynthesis.speak(ultimateUtterance);
-                } catch (ultimateError) {
-                  console.error('Ultimate fallback also failed:', ultimateError);
-                }
-              };
-              window.speechSynthesis.speak(finalUtterance);
-            } catch (finalError) {
-              console.error('Final fallback also failed:', finalError);
-            }
-          };
-          window.speechSynthesis.speak(retryUtterance);
-        } catch (retryError) {
-          console.error('Retry failed:', retryError);
-          // Final fallback
+        setTimeout(() => {
           try {
-            window.speechSynthesis.cancel();
-            const fallbackUtterance = new SpeechSynthesisUtterance(text);
-            fallbackUtterance.lang = langCode;
-            fallbackUtterance.rate = 0.9;
-            fallbackUtterance.onend = () => console.log('Fallback speech ended');
-            fallbackUtterance.onerror = (fallbackEvent) => {
-              console.error('Fallback speech error:', fallbackEvent.error || fallbackEvent);
+            const retryUtterance = new SpeechSynthesisUtterance(text);
+            retryUtterance.lang = langCode;
+            retryUtterance.rate = 0.9;
+            retryUtterance.pitch = 1.0;
+            retryUtterance.volume = 1.0;
+            retryUtterance.onend = () => {
+              console.log('Retry speech ended successfully');
             };
-            window.speechSynthesis.speak(fallbackUtterance);
-          } catch (fallbackError) {
-            console.error('Fallback speech also failed:', fallbackError);
-          }
-        }
-      } else {
-        // No voice was set, try with minimal configuration
-        try {
-          window.speechSynthesis.cancel();
-          const fallbackUtterance = new SpeechSynthesisUtterance(text);
-          fallbackUtterance.lang = langCode;
-          fallbackUtterance.rate = 0.9;
-          fallbackUtterance.onend = () => console.log('Minimal fallback speech ended');
-          fallbackUtterance.onerror = (fallbackEvent) => {
-            console.error('Minimal fallback speech error:', fallbackEvent.error || fallbackEvent);
-            // Ultimate fallback - try with no language specification
-            try {
-              window.speechSynthesis.cancel();
-              const ultimateUtterance = new SpeechSynthesisUtterance(text);
-              ultimateUtterance.rate = 0.9;
-              ultimateUtterance.onend = () => console.log('Ultimate fallback speech ended');
-              ultimateUtterance.onerror = (ultimateEvent) => {
-                console.error('Ultimate fallback speech error:', ultimateEvent.error || ultimateEvent);
-              };
-              window.speechSynthesis.speak(ultimateUtterance);
-            } catch (ultimateError) {
-              console.error('Ultimate fallback also failed:', ultimateError);
+            retryUtterance.onerror = (retryEvent) => {
+              console.error('Retry speech error:', retryEvent.error || 'Unknown error');
+              currentUtterance = null;
+              isSpeakingFlag = false;
+              
+              // Don't retry if interrupted
+              if (retryEvent.error === 'interrupted') {
+                console.log('Retry speech was interrupted, not retrying further');
+                return;
+              }
+              
+              // Final fallback - try without specifying voice
+              setTimeout(() => {
+                try {
+                  const finalUtterance = new SpeechSynthesisUtterance(text);
+                  finalUtterance.lang = langCode;
+                  finalUtterance.rate = 0.9;
+                  finalUtterance.onend = () => {
+                    console.log('Final fallback speech ended');
+                    currentUtterance = null;
+                    isSpeakingFlag = false;
+                  };
+                  finalUtterance.onerror = (finalEvent) => {
+                    console.error('Final fallback speech error:', finalEvent.error || 'Unknown error');
+                    currentUtterance = null;
+                    isSpeakingFlag = false;
+                    
+                    // Don't retry if interrupted
+                    if (finalEvent.error === 'interrupted') {
+                      console.log('Final fallback speech was interrupted');
+                      return;
+                    }
+                    
+                    // Ultimate fallback - try with no language specification
+                    setTimeout(() => {
+                      try {
+                        const ultimateUtterance = new SpeechSynthesisUtterance(text);
+                        ultimateUtterance.rate = 0.9;
+                        ultimateUtterance.onend = () => {
+                          console.log('Ultimate fallback speech ended');
+                          currentUtterance = null;
+                          isSpeakingFlag = false;
+                        };
+                        ultimateUtterance.onerror = (ultimateEvent) => {
+                          console.error('Ultimate fallback speech error:', ultimateEvent.error || 'Unknown error');
+                          currentUtterance = null;
+                          isSpeakingFlag = false;
+                        };
+                        // Check if we're still not speaking before starting
+                        if (!isSpeaking()) {
+                          window.speechSynthesis.speak(ultimateUtterance);
+                        }
+                      } catch (ultimateError) {
+                        console.error('Ultimate fallback also failed:', ultimateError);
+                        currentUtterance = null;
+                        isSpeakingFlag = false;
+                      }
+                    }, 100);
+                  };
+                  // Check if we're still not speaking before starting
+                  if (!isSpeaking()) {
+                    window.speechSynthesis.speak(finalUtterance);
+                  }
+                } catch (finalError) {
+                  console.error('Final fallback also failed:', finalError);
+                  currentUtterance = null;
+                  isSpeakingFlag = false;
+                }
+              }, 100);
+            };
+            // Check if we're still not speaking before starting
+            if (!isSpeaking()) {
+              window.speechSynthesis.speak(retryUtterance);
             }
-          };
-          window.speechSynthesis.speak(fallbackUtterance);
-        } catch (fallbackError) {
-          console.error('Minimal fallback speech also failed:', fallbackError);
-        }
+          } catch (retryError) {
+            console.error('Retry failed:', retryError);
+            currentUtterance = null;
+            isSpeakingFlag = false;
+          }
+        }, 100);
       }
     };
     
@@ -201,20 +224,8 @@ export const speakText = (text: string, languageCode: string = 'en'): void => {
     window.speechSynthesis.speak(utterance);
   } catch (error) {
     console.error('Error speaking text:', error);
-    // Final fallback: try with minimal configuration
-    try {
-      window.speechSynthesis.cancel();
-      const fallbackUtterance = new SpeechSynthesisUtterance(text || '');
-      fallbackUtterance.lang = LANGUAGE_MAP[languageCode] || 'en-US';
-      fallbackUtterance.rate = 0.9;
-      fallbackUtterance.onend = () => console.log('Final fallback speech ended');
-      fallbackUtterance.onerror = (fallbackEvent) => {
-        console.error('Final fallback speech error:', fallbackEvent.error || fallbackEvent);
-      };
-      window.speechSynthesis.speak(fallbackUtterance);
-    } catch (fallbackError) {
-      console.error('Final fallback speech also failed:', fallbackError);
-    }
+    currentUtterance = null;
+    isSpeakingFlag = false;
   }
 };
 
@@ -223,6 +234,8 @@ export const stopSpeech = (): void => {
   if (isSpeechSynthesisSupported()) {
     try {
       window.speechSynthesis.cancel();
+      currentUtterance = null;
+      isSpeakingFlag = false;
     } catch (error) {
       console.error('Error stopping speech:', error);
     }
@@ -255,7 +268,7 @@ export const resumeSpeech = (): void => {
 export const isSpeaking = (): boolean => {
   if (!isSpeechSynthesisSupported()) return false;
   try {
-    return window.speechSynthesis.speaking;
+    return isSpeakingFlag && window.speechSynthesis.speaking;
   } catch (error) {
     console.error('Error checking if speaking:', error);
     return false;
